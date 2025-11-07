@@ -6,10 +6,12 @@ var app = builder.Build();
 
 int userID = 0;
 
+
+// TODO: Create helpers for adding, removing and getting users/user property contents from this dictionary
 // Dictionary keyed by Username
 var users = new Dictionary<string, User>
 {
-    { "TestUser", new User { Id = userID++, Password = "Password123" } }
+    { "Ducklord", new User { Id = userID++, Password = "chatking" } }
 };
 
 app.MapGet("/", () => "Hello world");
