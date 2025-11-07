@@ -1,6 +1,26 @@
 @ChatServer_HostAddress = http://localhost:5201
 
-GET {{ChatServer_HostAddress}}/weatherforecast/
-Accept: application/json
+POST http://localhost:5201/login
+Content-Type: application/json
+
+{
+    "username": "TestUser",
+    "password": "Password123"
+}
 
 ###
+
+POST http://localhost:5201/register
+Content-Type: application/json
+
+{
+    "username": "CoolUser2",
+    "password": "pass"
+}
+
+###
+
+GET http://localhost:5201/users
+Content-Type: application/json
+
+
