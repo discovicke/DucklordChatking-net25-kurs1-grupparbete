@@ -14,9 +14,6 @@ var users = new Dictionary<string, User>
     { "Ducklord", new User { Id = userID++, Password = "chatking" } }
 };
 
-app.MapGet("/", () => "Hello world");
-
-
 // Login
 app.MapPost("/login", (LoginDTO dto) =>
 {
