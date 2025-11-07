@@ -9,20 +9,22 @@ internal static class Program
     {
         Raylib.InitWindow(800, 480, "DiscLord 1.0.0");
 
-        int x = 200;
-        int y = 200;
-        int width = 150;
-        int height = 80;
+        
 
         while (!Raylib.WindowShouldClose())
         {
             Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.White);
+            Raylib.ClearBackground(Color.Black);
 
             Raylib.DrawText("Hej Mackan!", 12, 12, 20, Color.Black);
             // Textruta test
-            Raylib.DrawRectangle(x, y, width, height, Color.DarkGray);
-            Raylib.DrawText("Logga in", x + 20, y + 25, 20, Color.White);
+            Raylib.DrawRectangle(200, 200, 150, 120, Color.DarkGray);
+            Raylib.DrawText("Logga in", 230, 250, 20, Color.White);
+            
+            Raylib.DrawRectangle(200, 70, 150, 120, Color.DarkGray);
+            Raylib.DrawText("Creat User", 220, 125, 20, Color.White);
+
+            
 
 
             Raylib.EndDrawing();
