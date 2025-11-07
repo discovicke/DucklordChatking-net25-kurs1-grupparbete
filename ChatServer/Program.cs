@@ -32,6 +32,33 @@ app.MapPost("/login", (LoginDTO dto) =>
   return Results.BadRequest(new { Message = "Invalid username or password" });
 });
 
+// Registration
+app.MapPost("/register", (LoginDTO dto) =>
+{
+  // Validate input
+  if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
+  {
+    return Results.BadRequest(new { Message = "Username and password are required" });
+  }
+
+  // Check if username already exists
+  if (users.ContainsKey(dto.Username))
+  {
+    return Results.BadRequest(new { Message = "Username already exists" });
+  }
+
+  // Create new userID
+  userID++;
+
+  users[dto.Username] = new User
+  {
+    Id = userID,
+    Password = dto.Password
+  };
+
+  return Results.Ok(new { UserID = userID, Message = "Registration successful" });
+});
+
 
 // TODO: POST for message to chat
 
