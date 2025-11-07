@@ -13,6 +13,7 @@ namespace ChatClient
     {
         public static void Run()
         {
+            Raylib.BeginDrawing();
             // LoginScreen-test
             Raylib.ClearBackground(new Color(15, 112, 152));
             int fontSize = 15;
@@ -44,13 +45,13 @@ namespace ChatClient
             Raylib.DrawRectangleRounded(rectPassword, 0.3f, 10, Color.Gold);
 
             // Logo
-            Texture2D logo = Raylib.LoadTexture(@"C:\Users\andyp\source\repos\EduEdugrade\net25-kurs-1-grupparbete-h1\ChatClient\Bilder\DuckLord1.0.png");
+            Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
             Raylib.DrawTextureEx(logo, new Vector2(400, 50), 0, 0.15f, Color.White);
 
 
             Raylib.DrawText("DuckLord v.1.0.0", 10, 460, 10, Color.Black);
 
-
+            Raylib.EndDrawing();
         }
     }
 }
