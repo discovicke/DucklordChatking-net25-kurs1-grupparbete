@@ -59,6 +59,11 @@ app.MapPost("/register", (LoginDTO dto) =>
   return Results.Ok(new { UserID = userID, Message = "Registration successful" });
 });
 
+// TODO: GET all users
+app.MapGet("/users", () =>
+{
+  return Results.Ok(users.Keys.ToList());
+});
 
 // TODO: POST for message to chat
 
