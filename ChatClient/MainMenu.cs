@@ -8,7 +8,7 @@ internal static class MainMenu
 
     public static void Run()
     {
-        /*
+        
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.Black);
 
@@ -25,6 +25,6 @@ internal static class MainMenu
 
 
         Raylib.EndDrawing();
-        */
+        
     }
 }

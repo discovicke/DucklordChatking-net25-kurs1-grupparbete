@@ -11,9 +11,9 @@ public class Program
         
         while (!Raylib.WindowShouldClose())
         {
-            MainMenu.Run();
+            //MainMenu.Run();
             // UI
-            // UIkladd.Run();
+            UIkladd.Run();
         }
 
         Raylib.CloseWindow();
