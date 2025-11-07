@@ -5,7 +5,6 @@ namespace ChatClient;
 internal static class Program
 {
     
-    [System.STAThread]
     public static void Main()
     {
         Raylib.InitWindow(800, 480, "DiscLord 1.0.0");
