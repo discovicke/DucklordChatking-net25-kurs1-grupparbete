@@ -11,9 +11,11 @@ public class Program
         
         while (!Raylib.WindowShouldClose())
         {
-            MainMenu.Run();
+            //MainMenu.Run();
             // calls on class for mouse interact
             MouseInput.Update();
+            var mousePos = MouseInput.Position;
+            bool mousePressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
             //MainMenu.Run();
             // UI
             UIkladd.Run();
