@@ -16,6 +16,7 @@ internal static class Program
             Raylib.ClearBackground(Color.White);
 
             Raylib.DrawText("Hej Mackan!", 12, 12, 20, Color.Black);
+            Raylib.DrawRectangle(x, y, width, height, Color.Black);
 
             Raylib.EndDrawing();
         }
