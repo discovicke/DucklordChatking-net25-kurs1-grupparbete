@@ -7,7 +7,7 @@ public class Program
     
     public static void Main()
     {
-        Raylib.InitWindow(800, 480, "DuckLord 1.0.0");
+        Raylib.InitWindow(800, 600, "DuckLord 1.0.0");
         
         while (!Raylib.WindowShouldClose())
         {
