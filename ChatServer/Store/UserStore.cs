@@ -41,7 +41,18 @@ public class UserStore
     return true;
   }
 
-  // REMOVE USER
+  #region REMOVE USER BY USERNAME
+  /// <summary>
+  /// Removes a user from the store using their username.
+  /// Deletes the user from both dictionaries to maintain consistency.
+  /// </summary>
+  /// <param name="username">
+  /// The username of the user that should be removed.
+  /// </param>
+  /// <returns>
+  /// True when a user with the specified username existed and was removed. False when no such user was found.
+  /// </returns>
+  #endregion
   public bool Remove(string username)
   {
     if (!usersByUsername.TryGetValue(username, out var user))
@@ -53,6 +64,18 @@ public class UserStore
     return true;
   }
 
+  #region REMOVE USER BY ID
+  /// <summary>
+  /// Removes a user from the store using their unique ID.
+  /// Deletes the user from both dictionaries to maintain consistency.
+  /// </summary>
+  /// <param name="id">
+  /// The ID of the user that should be removed.
+  /// </param>
+  /// <returns>
+  /// True when a user with the specified ID existed and was removed. False when no such user was found.
+  /// </returns>
+  #endregion
   public bool Remove(int id)
   {
     if (!usersById.TryGetValue(id, out var user))
@@ -71,17 +94,16 @@ public class UserStore
     return false;
   }
 
-  // GET USER
   public User? GetById(int id)
   {
-    // TODO: Implement logic
-    return null;
+    usersById.TryGetValue(id, out var user);
+    return user;
   }
 
   public User? GetByUsername(string username)
   {
-    // TODO: Implement logic
-    return null;
+    usersByUsername.TryGetValue(username, out var user);
+    return user;
   }
 
   // GET ALL USERNAMES
