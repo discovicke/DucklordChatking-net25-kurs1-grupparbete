@@ -24,8 +24,8 @@ namespace ChatClient
             string passWord = "Password";
 
             // Rita label
-            Raylib.DrawText(userName, 220, 300, fontSize, Color.Gold);
-            Raylib.DrawText(passWord, 220, 350, fontSize, Color.Gold);
+            Raylib.DrawText(userName, 220, 305, fontSize, Color.Gold);
+            Raylib.DrawText(passWord, 220, 355, fontSize, Color.Gold);
 
             // Beräkna textens bredd
             int textWidth = Raylib.MeasureText(userName, fontSize);
@@ -69,19 +69,19 @@ namespace ChatClient
             // Visual hover feedback (outline)
             if (hoverUser)
             {
-                Raylib.DrawRectangleRounded(rectUser, 0.3f, 10,  Color.Black);
+                Raylib.DrawRectangleRounded(rectUser, 0.3f, 10, (new Color(247, 227, 182)));
             }
             if (hoverPassword)
             { 
-                Raylib.DrawRectangleRounded(rectPassword, 0.3f, 10, Color.Black); 
+                Raylib.DrawRectangleRounded(rectPassword, 0.3f, 10, (new Color(247, 227, 182)));
             }
 
             // Logo
             Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
-            Raylib.DrawTextureEx(logo, new Vector2(400, 50), 0, 0.15f, Color.White);
+            Raylib.DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);
 
 
-            Raylib.DrawText("DuckLord v.1.0.0", 10, 460, 10, Color.Black);
+            Raylib.DrawText("DuckLord v.1.0.0", 10, 580, 10, Color.Black);
 
             Raylib.EndDrawing();
         }
