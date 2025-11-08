@@ -128,10 +128,17 @@ public class UserStore
     return user;
   }
 
-  // GET ALL USERNAMES
+  #region GET ALL USER[NAMES]
+  /// <summary>
+  /// Returns a collection of all usernames currently stored.
+  /// The caller receives a read-only view of the keys from the username dictionary.
+  /// </summary>
+  /// <returns>
+  /// An enumerable sequence of every username in the store.
+  /// </returns>
+  #endregion
   public IEnumerable<string> GetAllUsernames()
   {
-    // TODO: Implement logic
-    return [];
+    return usersByUsername.Keys;
   }
 }
