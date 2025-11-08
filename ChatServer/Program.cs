@@ -48,8 +48,12 @@ app.MapPost("/register", (LoginDTO dto) =>
   }
 
   var newUser = userStore.GetByUsername(dto.Username);
+  if (newUser == null)
+  {
+    return Results.BadRequest(new { Message = "Failed to add user" });
+  }
 
-  return Results.Ok(new { UserID = newUser!.Id, Message = "Registration successful" });
+  return Results.Ok(new { UserID = newUser.Id, Message = "Registration successful" }); // TODO: refactor the Add() in UserStore to return the User object, avoiding the issue here.
 });
 
 
