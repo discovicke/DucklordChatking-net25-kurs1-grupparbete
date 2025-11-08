@@ -41,7 +41,7 @@ public class UserStore
     return true;
   }
 
-  #region REMOVE USER BY USERNAME
+  #region REMOVE USER (by USERNAME)
   /// <summary>
   /// Removes a user from the store using their username.
   /// Deletes the user from both dictionaries to maintain consistency.
@@ -64,7 +64,7 @@ public class UserStore
     return true;
   }
 
-  #region REMOVE USER BY ID
+  #region REMOVE USER (by ID)
   /// <summary>
   /// Removes a user from the store using their unique ID.
   /// Deletes the user from both dictionaries to maintain consistency.
@@ -94,15 +94,37 @@ public class UserStore
     return false;
   }
 
-  public User? GetById(int id)
-  {
-    usersById.TryGetValue(id, out var user);
-    return user;
-  }
-
+  #region GET USER (by USERNAME)
+  /// <summary>
+  /// Retrieves a user based on their username.
+  /// </summary>
+  /// <param name="username">
+  /// The username used as the lookup key.
+  /// </param>
+  /// <returns>
+  /// The matching user when found, otherwise null.
+  /// </returns>
+  #endregion
   public User? GetByUsername(string username)
   {
     usersByUsername.TryGetValue(username, out var user);
+    return user;
+  }
+
+  #region GET USER (by ID)
+  /// <summary>
+  /// Retrieves a user based on their unique ID.
+  /// </summary>
+  /// <param name="id">
+  /// The numeric identifier assigned to the user when created.
+  /// </param>
+  /// <returns>
+  /// The matching user when found, otherwise null.
+  /// </returns>
+  #endregion
+  public User? GetById(int id)
+  {
+    usersById.TryGetValue(id, out var user);
     return user;
   }
 
