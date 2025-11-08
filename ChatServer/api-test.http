@@ -4,8 +4,8 @@ POST http://localhost:5201/login
 Content-Type: application/json
 
 {
-    "username": "TestUser",
-    "password": "Password123"
+    "username": "Ducklord",
+    "password": "chatking"
 }
 
 ###

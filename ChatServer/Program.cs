@@ -63,5 +63,8 @@ app.MapGet("/users", () =>
   return Results.Ok(userStore.GetAllUsernames());
 });
 
+// TODO: Add endpoints for updating and deleting users
+
+// TODO: add endpoints for sending and receiving chat messages
 
 app.Run();
