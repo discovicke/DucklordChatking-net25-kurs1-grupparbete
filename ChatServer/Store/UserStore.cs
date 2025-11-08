@@ -12,8 +12,19 @@ public class UserStore
   // ADD USER
   public bool Add(string username, string password)
   {
-    // TODO: Implement logic
-    return false;
+    if (usersByUsername.ContainsKey(username))
+    {
+      return false;
+    }
+
+    User newUser = new(username, password)
+    {
+      Id = nextId++
+    };
+
+    usersByUsername.Add(username, newUser);
+    usersById.Add(newUser.Id, newUser);
+    return true;
   }
 
   // REMOVE USER
