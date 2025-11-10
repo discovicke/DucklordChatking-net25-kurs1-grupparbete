@@ -5,7 +5,8 @@ namespace ChatServer.Store;
 public class UserStore
 {
   // Dictionaries for storing and looking up users
-  private readonly Dictionary<string, User> usersByUsername = [];
+  private readonly Dictionary<string, User> usersByUsername =
+      new(StringComparer.OrdinalIgnoreCase);  // Change stringcomparer setting to ignore case sensitivity
   private readonly Dictionary<int, User> usersById = [];
 
   // User ID counter
