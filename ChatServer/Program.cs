@@ -10,6 +10,7 @@ UserStore userStore = new();
 
 // Create a single shared MessageStore instance
 // The store contains both a list and dictionary (for ID lookup).
+// It requires a reference to the UserStore to validate senders.
 MessageStore messageStore = new(userStore);
 
 // Add one user for testing
