@@ -50,7 +50,7 @@ public class MessageStore
     return messages;
   }
 
-  public void Remove(int messageId)
+  public void RemoveById(int messageId)
   {
     throw new NotImplementedException();
   }
