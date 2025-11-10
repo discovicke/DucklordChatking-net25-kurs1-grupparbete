@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace ChatClient;
+namespace ChatClient.Windows;
 
 internal static class MainMenu
 {

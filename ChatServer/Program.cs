@@ -8,6 +8,10 @@ var app = builder.Build();
 // The store contains both dictionaries (by username and by id).
 UserStore userStore = new();
 
+// Create a single shared MessageStore instance
+// The store contains both a list and dictionary (for ID lookup).
+MessageStore messageStore = new();
+
 // Add one user for testing
 userStore.Add("Ducklord", "chatking");
 
@@ -66,5 +70,27 @@ app.MapGet("/users", () =>
 // TODO: Add endpoints for updating and deleting users
 
 // TODO: add endpoints for sending and receiving chat messages
+
+app.MapPost("/send-message", (MessageDTO dto) =>
+{
+  // Validate basic input
+  if (string.IsNullOrWhiteSpace(dto.Content))
+    return Results.BadRequest(new { Message = "Message content cannot be empty" });
+
+  // Look up the user
+  if (string.IsNullOrWhiteSpace(dto.Sender))
+    return Results.BadRequest(new { Message = "Sender cannot be empty" });
+
+  var user = userStore.GetByUsername(dto.Sender);
+  if (user == null)
+    return Results.BadRequest(new { Message = "User does not exist" });
+
+  // Add message to store
+  var added = messageStore.Add(user, dto.Content);
+  if (!added)
+    return Results.BadRequest(new { Message = "Failed to add message" }); // unlikely with current store, but safe
+
+  return Results.Ok(new { Message = "Message stored" });
+});
 
 app.Run();
