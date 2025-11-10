@@ -36,9 +36,18 @@ public class MessageStore
     return true;
   }
 
-  public List<ChatMessage> GetAll()
+  #region GET ALL MESSAGES
+  /// <summary>
+  /// Returns all stored chat messages in insertion order.
+  /// </summary>
+  /// <returns>
+  /// A read-only list of <see cref="ChatMessage"/> objects.
+  /// The caller can read and iterate through the messages without altering the internal storage.
+  /// </returns>
+  #endregion
+  public IReadOnlyList<ChatMessage> GetAll()
   {
-    throw new NotImplementedException();
+    return messages;
   }
 
   public void Remove(int messageId)
