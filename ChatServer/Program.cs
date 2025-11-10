@@ -39,7 +39,6 @@ app.MapPost("/login", (LoginDTO dto) =>
   return Results.BadRequest(new { Message = "Invalid username or password" });
 });
 
-
 // Registration endpoint
 app.MapPost("/register", (LoginDTO dto) =>
 {
@@ -64,7 +63,6 @@ app.MapPost("/register", (LoginDTO dto) =>
   return Results.Ok(new { UserID = newUser.Id, Message = "Registration successful" }); // TODO: refactor the Add() in UserStore to return the User object, avoiding the issue here.
 });
 
-
 // Return a list of all usernames (Note: only return the usernames, not the full objects)
 app.MapGet("/users", () =>
 {
@@ -88,7 +86,7 @@ app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
   if (!added)
     return Results.BadRequest(new { Message = "Failed to add message" }); // unlikely with current store, but safe
 
-// Broadcast to all SignalR Clients
+  // Broadcast to all SignalR Clients
   await hub.Clients.All.SendAsync("ReceiveMessage", dto.Sender, dto.Content);
 
 
