@@ -1,8 +1,10 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ChatClient.Data;
+using ChatClient.Tests.Helpers;
 using Shared;
 using Xunit;
 
@@ -15,7 +17,7 @@ public class MessageSenderTests
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5201") };
         var sender = new MessageSender(client);
 
-        var message = new MessageDTO
+        var message = new Message
         {
             Sender = "Ducklord",
             Content = "Hello world!",
@@ -34,7 +36,7 @@ public class MessageSenderTests
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5201") };
         var sender = new MessageSender(client);
 
-        var message = new MessageDTO
+        var message = new Message
         {
             Sender = "Ducklord",
             Content = "", // tomt meddelande
@@ -53,7 +55,7 @@ public class MessageSenderTests
         var client = new HttpClient(handler);
         var sender = new MessageSender(client);
 
-        var message = new MessageDTO
+        var message = new Message
         {
             Sender = "Ducklord",
             Content = "Oops",

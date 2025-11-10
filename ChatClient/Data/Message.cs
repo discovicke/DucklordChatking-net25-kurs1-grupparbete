@@ -1,62 +1,35 @@
-﻿using Shared;
+﻿using System;
+using Shared;
 
-namespace ChatClient.Data;
-
-public class Message
+namespace ChatClient.Data
 {
-    public string Sender { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    public DateTime Timestamp { get; set; }
-
-    // Skapar en DTO från detta objekt (när vi skickar till servern)
-    public MessageDTO SendToDTO()
+    // Represents a chat message in the client application
+    public class Message
     {
-        return new MessageDTO
+        public string Sender { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        
+        // Creates a DTO (when sending to server)
+        public MessageDTO ToDTO()
         {
-            Sender = this.Sender,
-            Content = this.Content,
-            Timestamp = DateTime.UtcNow // klienten sätter ev. nuvarande tid
-        };
-    }
-
-    // Skapar ett Message-objekt från en DTO (när vi tar emot från servern)
-    public static Message GetFromDTO(MessageDTO dto)
-    {
-        return new Message
-        {
-            Sender = dto.Sender ?? "Unknown",
-            Content = dto.Content ?? string.Empty,
-            Timestamp = dto.Timestamp
-        };
-    }
-    
-    private readonly HttpClient httpClient;
-
-    public MessageSender(HttpClient httpClient)
-    {
-        this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-    }
-
-    public bool SendMessage(MessageDTO message)
-    {
-        if (message == null)
-        {
-            throw new ArgumentNullException(nameof(message));
-        }
-            
-        if (string.IsNullOrWhiteSpace(message.Sender) || string.IsNullOrWhiteSpace(message.Content))
-        {
-            return false;
+            return new MessageDTO
+            {
+                Sender = this.Sender,
+                Content = this.Content,
+                Timestamp = DateTime.UtcNow
+            };
         }
 
-        try
+        // Creates a message from a DTO (when receiving from server)
+        public static Message FromDTO(MessageDTO dto)
         {
-            var response = httpClient.PostAsJsonAsync("/messages", message).Result;
-            return response.IsSuccessStatusCode;
-        }
-        catch
-        {
-            return false;
+            return new Message
+            {
+                Sender = dto.Sender ?? "Unknown",
+                Content = dto.Content ?? string.Empty,
+                Timestamp = dto.Timestamp
+            };
         }
     }
 }

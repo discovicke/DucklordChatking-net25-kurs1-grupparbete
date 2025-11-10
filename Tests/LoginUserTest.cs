@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ChatClient.Data;
+using ChatClient.Tests.Helpers;
 using Shared;
 using Xunit;
 
@@ -57,27 +58,5 @@ public class LoginUserTests
 
         // Assert
         Assert.False(result);
-    }
-}
-
-
-/// Fake HttpHandler som returnerar en förinställd statuskod.
-public class FakeHttpHandler : HttpMessageHandler
-{
-    private readonly HttpStatusCode _status;
-    public FakeHttpHandler(HttpStatusCode status) => _status = status;
-
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(new HttpResponseMessage(_status));
-    }
-}
-
-/// Fake HttpHandler som kastar exception — för att testa felhantering.
-public class ThrowingHttpHandler : HttpMessageHandler
-{
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        throw new HttpRequestException("Simulated network failure");
     }
 }
