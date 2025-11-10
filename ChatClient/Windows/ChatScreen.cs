@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ChatClient.Configurations;
+using ChatClient.Data;
 using Raylib_cs;
 
 
@@ -23,9 +24,13 @@ namespace ChatClient.Windows
 
         // Text field for user input
         private static TextField textField = new TextField(new Rectangle(50, 450, 550, 100), Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+        
+        // Adds a message sender to the text field
+        private static MessageSender? messageSender;
 
-         public static void Run()
+         public static void Run() //TODO Koppla inloggad user till sender
          {
+             //messageSender = "USERNAME";
              // ChatWindow-test
              Raylib.BeginDrawing();
              Raylib.ClearBackground(Colors.BackgroundColor);
@@ -75,7 +80,21 @@ namespace ChatClient.Windows
                 // Click on Send: save message and clear input field
                 if (!string.IsNullOrWhiteSpace(textField.Text))
                 {
-                    userMessage = textField.Text;       // store buffert field
+                    userMessage = textField.Text;
+                    var message = new Message()
+                    {
+                        Sender = "Ducklord",
+                        Content = textField.Text,
+                        Timestamp = DateTime.UtcNow
+                    };
+                    if (messageSender != null)
+                    {
+                        bool success = messageSender.SendMessage(message);
+                        if (!success)
+                        {
+                            Console.WriteLine("Failed to send message!");
+                        }
+                    }
                     textField.Clear();                  // empty text field
                 }
              }
