@@ -1,4 +1,4 @@
-using Raylib_cs;
+﻿using Raylib_cs;
 using System;
 
 namespace ChatClient.Configurations
@@ -34,6 +34,7 @@ namespace ChatClient.Configurations
 
             Raylib.DrawText(Text, (int)Rect.X + 10, (int)Rect.Y + 40, 20, TextColor);
         }
+
         
         // Get call every frame after MouseInput.Update() to handle click and text-input.
         public void Update()
@@ -68,8 +69,10 @@ namespace ChatClient.Configurations
                 Text = Text.Substring(0, Text.Length - 1);
             }
         }
+        
 
         public void Clear() => Text = string.Empty;
     }
+    
 }
 
