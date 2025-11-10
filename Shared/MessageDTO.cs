@@ -7,7 +7,7 @@ public class MessageDTO
 
     // Message ID is generated server-side
     public string? Sender { get; set; }
-    public string? MessageContent { get; set; }
+    public string? Content { get; set; }
 
     // Timestamp is generated server-side (UTC, which client will convert to local time)
     public DateTime Timestamp { get; set; }
