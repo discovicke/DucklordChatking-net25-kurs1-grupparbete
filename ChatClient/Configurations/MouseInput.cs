@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Raylib_cs;
 
-namespace ChatClient
+namespace ChatClient.Configurations
 {
     internal static class MouseInput
     {

@@ -1,9 +1,9 @@
 ﻿using System.Net.Http.Json;
 using Shared;
 
-namespace ChatClient;
+namespace ChatClient.Data;
 
-public class LoginScreen
+public class LoginUser
 {
     //TODO: Kolla så login fungerar med servern
     private static readonly HttpClient httpClient = new HttpClient
@@ -13,7 +13,7 @@ public class LoginScreen
 
     public static void LoginTest()
     {
-        var loginScreen = new LoginScreen();
+        var loginScreen = new LoginUser();
         var user = new UserAccount();
         user.Username = "Ducklord";
         user.Password = "chatking";
