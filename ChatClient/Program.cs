@@ -10,23 +10,22 @@ public class Program
     
     public static void Main()
     {
-        Raylib.InitWindow(800, 600, "DuckLord 1.0.0");
+        Raylib.InitWindow(800, 600, "DuckLord 0.0.1");
         
         while (!Raylib.WindowShouldClose())
         {
-            //MainMenu.Run();
-            // calls on class for mouse interact
+            // --- Mouse settings ---
+            // Calls on class for mouse interact (always on top)
             MouseInput.Update();
             var mousePos = MouseInput.Position;
             bool mousePressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
-            //MainMenu.Run();
-            // UI
-            //UIkladd.Run();
+            
+            // --- UI ---
+            // MainMenu.Run();
+            // UIkladd.Run();
             ChatScreen.Run();
-
-
         }
-        
+
         Raylib.CloseWindow();
     }
 }

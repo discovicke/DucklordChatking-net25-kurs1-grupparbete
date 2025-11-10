@@ -6,7 +6,7 @@ using ChatClient.Configurations;
 using Raylib_cs;
 
 
-namespace ChatClient
+namespace ChatClient.Windows
 {
     public class ChatScreen
     {
@@ -92,7 +92,7 @@ namespace ChatClient
 
 
             // Client Version
-            Raylib.DrawText("DuckLord v.1.0.0", 10, 580, 10, Colors.TextColor);
+            Raylib.DrawText("DuckLord v.0.0.1", 10, 580, 10, Colors.TextColor);
 
              Raylib.EndDrawing();
 

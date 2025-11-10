@@ -10,7 +10,7 @@ using ChatClient.Configurations;
 
 namespace ChatClient.Windows
 {
-    internal class UIkladd
+    public class StartScreen
     {
         private enum SelectedField { None, Username, Password }
         private static SelectedField selected = SelectedField.None;
