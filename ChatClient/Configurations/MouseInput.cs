@@ -8,7 +8,7 @@ using Raylib_cs;
 
 namespace ChatClient.Configurations
 {
-    internal static class MouseInput
+    public static class MouseInput
     {
         private static Vector2 mousePos;
 
@@ -37,6 +37,10 @@ namespace ChatClient.Configurations
         {
             return IsHovered(rect) ? hoverColor : normalColor;
         }
-
+        
+#if DEBUG
+        public static void TestSetPosition(Vector2 testPos) => mousePos = testPos;
+#endif
+        
     }
 }

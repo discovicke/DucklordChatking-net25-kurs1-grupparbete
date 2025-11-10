@@ -6,10 +6,24 @@ namespace ChatClient.Data;
 public class LoginUser
 {
     //TODO: Kolla så login fungerar med servern
-    private static readonly HttpClient httpClient = new HttpClient
+
+    private readonly HttpClient httpClient;
+
+    // Production-konstruktor (standard)
+    public LoginUser() : this(new HttpClient { BaseAddress = new Uri("http://localhost:5201") })
     {
-        BaseAddress = new Uri("http://localhost:5201")
-    };
+    }
+
+    // Test-konstruktor / DI-konstruktor
+    public LoginUser(HttpClient httpClient)
+    {
+        this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        if (this.httpClient.BaseAddress == null)
+        {
+            // valfri: sätt default baseadress om du vill
+            this.httpClient.BaseAddress = new Uri("http://localhost:5201");
+        }
+    }
 
     public static void LoginTest()
     {
@@ -27,7 +41,7 @@ public class LoginUser
             Console.WriteLine($"Login successful: {loginSuccess}");
         }
     }
-    
+
     public bool Login(UserAccount user)
     {
         var loginDto = new LoginDTO
