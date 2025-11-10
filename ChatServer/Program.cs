@@ -69,8 +69,6 @@ app.MapGet("/users", () =>
 
 // TODO: Add endpoints for updating and deleting users
 
-// TODO: add endpoints for sending and receiving chat messages
-
 app.MapGet("/messages", () =>
 {
   var messages = messageStore.GetAll();
@@ -86,10 +84,6 @@ app.MapPost("/send-message", (MessageDTO dto) =>
   // Look up the user
   if (string.IsNullOrWhiteSpace(dto.Sender))
     return Results.BadRequest(new { Message = "Sender cannot be empty" });
-
-  var user = userStore.GetByUsername(dto.Sender);
-  if (user == null)
-    return Results.BadRequest(new { Message = "User does not exist" });
 
   // Add message to store
   var added = messageStore.Add(dto.Sender, dto.Content);
