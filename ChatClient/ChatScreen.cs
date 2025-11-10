@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using ChatClient.Configurations;
 using Raylib_cs;
 
 
 namespace ChatClient
 {
-    internal class ChatScreen
+    public class ChatScreen
     {
 
         private enum SelectedField { None, Username, Password }
@@ -20,17 +18,23 @@ namespace ChatClient
         private static string inputText = "";
         private static string userMessage = "";
 
-        public static void Run()
-        {
-            // ChatWindow-test
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Colors.BackgroundColor);
+        // Load logo
+        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
 
-            // Logo
-            
-            Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
-            Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
-            
+        // Text field for user input
+        private static TextField textField = new TextField(new Rectangle(50, 450, 550, 100), Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+
+         public static void Run()
+         {
+             // ChatWindow-test
+             Raylib.BeginDrawing();
+             Raylib.ClearBackground(Colors.BackgroundColor);
+
+             // Update mouse state early each frame
+             MouseInput.Update();
+
+             // Logo
+             Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
 
             int rectX = 0;
             int rectY = 0;
@@ -46,88 +50,52 @@ namespace ChatClient
             Rectangle typeWindow = new Rectangle(rectX + 50, rectY + 450, rectWidth + 550, rectHeight + 100);
             Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.TextFieldColor);
 
-            // SendButton
-            Rectangle sendButton = new Rectangle(rectX + 610, rectY + 450, rectWidth + 100, rectHeight + 100);
-            Raylib.DrawRectangleRounded(sendButton, 0.3f, 10, Colors.TextFieldColor);
+            // SendButton rectangle
+            Rectangle sendButtonRect = new Rectangle(rectX + 610, rectY + 450, rectWidth + 100, rectHeight + 100);
 
-            // --- Inputhantering ---
-            if (selected == SelectedField.Username)
-            {
-                // Läs tecken
-                int key = Raylib.GetCharPressed();
-                while (key > 0)
-                {
-                    if (key >= 32 && key <= 126) // synliga ASCII-tecken
-                    {
-                        inputText += (char)key;
-                    }
-                    key = Raylib.GetCharPressed();
-                }
+            // Create reusable Button and draw it
+            var sendButton = new Button(sendButtonRect, "Send", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+            sendButton.Draw();
 
-                // Backspace
-                if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && inputText.Length > 0)
-                {
-                    inputText = inputText.Substring(0, inputText.Length - 1);
-                }
-            }
+            // Update and draw text field
+            textField.Update();
+            textField.Draw();
 
-            // Mouse LogicZ
+            // Mouse Logic
             bool hoverUser = MouseInput.IsHovered(typeWindow);
-            bool hoverPassword = MouseInput.IsHovered(sendButton);
+            bool hoverSend = sendButton.IsHovered();
             bool leftPressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
-           
 
             if (MouseInput.IsLeftClick(typeWindow))
             {
                 selected = SelectedField.Username;
             }
-            else if (MouseInput.IsLeftClick(sendButton))
-            {
-                selected = SelectedField.Password;
-                if (MouseInput.IsLeftClick(sendButton))
+            else if (sendButton.IsClicked())
+             {
+                // Click on Send: save message and clear input field
+                if (!string.IsNullOrWhiteSpace(textField.Text))
                 {
-                    if (!string.IsNullOrWhiteSpace(inputText))
-                    {
-                        userMessage = inputText;       // lagra bufferten
-                        inputText = "";                // töm inputfältet
-                    }
+                    userMessage = textField.Text;       // store buffert field
+                    textField.Clear();                  // empty text field
                 }
-
-            }
-            else if (leftPressed && !hoverUser && !hoverPassword)
+             }
+            else if (leftPressed && !hoverUser && !hoverSend)
             {
                 selected = SelectedField.None;
             }
-            
+
             // Visual hover feedback (outline)
             if (hoverUser)
             {
                 Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.HoverColor);
             }
-            if (hoverPassword)
-            {
-                // Rita en ram runt knappen istället för att fylla den igen
-                Raylib.DrawRectangleRoundedLinesEx(sendButton, 0.3f, 10, 3, Colors.TextColor);
-            }
-
-            Raylib.DrawText("Send", rectX + 635, rectY + 490, 20, Colors.TextColor);
-
-            // Rita texten i typeWindow
-            Raylib.DrawText(inputText, (int)typeWindow.X + 10, (int)typeWindow.Y + 40, 20, Colors.TextColor);
 
 
             // Client Version
             Raylib.DrawText("DuckLord v.1.0.0", 10, 580, 10, Colors.TextColor);
 
-            Raylib.EndDrawing();
+             Raylib.EndDrawing();
 
-        }
-    }
-}
-
-
-
-
-
-
-
+         }
+     }
+ }
