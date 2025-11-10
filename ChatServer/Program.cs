@@ -88,10 +88,13 @@ app.MapPost("/send-message", (MessageDTO dto) =>
   return Results.Ok(new { Message = "Message stored" });
 });
 
-app.MapGet("/messages", () =>
+app.MapGet("/messages/history", (int? take) =>
 {
-  var messages = messageStore.GetAll();
-  return Results.Ok(messages);
+  return take.HasValue
+      ? Results.Ok(messageStore.GetLast(take.Value))
+      : Results.Ok(messageStore.GetAll());
 });
+
+app.MapHub<ChatHub>("/chat");
 
 app.Run();
