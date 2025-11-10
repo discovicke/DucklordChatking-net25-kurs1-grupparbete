@@ -10,7 +10,7 @@ using Raylib_cs;
 
 namespace ChatClient
 {
-    internal class ChatScreen
+    public class ChatScreen
     {
 
         private enum SelectedField { None, Username, Password }
@@ -27,10 +27,10 @@ namespace ChatClient
             Raylib.ClearBackground(Colors.BackgroundColor);
 
             // Logo
-            
+
             Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
             Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
-            
+
 
             int rectX = 0;
             int rectY = 0;
@@ -75,7 +75,7 @@ namespace ChatClient
             bool hoverUser = MouseInput.IsHovered(typeWindow);
             bool hoverPassword = MouseInput.IsHovered(sendButton);
             bool leftPressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
-           
+
 
             if (MouseInput.IsLeftClick(typeWindow))
             {
@@ -89,6 +89,7 @@ namespace ChatClient
                     if (!string.IsNullOrWhiteSpace(inputText))
                     {
                         userMessage = inputText;       // lagra bufferten
+
                         inputText = "";                // töm inputfältet
                     }
                 }
@@ -98,7 +99,7 @@ namespace ChatClient
             {
                 selected = SelectedField.None;
             }
-            
+
             // Visual hover feedback (outline)
             if (hoverUser)
             {
