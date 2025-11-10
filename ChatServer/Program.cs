@@ -1,5 +1,7 @@
 ﻿using Shared;
 using ChatServer.Store;
+using ChatServer.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
@@ -71,7 +73,7 @@ app.MapGet("/users", () =>
 
 // TODO: Add endpoints for updating and deleting users
 
-app.MapPost("/send-message", (MessageDTO dto) =>
+app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
   // Validate basic input
   if (string.IsNullOrWhiteSpace(dto.Content))
@@ -81,10 +83,14 @@ app.MapPost("/send-message", (MessageDTO dto) =>
   if (string.IsNullOrWhiteSpace(dto.Sender))
     return Results.BadRequest(new { Message = "Sender cannot be empty" });
 
-  // Add message to store
+  // Add message to store (history and lookup)
   var added = messageStore.Add(dto.Sender, dto.Content);
   if (!added)
     return Results.BadRequest(new { Message = "Failed to add message" }); // unlikely with current store, but safe
+
+// Broadcast to all SignalR Clients
+  await hub.Clients.All.SendAsync("ReceiveMessage", dto.Sender, dto.Content);
+
 
   return Results.Ok(new { Message = "Message stored" });
 });
