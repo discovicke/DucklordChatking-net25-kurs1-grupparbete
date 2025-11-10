@@ -5,6 +5,7 @@ namespace ChatServer.Store;
 public class MessageStore
 {
   private readonly List<ChatMessage> messages = [];
+  private readonly Dictionary<int, ChatMessage> messagesById = [];
 
   private int nextMessageId = 1;
 
@@ -32,7 +33,9 @@ public class MessageStore
       Timestamp = DateTime.UtcNow
     };
 
-    messages.Add(newMessage); // Store the new message
+    // Store message in both list and dictionary
+    messages.Add(newMessage);
+    messagesById.Add(newMessage.Id, newMessage);
     return true;
   }
 
