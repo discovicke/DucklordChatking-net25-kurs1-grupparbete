@@ -1,4 +1,5 @@
 using ChatServer.Models;
+using Shared;
 
 namespace ChatServer.Store;
 
@@ -45,17 +46,36 @@ public class MessageStore(UserStore userStore)
 
   #region GET ALL MESSAGES
   /// <summary>
-  /// Returns all stored chat messages in insertion order.
+  /// Converts all stored chat messages into DTOs and returns them in insertion order.
   /// </summary>
+  /// <remarks>
+  /// Each returned message contains the sender's username resolved from the UserStore.
+  /// If a message references a user that no longer exists, the method throws an exception.
+  /// </remarks>
   /// <returns>
-  /// A read-only list of <see cref="ChatMessage"/> objects.
-  /// The caller can read and iterate through the messages without altering the internal storage.
+  /// A read-only list of <see cref="MessageDTO"/> objects formatted for client use.
   /// </returns>
   #endregion
-  public IReadOnlyList<ChatMessage> GetAll()
+  public IReadOnlyList<MessageDTO> GetAll()
   {
-    return messages;
+    var result = new List<MessageDTO>();
+
+    foreach (var m in messages)
+    {
+      var user = userStore.GetById(m.SenderId) ?? throw new InvalidOperationException(
+            $"Message with ID {m.Id} references a missing user"
+        );
+      result.Add(new MessageDTO
+      {
+        Sender = user.Username,
+        Content = m.Content,
+        Timestamp = m.Timestamp
+      });
+    }
+
+    return result;
   }
+
 
   #region REMOVE MESSAGE BY ID
   /// <summary>

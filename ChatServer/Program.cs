@@ -70,12 +70,6 @@ app.MapGet("/users", () =>
 
 // TODO: Add endpoints for updating and deleting users
 
-app.MapGet("/messages", () =>
-{
-  var messages = messageStore.GetAll();
-  return Results.Ok(messages);
-});
-
 app.MapPost("/send-message", (MessageDTO dto) =>
 {
   // Validate basic input
@@ -92,6 +86,12 @@ app.MapPost("/send-message", (MessageDTO dto) =>
     return Results.BadRequest(new { Message = "Failed to add message" }); // unlikely with current store, but safe
 
   return Results.Ok(new { Message = "Message stored" });
+});
+
+app.MapGet("/messages", () =>
+{
+  var messages = messageStore.GetAll();
+  return Results.Ok(messages);
 });
 
 app.Run();

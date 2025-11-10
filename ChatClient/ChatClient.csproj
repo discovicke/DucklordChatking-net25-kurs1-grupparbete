@@ -8,6 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Windows\RegisterScreen.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Windows\RegisterScreen.cs" />
+    <None Include="Windows\StartScreen.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="7.0.2" />
   </ItemGroup>
 
@@ -17,6 +26,9 @@
 
   <ItemGroup>
     <None Update="Bilder\DuckLord1.0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Bilder\DuckLord2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

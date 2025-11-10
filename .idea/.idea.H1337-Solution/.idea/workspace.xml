@@ -12,25 +12,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="114cf65c-bc63-4c56-b2e3-52487a2d61c4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/.name" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/copilot.data.migration.edit.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/material_theme_project_new.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ChatClient/Data/MessageSender.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/LoginUserTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/MessageSenderTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/MouseInputTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChatClient/Configurations/MouseInput.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ChatClient/Configurations/MouseInput.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ChatClient/Configurations/TextField.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.H1337-Solution/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChatClient/ChatClient.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ChatClient/ChatClient.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChatClient/ChatScreen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ChatClient/ChatScreen.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChatClient/Configurations/Button.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ChatClient/Configurations/Button.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ChatClient/Data/LoginUser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ChatClient/Data/LoginUser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChatClient/Data/TESTAMESSAGE.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChatClient/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ChatClient/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/H1337-Solution.sln" beforeDir="false" afterPath="$PROJECT_DIR$/H1337-Solution.sln" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,17 +31,26 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/ChatScreen.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/ChatScreen.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Configurations/MouseInput.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Configurations/MouseInput.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ChatClient/Configurations/TextField.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/ChatClient/Data/LoginUser.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Data/LoginUser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Data/Message.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/ChatClient/Data/Message.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Data/MessageSender.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/ChatClient/Data/MessageSender.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/ChatClient/Data/UserAccount.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/ChatClient/Windows/MainMenu.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/lohappa/Documents/GitHub/net25-kurs-1-grupparbete-h1/ChatClient/Windows/UIkladd.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Shared/MessageDTO.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Tests/LoginUserTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Tests/MessageSenderTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Tests/MouseInputTests.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Tests/UserStoreTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/a8963bc323984418a687302ec83059a11400/63/c4da6749/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/11b66c81e757b9366e1dfeaec6a97425a72fe213cacac517b832a16481bd7149/Raylib.Utils.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/19b0e96663ce94dc64255e926a41ca3deb74a07b6d54e8f53472358750f789/Raylib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -197,7 +193,7 @@
       <option name="presentableId" value="Default" />
       <updated>1762507937171</updated>
       <workItem from="1762507939919" duration="14133000" />
-      <workItem from="1762762697619" duration="6388000" />
+      <workItem from="1762762697619" duration="10065000" />
     </task>
     <task id="LOCAL−00001" summary="Add Raylib">
       <option name="closed" value="true" />
@@ -311,7 +307,35 @@
       <option name="presentableId" value="LOCAL−00016" />
       <updated>1762767321877</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL−00017" summary="Add and implement Tests">
+      <option name="closed" value="true" />
+      <created>1762769308382</created>
+      <option name="number" value="LOCAL−00017" />
+      <option name="presentableId" value="LOCAL−00017" />
+      <updated>1762769308382</updated>
+    </task>
+    <task id="LOCAL−00018" summary="Message name change">
+      <option name="closed" value="true" />
+      <created>1762769617759</created>
+      <option name="number" value="LOCAL−00018" />
+      <option name="presentableId" value="LOCAL−00018" />
+      <updated>1762769617759</updated>
+    </task>
+    <task id="LOCAL−00019" summary="NameSpace fix">
+      <option name="closed" value="true" />
+      <created>1762769815702</created>
+      <option name="number" value="LOCAL−00019" />
+      <option name="presentableId" value="LOCAL−00019" />
+      <updated>1762769815702</updated>
+    </task>
+    <task id="LOCAL−00020" summary="NameSpace fix">
+      <option name="closed" value="true" />
+      <created>1762770576447</created>
+      <option name="number" value="LOCAL−00020" />
+      <option name="presentableId" value="LOCAL−00020" />
+      <updated>1762770576447</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -335,7 +359,10 @@
     <MESSAGE value="Structure in dictionaries &amp; namespaces" />
     <MESSAGE value="Move Logo LoadTexture outside of loop" />
     <MESSAGE value="Add Message-class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Message-class" />
+    <MESSAGE value="Add and implement Tests" />
+    <MESSAGE value="Message name change" />
+    <MESSAGE value="NameSpace fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="NameSpace fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

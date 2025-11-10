@@ -9,18 +9,18 @@ public class LoginUser
 
     private readonly HttpClient httpClient;
 
-    // Production-konstruktor (standard)
+    // Production construktor
     public LoginUser() : this(new HttpClient { BaseAddress = new Uri("http://localhost:5201") })
     {
     }
 
-    // Test-konstruktor / DI-konstruktor
+    // Test construktor
     public LoginUser(HttpClient httpClient)
     {
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         if (this.httpClient.BaseAddress == null)
         {
-            // valfri: sätt default baseadress om du vill
+            // set default base address
             this.httpClient.BaseAddress = new Uri("http://localhost:5201");
         }
     }
