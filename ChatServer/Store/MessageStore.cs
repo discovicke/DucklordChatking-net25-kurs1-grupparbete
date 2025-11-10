@@ -8,7 +8,17 @@ public class MessageStore
 
   private int nextMessageId = 1;
 
-
+  #region ADD MESSAGE
+  /// <summary>
+  /// Adds a new chat message to the store.
+  /// </summary>
+  /// <param name="user">The user sending the message. Must not be null.</param>
+  /// <param name="messageContent">The text content of the message. Must not be null or whitespace.</param>
+  /// <returns>
+  /// True if the message was successfully added.
+  /// False if <paramref name="user"/> is null or <paramref name="messageContent"/> is invalid.
+  /// </returns>
+  #endregion
   public bool Add(User user, string messageContent)
   {
     if (user == null || string.IsNullOrWhiteSpace(messageContent)) // Validate message sender and content
