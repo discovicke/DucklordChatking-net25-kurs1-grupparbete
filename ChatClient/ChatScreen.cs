@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ChatClient.Configurations;
 using Raylib_cs;
 
 
@@ -13,7 +14,7 @@ namespace ChatClient
     {
 
         private enum SelectedField { None, Username, Password }
-        private static SelectedField _selected = SelectedField.None;
+        private static SelectedField selected = SelectedField.None;
 
         //Input from user
         private static string inputText = "";
@@ -50,7 +51,7 @@ namespace ChatClient
             Raylib.DrawRectangleRounded(sendButton, 0.3f, 10, Colors.TextFieldColor);
 
             // --- Inputhantering ---
-            if (_selected == SelectedField.Username)
+            if (selected == SelectedField.Username)
             {
                 // Läs tecken
                 int key = Raylib.GetCharPressed();
@@ -78,11 +79,11 @@ namespace ChatClient
 
             if (MouseInput.IsLeftClick(typeWindow))
             {
-                _selected = SelectedField.Username;
+                selected = SelectedField.Username;
             }
             else if (MouseInput.IsLeftClick(sendButton))
             {
-                _selected = SelectedField.Password;
+                selected = SelectedField.Password;
                 if (MouseInput.IsLeftClick(sendButton))
                 {
                     if (!string.IsNullOrWhiteSpace(inputText))
@@ -95,7 +96,7 @@ namespace ChatClient
             }
             else if (leftPressed && !hoverUser && !hoverPassword)
             {
-                _selected = SelectedField.None;
+                selected = SelectedField.None;
             }
             
             // Visual hover feedback (outline)

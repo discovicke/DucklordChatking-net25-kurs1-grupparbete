@@ -38,9 +38,9 @@ namespace ChatClient.Configurations
             return IsHovered(rect) ? hoverColor : normalColor;
         }
         
-#if DEBUG
+        #if DEBUG
         public static void TestSetPosition(Vector2 testPos) => mousePos = testPos;
-#endif
+        #endif
         
     }
 }
