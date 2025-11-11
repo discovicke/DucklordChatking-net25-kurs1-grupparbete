@@ -93,7 +93,8 @@ namespace ChatClient.Windows
                         }
 
                     }
-                    textField.Clear();                  // empty text field
+                    // Empty text field
+                    textField.Clear();                  
                 }
              }
             
