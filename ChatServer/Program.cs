@@ -2,10 +2,19 @@
 using ChatServer.Store;
 using ChatServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
+builder.Services.AddOpenApi(); // Register OpenAPI services
 var app = builder.Build();
+
+// Scalar and OpenAPI are only intended for development testing
+if (app.Environment.IsDevelopment())
+{
+  app.MapOpenApi();                // exposes /openapi/v1.json
+  app.MapScalarApiReference();     // exposes visual UI at /scalar
+}
 
 // Create a single shared UserStore instance.
 // The store contains both dictionaries (by username and by id).
