@@ -6,29 +6,43 @@ using Shared;
 namespace ChatClient.Data
 {
     // Responsible for sending messages to server via HTTP
-    public class MessageSender
+    public class MessageHandler
     {
         private readonly HttpClient _httpClient;
 
-        public MessageSender(HttpClient httpClient)
+        public MessageHandler(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         // Sends message to server. Returns true if message was sent, false otherwise.
-        public bool SendMessage(Message message)
+        public bool SendMessage(string content)
         {
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+            //Converts current user and added content to a DTO for sending to server
+            var messageDto = new MessageDTO
+            {
+                Sender = UserAccount.Username!,
+                Content = content,
+                Timestamp = DateTime.UtcNow
+            };
 
-            var dto = message.ToDTO();
-
-            if (string.IsNullOrWhiteSpace(dto.Sender) || string.IsNullOrWhiteSpace(dto.Content))
+            if (string.IsNullOrWhiteSpace(messageDto.Sender) || string.IsNullOrWhiteSpace(messageDto.Content))
+            {
                 return false;
+            }
+
+            if (!UserAccount.IsLoggedIn)
+            {
+                throw new InvalidOperationException("Ingen användare inloggad!");
+            }
 
             try
             {
-                var response = _httpClient.PostAsJsonAsync("/messages", dto).Result;
+                var response = _httpClient.PostAsJsonAsync("/messages", messageDto).Result;
                 return response.IsSuccessStatusCode;
             }
             catch

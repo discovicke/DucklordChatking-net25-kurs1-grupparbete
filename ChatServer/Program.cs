@@ -34,7 +34,7 @@ userStore.Add("Ducklord", "chatking");
 
 
 // Login endpoint
-app.MapPost("/login", (LoginDTO dto) =>
+app.MapPost("/login", (UserDTO dto) =>
 {
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -53,7 +53,7 @@ app.MapPost("/login", (LoginDTO dto) =>
 });
 
 // Registration endpoint
-app.MapPost("/register", (LoginDTO dto) =>
+app.MapPost("/register", (UserDTO dto) =>
 {
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
