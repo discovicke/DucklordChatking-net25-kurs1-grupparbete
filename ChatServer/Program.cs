@@ -40,7 +40,6 @@ MessageStore messageStore = new(userStore);
 userStore.Add("Ducklord", "chatking");
 
 
-// Login endpoint
 app.MapPost("/login", (UserDTO dto) =>
 {
   // Validate input
@@ -58,6 +57,7 @@ app.MapPost("/login", (UserDTO dto) =>
 
   return Results.BadRequest(new ApiResponseFail("Invalid username or password."));
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("User Login")
 .WithDescription("Validates a `username` and `password`. If the credentials match a stored account, the server returns the user's username and confirms the login.")
 .Produces<ApiResponseWithUsername>(StatusCodes.Status200OK)
@@ -65,7 +65,6 @@ app.MapPost("/login", (UserDTO dto) =>
 .WithSummary("User Login")
 .WithDescription("Validates username and password.");
 
-// Registration endpoint
 app.MapPost("/register", (UserDTO dto) =>
 {
   // Validate input
@@ -88,19 +87,19 @@ app.MapPost("/register", (UserDTO dto) =>
 
   return Results.Ok(new { UserID = newUser.Id, Message = "Registration successful" }); // TODO: refactor the Add() in UserStore to return the User object, avoiding the issue here.
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("Register User Account")
 .WithDescription("Creates a new user account using the provided `username` and `password`. The server stores the account and returns the assigned user ID on success.");
 
 
-// Return a list of all usernames (Note: only return the usernames, not the full objects)
 app.MapGet("/users", () =>
 {
   return Results.Ok(userStore.GetAllUsernames());
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("List All Usernames")
 .WithDescription("Returns every registered username as a simple list of strings. The response does not include passwords or any other account information.");
 
-// Update user endpoint
 app.MapPost("/user/update", (UpdateUserDTO dto) =>
 {
   // Validate input
@@ -117,10 +116,10 @@ app.MapPost("/user/update", (UpdateUserDTO dto) =>
 
   return Results.Ok(new { UpdatedUsername = dto.NewUsername, Message = "User updated successfully" });
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("Update User Account")
 .WithDescription("Changes a user's account information. The request must include the current `OldUsername` and the desired `NewUsername`. If a `Password` is provided, it replaces the existing password. If `Password` is omitted, the existing password stays the same.");
 
-// Delete user endpoint
 app.MapPost("/user/delete", (UserDTO dto) =>
 {
   // Validate input
@@ -143,10 +142,10 @@ app.MapPost("/user/delete", (UserDTO dto) =>
   return Results.Ok(new { Message = "User deleted successfully." });
 
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("Delete User Account")
 .WithDescription("Deletes a user account based on the provided `username` and `password`. If the credentials match a stored account, the user is removed from the server and can no longer log in.");
 
-// Send and stream (SignalR broadcast) message endpoint
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
   // Validate basic input
@@ -168,16 +167,17 @@ app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 
   return Results.Ok(new { Message = "Message stored" });
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("Send Message")
 .WithDescription("Sends a chat message through HTTP and broadcasts it to all connected SignalR clients via the `ReceiveMessage` hub method. The message is saved to the server history and becomes available through `/messages/history`.");
 
-// Get history endpoint (with optional 'take' query parameter)
 app.MapGet("/messages/history", (int? take) =>
 {
   return take.HasValue
       ? Results.Ok(messageStore.GetLast(take.Value))
       : Results.Ok(messageStore.GetAll());
 })
+// API Docs through OpenAPI & ScalarUI
 .WithSummary("Get Message History")
 .WithDescription("Returns chat messages in chronological order (oldest to newest). If the optional `take` query parameter is used, the server selects the newest messages first and then returns them in chronological order. For example, `GET /messages/history?take=10` returns the 10 most recent messages, ordered from oldest to newest.");
 
