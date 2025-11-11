@@ -26,22 +26,24 @@ public class LoginUser
         }
     }
 
-    public bool Login(UserAccount user)
+    public bool Login(string username, string password)
     {
-        var loginDto = new LoginDTO
-        {
-            Username = user.Username,
-            Password = user.Password
-        };
+        var userDto = new UserDTO { Username = username, Password = password };
 
         try
         {
-            var response = httpClient.PostAsJsonAsync("/login", loginDto).Result;
+            var response = httpClient.PostAsJsonAsync("/login", userDto).Result;
             return response.IsSuccessStatusCode;
         }
         catch
         {
             return false;
         }
+    }
+    // New overload to allow tests to pass a DTO instance directly
+    public bool Login(UserDTO user)
+    {
+        if (user == null) throw new ArgumentNullException(nameof(user));
+        return Login(user.Username ?? string.Empty, user.Password ?? string.Empty);
     }
 }
