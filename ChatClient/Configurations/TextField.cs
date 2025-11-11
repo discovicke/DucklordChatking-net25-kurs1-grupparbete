@@ -26,18 +26,23 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, TextColor);
             }
+            
+            int fontSize = 20;
+            int padding = 5;
+            int textX = (int)(Rect.X + padding);
+            int textY = (int)(Rect.Y + padding);
+            
+            Raylib.DrawText(Text, textX, textY, fontSize, TextColor);
 
+            
             if (IsSelected && CreatVisible)
             {
-                int textWidth = Raylib.MeasureText(Text, 20); // same font size you draw with
-                int caretX = (int)Rect.X + 10 + textWidth;    // same X offset as text
-                int caretTop = (int)Rect.Y + 40;              // same Y as text
-                int caretBottom = caretTop + 20;              // same font size as height
+                int textWidth = Raylib.MeasureText(Text, fontSize);
+                int caretX = textX + + textWidth;    // same X offset as text
+                int caretTop = textY;              // same Y as text
+                int caretBottom = caretTop + fontSize;              // same font size as height
                 Raylib.DrawLine(caretX, caretTop, caretX, caretBottom, TextColor);
             }
-
-
-            Raylib.DrawText(Text, (int)Rect.X + 10, (int)Rect.Y + 40, 20, TextColor);
         }
 
 
