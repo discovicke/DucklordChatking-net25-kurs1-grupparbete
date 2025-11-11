@@ -12,7 +12,7 @@ namespace ChatClient.Windows
     public class ChatScreen
     {
 
-        private enum SelectedField { None, Username, Password }
+        private enum SelectedField { None, TypeWindow }
         private static SelectedField selected = SelectedField.None;
 
         //Input from user
@@ -35,9 +35,6 @@ namespace ChatClient.Windows
              Raylib.BeginDrawing();
              Raylib.ClearBackground(Colors.BackgroundColor);
 
-             // Update mouse state early each frame
-             MouseInput.Update();
-
              // Logo
              Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
 
@@ -45,6 +42,8 @@ namespace ChatClient.Windows
             int rectY = 0;
             int rectWidth = 0;
             int rectHeight = 0;
+            
+            // TODO: Move rectVARIABLES to configuration classes?
 
 
             // ChatWindow
@@ -73,7 +72,7 @@ namespace ChatClient.Windows
 
             if (MouseInput.IsLeftClick(typeWindow))
             {
-                selected = SelectedField.Username;
+                selected = SelectedField.TypeWindow;
             }
             else if (sendButton.IsClicked())
              {
@@ -92,7 +91,7 @@ namespace ChatClient.Windows
                         bool success = messageSender.SendMessage(message);
                         if (!success)
                         {
-                            Console.WriteLine("Failed to send message!");
+                            Console.WriteLine("Failed to send message!"); // TODO: To log
                         }
                     }
                     textField.Clear();                  // empty text field
@@ -108,12 +107,12 @@ namespace ChatClient.Windows
             {
                 Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.HoverColor);
             }
-
+            //TODO: Text not visible when hovering
 
             // Client Version
             Raylib.DrawText("DuckLord v.0.0.1", 10, 580, 10, Colors.TextColor);
 
-             Raylib.EndDrawing();
+            Raylib.EndDrawing();
 
          }
      }
