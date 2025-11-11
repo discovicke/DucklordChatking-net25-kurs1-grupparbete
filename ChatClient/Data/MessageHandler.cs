@@ -17,6 +17,7 @@ namespace ChatClient.Data
             {
                 throw new ArgumentNullException(nameof(content));
             }
+
             //Converts current user and added content to a DTO for sending to server
             var messageDto = new MessageDTO
             {
@@ -44,6 +45,7 @@ namespace ChatClient.Data
                     Log.Info(messageDto.Content);
                     return true;
                 }
+
                 Log.Error($"Server returned {response.StatusCode}");
                 return false;
             }

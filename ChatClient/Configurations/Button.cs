@@ -28,7 +28,7 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 2, TextColor);
             }
-            
+
             // Draw text centered in rectangle (simple)
             int fontSize = 20;
             int textWidth = Raylib.MeasureText(Text, fontSize);
@@ -36,7 +36,7 @@ namespace ChatClient.Configurations
             int y = (int)(Rect.Y + (Rect.Height - fontSize) / 2);
             Raylib.DrawText(Text, x, y, fontSize, TextColor);
         }
-        
+
         // Return true if mouse is hovering over button.
         public bool IsHovered() => MouseInput.IsHovered(Rect);
 

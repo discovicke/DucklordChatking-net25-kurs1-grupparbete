@@ -12,7 +12,7 @@ namespace ChatClient.Configurations
     {
         private static Vector2 mousePos;
 
-        public static void Update() 
+        public static void Update()
         {
             mousePos = Raylib.GetMousePosition();
         }
@@ -31,10 +31,9 @@ namespace ChatClient.Configurations
         {
             return IsHovered(rect) && Raylib.IsMouseButtonPressed(MouseButton.Left);
         }
-        
+
         #if DEBUG
         public static void TestSetPosition(Vector2 testPos) => mousePos = testPos;
         #endif
-        
     }
 }

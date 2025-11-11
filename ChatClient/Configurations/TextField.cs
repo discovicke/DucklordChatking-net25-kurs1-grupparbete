@@ -27,21 +27,21 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, TextColor);
             }
-            
+
             int fontSize = 20;
             int padding = 5;
             int textX = (int)(Rect.X + padding);
             int textY = (int)(Rect.Y + padding);
-            
+
             Raylib.DrawText(Text, textX, textY, fontSize, TextColor);
 
-            
+
             if (IsSelected && CreatVisible)
             {
                 int textWidth = Raylib.MeasureText(Text, fontSize);
-                int caretX = textX + textWidth;    // same X offset as text
-                int caretTop = textY;              // same Y as text
-                int caretBottom = caretTop + fontSize;              // same font size as height
+                int caretX = textX + textWidth; // same X offset as text
+                int caretTop = textY; // same Y as text
+                int caretBottom = caretTop + fontSize; // same font size as height
                 Raylib.DrawLine(caretX, caretTop, caretX, caretBottom, TextColor);
             }
         }
@@ -82,7 +82,6 @@ namespace ChatClient.Configurations
                 // Accepts all Unicode-tecken (>= 32)
                 if (key >= 32)
                 {
-
                     // Converts to Unicode to accept all even åäö
                     Text += char.ConvertFromUtf32(key);
                     CreatBlinkTimer = 0f;
@@ -96,27 +95,20 @@ namespace ChatClient.Configurations
 
             // Backspace
             if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 ||
-                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && Text.Length >0)
+                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && Text.Length > 0)
             {
                 Text = Text.Substring(0, Text.Length - 1);
                 CreatBlinkTimer = 0f;
                 CreatVisible = true;
             }
             
-
-
-            // TODO: Add visible cursor
-
             // TODO: Text row break when hitting border
 
             // TODO: Scroll logicZ
 
             // TODO: Font?
-
         }
 
         public void Clear() => Text = string.Empty;
     }
-
 }
-

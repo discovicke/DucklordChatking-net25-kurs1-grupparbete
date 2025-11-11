@@ -26,7 +26,7 @@ namespace ChatClient.Windows
         );
 
         private static Button loginButton = new Button(new Rectangle(325, 400, 100, 25),
-          "Login", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+            "Login", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
         );
 
         public static void Run()
@@ -43,7 +43,7 @@ namespace ChatClient.Windows
                 AppState.CurrentScreen = Screen.Chat;
                 Log.Info("User logged in, switching to chat screen");
             }
-            
+
             // Update and draw fields/buttons
             userField.Update();
             userField.Draw();
@@ -61,4 +61,3 @@ namespace ChatClient.Windows
         }
     }
 }
-

@@ -5,9 +5,9 @@ namespace ChatClient
 {
     public enum LogLevel
     {
-        Info,    // Black
+        Info, // Black
         Success, // Green
-        Error    // Red
+        Error // Red
     }
 
     public class Log

@@ -7,7 +7,7 @@ namespace ChatClient;
 
 public class Program
 {
-    
+    // TODO: What happens when connection to server is lost?
     public static void Main()
     {
         Raylib.InitWindow(800, 600, "DuckLord 0.0.1");

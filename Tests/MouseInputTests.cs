@@ -9,7 +9,7 @@ public class MouseInputTests
     public void IsHovered_ReturnsTrue_WhenMouseInsideRectangle()
     {
         Rectangle rect = new Rectangle(100, 100, 200, 200);
-        MouseInput.TestSetPosition(new Vector2(150, 150)); 
+        MouseInput.TestSetPosition(new Vector2(150, 150));
 
         Assert.True(MouseInput.IsHovered(rect));
     }
