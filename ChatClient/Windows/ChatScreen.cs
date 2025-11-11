@@ -26,9 +26,8 @@ namespace ChatClient.Windows
         private static TextField textField = new TextField(new Rectangle(50, 450, 550, 100), Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
         
         // Adds a message sender to the text field
-        private static MessageHandler? messageSender;
-
-         public static void Run() //TODO Koppla inloggad user till sender
+        private static MessageHandler? messageSender = new MessageHandler(new HttpClient { BaseAddress = new Uri("http://192.168.20.17:5201/scalar/") });
+         public static void Run()
          {
              // ChatWindow-test
              Raylib.BeginDrawing();
@@ -75,6 +74,7 @@ namespace ChatClient.Windows
             }
             else if (sendButton.IsClicked()|| Raylib.IsKeyPressed(KeyboardKey.Enter))
              {
+                 Log.Info("Send button clicked");
                 // Click on Send: save message and clear input field
                 if (!string.IsNullOrWhiteSpace(textField.Text))
                 {
@@ -83,8 +83,15 @@ namespace ChatClient.Windows
                         bool success = messageSender.SendMessage(textField.Text);
                         if (!success)
                         {
-                            Console.WriteLine("Failed to send message!"); // TODO: To log
+                            Log.Error("Failed to send message!");
+                            Console.WriteLine("Failed to send message!");
                         }
+                        else
+                        {
+                            Log.Success("Message sent successfully");
+                            Console.WriteLine("Message sent successfully");
+                        }
+
                     }
                     textField.Clear();                  // empty text field
                 }

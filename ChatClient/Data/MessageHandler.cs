@@ -6,14 +6,9 @@ using Shared;
 namespace ChatClient.Data
 {
     // Responsible for sending messages to server via HTTP
-    public class MessageHandler
+    public class MessageHandler(HttpClient httpClient)
     {
-        private readonly HttpClient _httpClient;
-
-        public MessageHandler(HttpClient httpClient)
-        {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        }
+        private readonly HttpClient httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
         // Sends message to server. Returns true if message was sent, false otherwise.
         public bool SendMessage(string content)
@@ -42,11 +37,19 @@ namespace ChatClient.Data
 
             try
             {
-                var response = _httpClient.PostAsJsonAsync("/messages", messageDto).Result;
-                return response.IsSuccessStatusCode;
+                var response = httpClient.PostAsJsonAsync("/send-message", messageDto).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    Log.Success($"Message sent by {messageDto.Sender}");
+                    Log.Info(messageDto.Content);
+                    return true;
+                }
+                Log.Error($"Server returned {response.StatusCode}");
+                return false;
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Error($"Exception sending message: {ex.Message}");
                 return false;
             }
         }

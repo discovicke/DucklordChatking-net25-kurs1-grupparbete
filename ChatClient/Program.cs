@@ -11,6 +11,8 @@ public class Program
     public static void Main()
     {
         Raylib.InitWindow(800, 600, "DuckLord 0.0.1");
+        Console.WriteLine($"Log path: {AppDomain.CurrentDomain.BaseDirectory}log.txt");
+        Log.Write("Program started.");
         
         while (!Raylib.WindowShouldClose())
         {
@@ -27,5 +29,6 @@ public class Program
         }
 
         Raylib.CloseWindow();
+        Log.Write("Program closed.");
     }
 }
