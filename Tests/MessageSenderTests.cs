@@ -1,11 +1,8 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using ChatClient.Data;
 using ChatClient.Tests.Helpers;
-using Shared;
 using Xunit;
 
 public class MessageSenderTests
@@ -15,18 +12,18 @@ public class MessageSenderTests
     {
         var handler = new FakeHttpHandler(HttpStatusCode.OK);
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5201") };
-        var sender = new MessageSender(client);
+        var sender = new MessageHandler(client);
 
-        var message = new Message
+        UserAccount.SetUser("Ducklord");
+        try
         {
-            Sender = "Ducklord",
-            Content = "Hello world!",
-            Timestamp = DateTime.UtcNow
-        };
-
-        bool result = sender.SendMessage(message);
-
-        Assert.True(result);
+            bool result = sender.SendMessage("Hello world!");
+            Assert.True(result);
+        }
+        finally
+        {
+            UserAccount.Clear();
+        }
     }
 
     [Fact]
@@ -34,18 +31,18 @@ public class MessageSenderTests
     {
         var handler = new FakeHttpHandler(HttpStatusCode.OK);
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5201") };
-        var sender = new MessageSender(client);
+        var sender = new MessageHandler(client);
 
-        var message = new Message
+        UserAccount.SetUser("Ducklord");
+        try
         {
-            Sender = "Ducklord",
-            Content = "", // tomt meddelande
-            Timestamp = DateTime.UtcNow
-        };
-
-        bool result = sender.SendMessage(message);
-
-        Assert.False(result);
+            bool result = sender.SendMessage("");
+            Assert.False(result);
+        }
+        finally
+        {
+            UserAccount.Clear();
+        }
     }
 
     [Fact]
@@ -53,17 +50,17 @@ public class MessageSenderTests
     {
         var handler = new ThrowingHttpHandler();
         var client = new HttpClient(handler);
-        var sender = new MessageSender(client);
+        var sender = new MessageHandler(client);
 
-        var message = new Message
+        UserAccount.SetUser("Ducklord");
+        try
         {
-            Sender = "Ducklord",
-            Content = "Oops",
-            Timestamp = DateTime.UtcNow
-        };
-
-        bool result = sender.SendMessage(message);
-
-        Assert.False(result);
+            bool result = sender.SendMessage("Oops");
+            Assert.False(result);
+        }
+        finally
+        {
+            UserAccount.Clear();
+        }
     }
 }

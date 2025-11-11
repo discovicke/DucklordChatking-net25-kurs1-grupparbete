@@ -38,13 +38,21 @@ namespace ChatClient.Windows
             int rectWidth = 150;
             int rectHeight = fontSize + 10; // lite högre än texten
 
-            // Textfält
+            // Rectangles
             Rectangle rectUser = new Rectangle(rectX, rectY, rectWidth, rectHeight);
             Rectangle rectPassword = new Rectangle(rectX, rectY + 50, rectWidth, rectHeight);
-            Rectangle rectLogIn = new Rectangle(rectX, rectY, rectWidth, rectHeight);
+            Rectangle rectRegister = new Rectangle(rectX, rectY + 200, rectWidth, rectHeight);
+
+            // TextFields
+            TextField userField = new TextField(rectUser, Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+            TextField passwordField = new TextField(rectPassword, Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+            
+            // Buttons
+            Button registerButton = new Button(rectRegister, "Register", Colors.TextFieldColor, Colors.HoverColor, Colors.TextFieldColor);
 
             bool hoverUser = MouseInput.IsHovered(rectUser);
             bool hoverPassword = MouseInput.IsHovered(rectPassword);
+            bool hoverRegister = MouseInput.IsHovered(rectRegister);
             bool leftPressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
 
             if (MouseInput.IsLeftClick(rectUser))
@@ -59,14 +67,6 @@ namespace ChatClient.Windows
             {
                 selected = SelectedField.None;
             }
-
-
-
-            Raylib.DrawRectangleRounded(rectUser, 0.3f, 10, Colors.TextFieldColor);
-
-            Raylib.DrawRectangleRounded(rectPassword, 0.3f, 10, Colors.TextFieldColor);
-            
-            
             
             // Visual hover feedback (outline)
             if (hoverUser)
@@ -76,6 +76,10 @@ namespace ChatClient.Windows
             if (hoverPassword)
             { 
                 Raylib.DrawRectangleRounded(rectPassword, 0.3f, 10, Colors.HoverColor);
+            }
+            if (hoverRegister)
+            {
+                Raylib.DrawRectangleRounded(rectRegister, 0.3f, 10, Colors.HoverColor);
             }
 
             // Logo

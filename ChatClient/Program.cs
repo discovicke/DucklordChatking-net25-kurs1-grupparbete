@@ -21,9 +21,9 @@ public class Program
             bool mousePressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
             
             // --- UI ---
-            // MainMenu.Run();
-            // UIkladd.Run();
-            ChatScreen.Run();
+            // StartScreen.Run();
+            // RegisterScreen.Run();
+             ChatScreen.Run();
         }
 
         Raylib.CloseWindow();
