@@ -34,6 +34,11 @@ namespace ChatClient.Windows
 
              // Logo
              Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
+             var tillbakaknapp = new Rectangle(620, 25, 150, 250);
+             if (MouseInput.IsLeftClick(tillbakaknapp))
+             {
+                 AppState.CurrentScreen = Screen.Start;
+             }
 
             int rectX = 0;
             int rectY = 0;
