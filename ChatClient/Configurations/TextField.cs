@@ -27,7 +27,7 @@ namespace ChatClient.Configurations
             Raylib.DrawText(Text, (int)Rect.X + 10, (int)Rect.Y + 40, 20, TextColor);
         }
 
-        
+
         // Get call every frame after MouseInput.Update() to handle click and text-input.
         public void Update()
         {
@@ -46,30 +46,35 @@ namespace ChatClient.Configurations
 
             // Read text input
             int key = Raylib.GetCharPressed();
+
             while (key > 0)
             {
-                if (key >= 32 && key <= 126) // synliga ASCII-tecken
+                // Accepts all Unicode-tecken (>= 32)
+                if (key >= 32)
                 {
-                    Text += (char)key;
+                    // Converts to Unicode to accept all even åäö
+                    Text += char.ConvertFromUtf32(key);
                 }
                 key = Raylib.GetCharPressed();
             }
+                
 
-            // Backspace
-            // TODO: Backspace pressed = hold down for continuous delete
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace))
-            {
-                Text = Text.Substring(0, Text.Length - 1);
-            }
-            // TODO: Enter = isClicked
+                // Backspace
+                // TODO: Backspace pressed = hold down for continuous delete
+                if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace))
+                {
+                    Text = Text.Substring(0, Text.Length - 1);
+                }
+                // TODO: Enter = isClicked
+
+                // TODO: Add visible cursor
+
+                // TODO: Text row break when hitting border
+
+                // TODO: Scroll logicZ
+
+                // TODO: Font?
             
-            // TODO: Add visible cursor
-            
-            // TODO: Text row break when hitting border
-            
-            // TODO: Scroll logicZ
-            
-            // TODO: Font?
         }
         
         public void Clear() => Text = string.Empty;
