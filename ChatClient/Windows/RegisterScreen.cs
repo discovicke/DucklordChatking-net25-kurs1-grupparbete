@@ -12,6 +12,59 @@ namespace ChatClient.Windows
 {
     public class RegisterScreen
     {
+        // Ladda logon direkt som statiskt fält
+        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
 
+        // Skapa textfält och knappar som statiska fält
+        private static TextField userField = new TextField(
+            new Rectangle(300, 300, 150, 25),
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+        );
+
+        private static TextField passwordField = new TextField(
+            new Rectangle(300, 350, 150, 25),
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+        );
+
+        private static Button registerButton = new Button(
+            new Rectangle(325, 450, 100, 25),
+            "Register", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+        );
+
+        private static Button loginButton = new Button(new Rectangle(325, 400, 100, 25),
+          "Login", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+        );
+
+        public static void Run()
+        {
+            Raylib.BeginDrawing();
+            Raylib.ClearBackground(Colors.BackgroundColor);
+
+            Raylib.DrawText("Username:", 220, 305, 15, Colors.TextFieldColor);
+            Raylib.DrawText("Password:", 220, 355, 15, Colors.TextFieldColor);
+
+            // Buttons
+
+            if (MouseInput.IsLeftClick(loginButton.Rect))
+            {
+                AppState.CurrentScreen = Screen.Chat;
+                Log.Info("User logged in, switching to chat screen");
+            }
+
+            // Uppdatera och rita fälten
+            userField.Update();
+            userField.Draw();
+
+            passwordField.Update();
+            passwordField.Draw();
+
+            registerButton.Draw();
+            loginButton.Draw();
+
+            // Logo
+            Raylib.DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);
+
+            Raylib.EndDrawing();
+        }
     }
 }

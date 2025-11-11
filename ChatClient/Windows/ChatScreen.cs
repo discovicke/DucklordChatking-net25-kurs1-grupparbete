@@ -11,8 +11,12 @@ namespace ChatClient.Windows
 {
     public class ChatScreen
     {
+        private enum SelectedField
+        {
+            None,
+            TypeWindow
+        }
 
-        private enum SelectedField { None, TypeWindow }
         private static SelectedField selected = SelectedField.None;
 
         //Input from user
@@ -23,41 +27,52 @@ namespace ChatClient.Windows
         private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
 
         // Text field for user input
-        private static TextField textField = new TextField(new Rectangle(50, 450, 550, 100), Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
-        
+        private static TextField textField = new TextField(
+            new Rectangle(50, 450, 550, 100),
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
+            allowMultiline: true
+        );
+
         // Adds a message sender to the text field
-        private static MessageHandler? messageSender;
+        private static MessageHandler? messageSender = new MessageHandler(new HttpClient
+            { BaseAddress = new Uri("http://192.168.20.17:5201/scalar/") });
 
-         public static void Run() //TODO Koppla inloggad user till sender
-         {
-             // ChatWindow-test
-             Raylib.BeginDrawing();
-             Raylib.ClearBackground(Colors.BackgroundColor);
+        public static void Run()
+        {
+            // ChatWindow-test
+            Raylib.BeginDrawing();
+            Raylib.ClearBackground(Colors.BackgroundColor);
 
-             // Logo
-             Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
+            // Logo
+            Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
+            var tillbakaknapp = new Rectangle(620, 25, 150, 250);
+            if (MouseInput.IsLeftClick(tillbakaknapp))
+            {
+                AppState.CurrentScreen = Screen.Start;
+            }
 
             int rectX = 0;
             int rectY = 0;
             int rectWidth = 0;
             int rectHeight = 0;
-            
+
             // TODO: Move rectVARIABLES to configuration classes?
 
+            // Rectangles
+            Rectangle typeWindow = new Rectangle(rectX + 50, rectY + 450, rectWidth + 550, rectHeight + 100);
+            Rectangle sendButtonRect = new Rectangle(rectX + 610, rectY + 450, rectWidth + 100, rectHeight + 100);
+            Rectangle chatWindow = new Rectangle(rectX + 50, rectY + 50, rectWidth + 550, rectHeight + 380);
 
             // ChatWindow
-            Rectangle chatWindow = new Rectangle(rectX + 50, rectY + 50, rectWidth + 550, rectHeight + 380);
             Raylib.DrawRectangleRounded(chatWindow, 0.1f, 10, Colors.HoverColor);
 
+
             // TypeWindow
-            Rectangle typeWindow = new Rectangle(rectX + 50, rectY + 450, rectWidth + 550, rectHeight + 100);
-            Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.TextFieldColor);
+            //Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.TextFieldColor);
 
-            // SendButton rectangle
-            Rectangle sendButtonRect = new Rectangle(rectX + 610, rectY + 450, rectWidth + 100, rectHeight + 100);
-
-            // Create reusable Button and draw it
-            var sendButton = new Button(sendButtonRect, "Send", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+            // Send button
+            Button sendButton = new Button(sendButtonRect, "Send", Colors.TextFieldColor, Colors.HoverColor,
+                Colors.TextColor);
             sendButton.Draw();
 
             // Update and draw text field
@@ -65,16 +80,13 @@ namespace ChatClient.Windows
             textField.Draw();
 
             // Mouse Logic
-            bool hoverUser = MouseInput.IsHovered(typeWindow);
-            bool hoverSend = sendButton.IsHovered();
-            bool leftPressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
-
             if (MouseInput.IsLeftClick(typeWindow))
             {
                 selected = SelectedField.TypeWindow;
             }
-            else if (sendButton.IsClicked()|| Raylib.IsKeyPressed(KeyboardKey.Enter))
-             {
+            else if (sendButton.IsClicked() || Raylib.IsKeyPressed(KeyboardKey.Enter))
+            {
+                Log.Info("Send button clicked");
                 // Click on Send: save message and clear input field
                 if (!string.IsNullOrWhiteSpace(textField.Text))
                 {
@@ -83,29 +95,23 @@ namespace ChatClient.Windows
                         bool success = messageSender.SendMessage(textField.Text);
                         if (!success)
                         {
-                            Console.WriteLine("Failed to send message!"); // TODO: To log
+                            Log.Error("Failed to send message!");
+                            Console.WriteLine("Failed to send message!");
                         }
+                        else
+                        {
+                            Log.Success("Message sent successfully");
+                            Console.WriteLine("Message sent successfully");
+                        }
+
                     }
-                    textField.Clear();                  // empty text field
+
+                    // Empty text field
+                    textField.Clear();
                 }
-             }
-            else if (leftPressed && !hoverUser && !hoverSend)
-            {
-                selected = SelectedField.None;
             }
-
-            // Visual hover feedback (outline)
-            if (hoverUser)
-            {
-                Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.HoverColor);
-            }
-            //TODO: Text not visible when hovering
-
-            // Client Version
-            Raylib.DrawText("DuckLord v.0.0.1", 10, 580, 10, Colors.TextColor);
 
             Raylib.EndDrawing();
-
-         }
-     }
- }
+        }
+    }
+}

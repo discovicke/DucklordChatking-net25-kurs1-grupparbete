@@ -6,17 +6,18 @@ namespace ChatClient.Configurations
     // Simpel UI-button that handles drawing, hover color and click detection.
     // Uses Raylib for drawing and existing MouseInput for position/click.
     public class Button(Rectangle rect, string text, Color normalColor, Color hoverColor, Color textColor)
+        : UIComponent
     {
         public Rectangle Rect { get; } = rect;
-        public string Text { get; set; } = text;
-        public Color NormalColor { get; set; } = normalColor; //TODO: Is it necessary?
-        public Color HoverColor { get; set; } = hoverColor;
-        public Color TextColor { get; set; } = textColor;
-        public float Rounds { get; set; } = 0.3f;
-        public int Segments { get; set; } = 10;
+        private string Text { get; set; } = text;
+        private Color NormalColor { get; set; } = normalColor;
+        private Color HoverColor { get; set; } = hoverColor;
+        private Color TextColor { get; set; } = textColor;
+        private float Rounds { get; set; } = 0.3f;
+        private int Segments { get; set; } = 10;
 
         // Draws button: fill color changes on hover and text is drawn centered.
-        public void Draw()
+        public override void Draw()
         {
             // Decide fill color based on hover
             var fill = MouseInput.IsHovered(Rect) ? HoverColor : NormalColor;
@@ -27,7 +28,7 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 2, TextColor);
             }
-            
+
             // Draw text centered in rectangle (simple)
             int fontSize = 20;
             int textWidth = Raylib.MeasureText(Text, fontSize);
@@ -35,7 +36,7 @@ namespace ChatClient.Configurations
             int y = (int)(Rect.Y + (Rect.Height - fontSize) / 2);
             Raylib.DrawText(Text, x, y, fontSize, TextColor);
         }
-        
+
         // Return true if mouse is hovering over button.
         public bool IsHovered() => MouseInput.IsHovered(Rect);
 
@@ -47,6 +48,11 @@ namespace ChatClient.Configurations
             // Click happens when button is pressed in this frame while hovering over it.
             bool clicked = hovered && pressed;
             return clicked;
+        }
+
+        public override void Update()
+        {
+            // No internal state to update for button currently.
         }
     }
 }

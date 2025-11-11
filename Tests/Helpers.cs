@@ -15,7 +15,8 @@ namespace ChatClient.Tests.Helpers
             _statusCode = statusCode;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
             return Task.FromResult(new HttpResponseMessage(_statusCode));
         }
@@ -24,7 +25,8 @@ namespace ChatClient.Tests.Helpers
     // En handler som alltid kastar exception (för att testa felhantering)
     public class ThrowingHttpHandler : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
             throw new HttpRequestException("Simulated network failure");
         }

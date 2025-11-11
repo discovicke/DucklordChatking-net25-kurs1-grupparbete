@@ -5,13 +5,12 @@ namespace ChatClient.Data;
 
 public class UserAuth
 {
-    //TODO: Kolla så login fungerar med servern
-    
     private readonly HttpClient httpClient;
 
     // Production construktor
     public UserAuth() : this(new HttpClient { BaseAddress = new Uri("http://localhost:5201") })
-    { }
+    {
+    }
 
     // Test construktor
     public UserAuth(HttpClient httpClient)
@@ -38,6 +37,7 @@ public class UserAuth
             return false;
         }
     }
+
     // New overload to allow tests to pass a DTO instance directly
     public bool Login(UserDTO user)
     {

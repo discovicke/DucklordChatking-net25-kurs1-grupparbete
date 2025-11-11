@@ -1,92 +1,64 @@
-﻿using Raylib_cs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using ChatClient.Configurations;
-
+using Raylib_cs;
 
 namespace ChatClient.Windows
 {
     public class StartScreen
     {
-        private enum SelectedField { None, Username, Password }
-        private static SelectedField selected = SelectedField.None;
+        // Load logo
         private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
+
+        // Create text fields and buttons
+        private static TextField userField = new TextField(
+            new Rectangle(300, 300, 150, 25),
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
+            allowMultiline: false
+        );
+
+        private static TextField passwordField = new TextField(
+            new Rectangle(300, 350, 150, 25),
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
+            allowMultiline: false
+        );
+
+
+        private static Button registerButton = new Button(
+            new Rectangle(325, 450, 100, 25),
+            "Register", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+        );
+
+        private static Button loginButton = new Button(new Rectangle(325, 400, 100, 25),
+            "Login", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+        );
+
         public static void Run()
         {
-
             Raylib.BeginDrawing();
-            // LoginScreen-test
             Raylib.ClearBackground(Colors.BackgroundColor);
-            int fontSize = 15;
-            string userName = "Username:";
-            string passWord = "Password";
 
-            // Rita label
-            Raylib.DrawText(userName, 220, 305, fontSize, Colors.TextFieldColor);
-            Raylib.DrawText(passWord, 220, 355, fontSize, Colors.TextFieldColor);
+            Raylib.DrawText("Username:", 220, 305, 15, Colors.TextFieldColor);
+            Raylib.DrawText("Password:", 220, 355, 15, Colors.TextFieldColor);
 
-            // Beräkna textens bredd
-            int textWidth = Raylib.MeasureText(userName, fontSize);
-
-            // Placera rektangeln direkt efter texten
-            int rectX = 220 + textWidth + 10; // +10 för lite mellanrum
-            int rectY = 300;
-            int rectWidth = 150;
-            int rectHeight = fontSize + 10; // lite högre än texten
-
-            // Rectangles
-            Rectangle rectUser = new Rectangle(rectX, rectY, rectWidth, rectHeight);
-            Rectangle rectPassword = new Rectangle(rectX, rectY + 50, rectWidth, rectHeight);
-            Rectangle rectRegister = new Rectangle(rectX, rectY + 200, rectWidth, rectHeight);
-
-            // TextFields
-            TextField userField = new TextField(rectUser, Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
-            TextField passwordField = new TextField(rectPassword, Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
-            
-            // Buttons
-            Button registerButton = new Button(rectRegister, "Register", Colors.TextFieldColor, Colors.HoverColor, Colors.TextFieldColor);
-
-            bool hoverUser = MouseInput.IsHovered(rectUser);
-            bool hoverPassword = MouseInput.IsHovered(rectPassword);
-            bool hoverRegister = MouseInput.IsHovered(rectRegister);
-            bool leftPressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
-
-            if (MouseInput.IsLeftClick(rectUser))
+            // Button logics (change screens)
+            if (MouseInput.IsLeftClick(loginButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
             {
-                selected = SelectedField.Username;
-            }
-            else if (MouseInput.IsLeftClick(rectPassword))
-            {
-                selected = SelectedField.Password;
-            }
-            else if (leftPressed && !hoverUser && !hoverPassword)
-            {
-                selected = SelectedField.None;
-            }
-            
-            // Visual hover feedback (outline)
-            if (hoverUser)
-            {
-                Raylib.DrawRectangleRounded(rectUser, 0.3f, 10, Colors.HoverColor);
-            }
-            if (hoverPassword)
-            { 
-                Raylib.DrawRectangleRounded(rectPassword, 0.3f, 10, Colors.HoverColor);
-            }
-            if (hoverRegister)
-            {
-                Raylib.DrawRectangleRounded(rectRegister, 0.3f, 10, Colors.HoverColor);
+                AppState.CurrentScreen = Screen.Chat;
+                Log.Info("User logged in, switching to chat screen");
             }
 
-            // Logo
+            // Update and draw fields/buttons
+            userField.Update();
+            userField.Draw();
+
+            passwordField.Update();
+            passwordField.Draw();
+
+            registerButton.Draw();
+            loginButton.Draw();
+
+            // Draw logo
             Raylib.DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);
-
-
-            Raylib.DrawText("DuckLord v.1.0.0", 10, 580, 10, Colors.TextColor);
 
             Raylib.EndDrawing();
         }
