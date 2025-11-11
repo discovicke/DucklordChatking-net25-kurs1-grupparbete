@@ -15,8 +15,8 @@ namespace ChatClient.Data
         {
             return new MessageDTO
             {
-                Sender = this.Sender,
-                Content = this.Content,
+                Sender = Sender,
+                Content = Content,
                 Timestamp = DateTime.UtcNow
             };
         }
