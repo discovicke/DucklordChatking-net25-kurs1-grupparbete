@@ -5,24 +5,15 @@ namespace ChatClient.Configurations
 {
     // Simpel UI-button that handles drawing, hover color and click detection.
     // Uses Raylib for drawing and existing MouseInput for position/click.
-    public class Button
+    public class Button(Rectangle rect, string text, Color normalColor, Color hoverColor, Color textColor)
     {
-        public Rectangle Rect { get; }
-        public string Text { get; set; }
-        public Color NormalColor { get; set; }
-        public Color HoverColor { get; set; }
-        public Color TextColor { get; set; }
+        public Rectangle Rect { get; } = rect;
+        public string Text { get; set; } = text;
+        public Color NormalColor { get; set; } = normalColor; //TODO: Is it necessary?
+        public Color HoverColor { get; set; } = hoverColor;
+        public Color TextColor { get; set; } = textColor;
         public float Rounds { get; set; } = 0.3f;
         public int Segments { get; set; } = 10;
-
-        public Button(Rectangle rect, string text, Color normalColor, Color hoverColor, Color textColor)
-        {
-            Rect = rect;
-            Text = text;
-            NormalColor = normalColor;
-            HoverColor = hoverColor;
-            TextColor = textColor;
-        }
 
         // Draws button: fill color changes on hover and text is drawn centered.
         public void Draw()
