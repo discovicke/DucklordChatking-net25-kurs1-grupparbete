@@ -123,6 +123,7 @@ app.MapPost("/user/delete", (UserDTO dto) =>
   return Results.Ok(new { Message = "User deleted successfully." });
 });
 
+// Send and stream (SignalR broadcast) message endpoint
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
   // Validate basic input
@@ -145,6 +146,7 @@ app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
   return Results.Ok(new { Message = "Message stored" });
 });
 
+// Get history endpoint (with optional 'take' query parameter)
 app.MapGet("/messages/history", (int? take) =>
 {
   return take.HasValue
@@ -152,6 +154,7 @@ app.MapGet("/messages/history", (int? take) =>
       : Results.Ok(messageStore.GetAll());
 });
 
+// Map the SignalR ChatHub to the /chat endpoint
 app.MapHub<ChatHub>("/chat");
 
 app.Run();
