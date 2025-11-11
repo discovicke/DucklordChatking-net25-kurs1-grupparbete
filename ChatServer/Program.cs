@@ -82,7 +82,7 @@ app.MapGet("/users", () =>
   return Results.Ok(userStore.GetAllUsernames());
 });
 
-// TODO: Add endpoints for updating and deleting users
+// Update user endpoint
 app.MapPost("/user/update", (UpdateUserDTO dto) =>
 {
   // Validate input
@@ -100,6 +100,7 @@ app.MapPost("/user/update", (UpdateUserDTO dto) =>
   return Results.Ok(new { UpdatedUsername = dto.NewUsername, Message = "User updated successfully" });
 });
 
+// Delete user endpoint
 app.MapPost("/user/delete", (UserDTO dto) =>
 {
   // Validate input
@@ -121,7 +122,6 @@ app.MapPost("/user/delete", (UserDTO dto) =>
 
   return Results.Ok(new { Message = "User deleted successfully." });
 });
-
 
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
@@ -154,7 +154,4 @@ app.MapGet("/messages/history", (int? take) =>
 
 app.MapHub<ChatHub>("/chat");
 
-
 app.Run();
-
-
