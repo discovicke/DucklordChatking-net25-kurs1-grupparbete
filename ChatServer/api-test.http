@@ -1,4 +1,4 @@
-@ChatServer_HostAddress = http://localhost:5201
+@ChatServer_HostAddress = http://192.168.20.17:5201
 
 ### LOGIN
 POST {{ChatServer_HostAddress}}/login
@@ -33,5 +33,5 @@ Content-Type: application/json
 
 ### GET ALL MESSAGES
 # Returns a JSON list containing every stored chat message (in insertion order)
-GET {{ChatServer_HostAddress}}/messages
+GET {{ChatServer_HostAddress}}/messages/history
 
