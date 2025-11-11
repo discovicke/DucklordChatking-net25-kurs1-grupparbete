@@ -7,6 +7,7 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
 builder.Services.AddOpenApi(); // Register OpenAPI services
+
 var app = builder.Build();
 
 // Configure the server to listen on all network interfaces on port 5201,
@@ -46,11 +47,12 @@ app.MapPost("/login", (UserDTO dto) =>
 
   if (user != null && user.Password == dto.Password)
   {
-    return Results.Ok(new { UserID = user.Id, Message = "Login successful" });
+    return Results.Ok(new { user.Id, Message = "Username and password are required" });
   }
 
-  return Results.BadRequest(new { Message = "Invalid username or password" });
-}).WithDescription("Validates a `username` and `password`. If the credentials match a stored account, the server returns the user's ID and confirms the login.");
+  return Results.BadRequest(new { Message = "Invalid username and password." });
+})
+.WithDescription("Validates a `username` and `password`. If the credentials match a stored account, the server returns the user's ID and confirms the login.");
 
 // Registration endpoint
 app.MapPost("/register", (UserDTO dto) =>
@@ -123,6 +125,7 @@ app.MapPost("/user/delete", (UserDTO dto) =>
   }
 
   return Results.Ok(new { Message = "User deleted successfully." });
+
 }).WithDescription("Deletes a user account based on the provided `username` and `password`. If the credentials match a stored account, the user is removed from the server and can no longer log in.");
 
 // Send and stream (SignalR broadcast) message endpoint
@@ -163,3 +166,4 @@ app.MapGet("/messages/history", (int? take) =>
 app.MapHub<ChatHub>("/chat");
 
 app.Run();
+
