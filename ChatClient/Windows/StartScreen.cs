@@ -37,6 +37,14 @@ namespace ChatClient.Windows
             Raylib.DrawText("Username:", 220, 305, 15, Colors.TextFieldColor);
             Raylib.DrawText("Password:", 220, 355, 15, Colors.TextFieldColor);
 
+            // Buttons
+           
+            if (MouseInput.IsLeftClick(loginButton.Rect))
+            {
+                AppState.CurrentScreen = Screen.Chat;
+                Log.Info("User logged in, switching to chat screen");
+            }
+            
             // Uppdatera och rita fälten
             userField.Update();
             userField.Draw();
@@ -47,6 +55,7 @@ namespace ChatClient.Windows
             registerButton.Draw();
             loginButton.Draw();
 
+            // Logo
             Raylib.DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);
 
             Raylib.EndDrawing();
