@@ -8,7 +8,21 @@ using static ChatServer.Models.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
-builder.Services.AddOpenApi(); // Register OpenAPI services
+builder.Services.AddOpenApi(options =>
+{
+  // add metadata to the OpenAPI document
+  options.AddDocumentTransformer((document, context, ct) =>
+  {
+    document.Info = new()
+    {
+      Title = "Ducklord Chatking's Super Secure Server API Docs",
+      Version = "v0.0.0.1",
+      Description = "Backend for a lightweight chat system. Supports account creation, login, updating and deleting users, " +
+    "sending chat messages, retrieving message history, and real-time broadcasting through SignalR."
+    };
+    return Task.CompletedTask;
+  });
+});
 
 var app = builder.Build();
 
@@ -23,7 +37,7 @@ if (app.Environment.IsDevelopment())
   app.MapScalarApiReference(opt => // exposes visual UI at /scalar
 {
   opt.Title = "Ducklord's Server API Docs";
-  opt.Theme = ScalarTheme.Alternate;
+  opt.Theme = ScalarTheme.Default;
 });
 }
 
