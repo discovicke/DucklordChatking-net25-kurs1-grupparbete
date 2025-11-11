@@ -83,6 +83,22 @@ app.MapGet("/users", () =>
 });
 
 // TODO: Add endpoints for updating and deleting users
+app.MapPost("/update-user", (UpdateUserDTO dto) =>
+{
+  // Validate input
+  if (string.IsNullOrWhiteSpace(dto.OldUsername) || string.IsNullOrWhiteSpace(dto.NewUsername))
+  {
+    return Results.BadRequest(new { Message = "Old and new username are required." });
+  }
+
+  var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
+  if (!updated)
+  {
+    return Results.BadRequest(new { Message = "Failed to update user. Old username may not exist or new username already taken." });
+  }
+
+  return Results.Ok(new { UpdatedUsername = dto.NewUsername, Message = "User updated successfully" });
+});
 
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
