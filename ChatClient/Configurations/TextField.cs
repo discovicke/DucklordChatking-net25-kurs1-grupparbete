@@ -57,7 +57,7 @@ namespace ChatClient.Configurations
 
             // Backspace
             // TODO: Backspace pressed = hold down for continuous delete
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0)
+            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace))
             {
                 Text = Text.Substring(0, Text.Length - 1);
             }
