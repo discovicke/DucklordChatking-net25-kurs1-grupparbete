@@ -96,6 +96,7 @@ namespace ChatClient.Configurations
                 CreatBlinkTimer = 0f;
                 CreatVisible = true;
             }
+            
 
 
             // TODO: Add visible cursor
