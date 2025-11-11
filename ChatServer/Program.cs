@@ -40,19 +40,24 @@ app.MapPost("/login", (UserDTO dto) =>
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
   {
-    return Results.BadRequest(new { Message = "Username and password are required" });
+    return Results.BadRequest(new ApiResponseFail("Username and password are required."));
   }
 
   var user = userStore.GetByUsername(dto.Username);
 
   if (user != null && user.Password == dto.Password)
   {
-    return Results.Ok(new { user.Id, Message = "Username and password are required" });
+    return Results.Ok(new ApiResponseWithUsername(user.Username, "Login successful."));
   }
 
-  return Results.BadRequest(new { Message = "Invalid username and password." });
+  return Results.BadRequest(new ApiResponseFail("Invalid username or password."));
 })
-.WithDescription("Validates a `username` and `password`. If the credentials match a stored account, the server returns the user's ID and confirms the login.");
+.WithSummary("User Login")
+.WithDescription("Validates a `username` and `password`. If the credentials match a stored account, the server returns the user's username and confirms the login.")
+.Produces<ApiResponseWithUsername>(StatusCodes.Status200OK)
+.Produces<ApiResponseFail>(StatusCodes.Status400BadRequest)
+.WithSummary("User Login")
+.WithDescription("Validates username and password.");
 
 // Registration endpoint
 app.MapPost("/register", (UserDTO dto) =>
