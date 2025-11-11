@@ -3,20 +3,18 @@ using Shared;
 
 namespace ChatClient.Data;
 
-public class LoginUser
+public class UserAuth
 {
     //TODO: Kolla så login fungerar med servern
     
-    //TODO: Change LoginUser to more abstract user class
-
     private readonly HttpClient httpClient;
 
     // Production construktor
-    public LoginUser() : this(new HttpClient { BaseAddress = new Uri("http://localhost:5201") })
+    public UserAuth() : this(new HttpClient { BaseAddress = new Uri("http://localhost:5201") })
     { }
 
     // Test construktor
-    public LoginUser(HttpClient httpClient)
+    public UserAuth(HttpClient httpClient)
     {
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         if (this.httpClient.BaseAddress == null)
@@ -26,22 +24,24 @@ public class LoginUser
         }
     }
 
-    public bool Login(UserAccount user)
+    public bool Login(string username, string password)
     {
-        var loginDto = new LoginDTO
-        {
-            Username = user.Username,
-            Password = user.Password
-        };
+        var userDto = new UserDTO { Username = username, Password = password };
 
         try
         {
-            var response = httpClient.PostAsJsonAsync("/login", loginDto).Result;
+            var response = httpClient.PostAsJsonAsync("/login", userDto).Result;
             return response.IsSuccessStatusCode;
         }
         catch
         {
             return false;
         }
+    }
+    // New overload to allow tests to pass a DTO instance directly
+    public bool Login(UserDTO user)
+    {
+        if (user == null) throw new ArgumentNullException(nameof(user));
+        return Login(user.Username ?? string.Empty, user.Password ?? string.Empty);
     }
 }

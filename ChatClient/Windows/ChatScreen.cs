@@ -26,11 +26,10 @@ namespace ChatClient.Windows
         private static TextField textField = new TextField(new Rectangle(50, 450, 550, 100), Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
         
         // Adds a message sender to the text field
-        private static MessageSender? messageSender;
+        private static MessageHandler? messageSender;
 
          public static void Run() //TODO Koppla inloggad user till sender
          {
-             //messageSender = "USERNAME";
              // ChatWindow-test
              Raylib.BeginDrawing();
              Raylib.ClearBackground(Colors.BackgroundColor);
@@ -79,16 +78,9 @@ namespace ChatClient.Windows
                 // Click on Send: save message and clear input field
                 if (!string.IsNullOrWhiteSpace(textField.Text))
                 {
-                    userMessage = textField.Text;
-                    var message = new Message()
-                    {
-                        Sender = "Ducklord",
-                        Content = textField.Text,
-                        Timestamp = DateTime.UtcNow
-                    };
                     if (messageSender != null)
                     {
-                        bool success = messageSender.SendMessage(message);
+                        bool success = messageSender.SendMessage(textField.Text);
                         if (!success)
                         {
                             Console.WriteLine("Failed to send message!"); // TODO: To log

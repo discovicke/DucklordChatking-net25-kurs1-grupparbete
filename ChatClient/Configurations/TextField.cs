@@ -89,7 +89,8 @@ namespace ChatClient.Configurations
 
 
             // Backspace
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace))
+            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 ||
+                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && Text.Length >0)
             {
                 Text = Text.Substring(0, Text.Length - 1);
                 CreatBlinkTimer = 0f;

@@ -34,7 +34,7 @@ userStore.Add("Ducklord", "chatking");
 
 
 // Login endpoint
-app.MapPost("/login", (LoginDTO dto) =>
+app.MapPost("/login", (UserDTO dto) =>
 {
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -53,7 +53,7 @@ app.MapPost("/login", (LoginDTO dto) =>
 });
 
 // Registration endpoint
-app.MapPost("/register", (LoginDTO dto) =>
+app.MapPost("/register", (UserDTO dto) =>
 {
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -83,6 +83,22 @@ app.MapGet("/users", () =>
 });
 
 // TODO: Add endpoints for updating and deleting users
+app.MapPost("/update-user", (UpdateUserDTO dto) =>
+{
+  // Validate input
+  if (string.IsNullOrWhiteSpace(dto.OldUsername) || string.IsNullOrWhiteSpace(dto.NewUsername))
+  {
+    return Results.BadRequest(new { Message = "Old and new username are required." });
+  }
+
+  var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
+  if (!updated)
+  {
+    return Results.BadRequest(new { Message = "Failed to update user. Old username may not exist or new username already taken." }); // TODO: refine error messages in UserStore.Update to give more specific feedback, that is, if the old username does not exist, or if the new username is already taken specifically.
+  }
+
+  return Results.Ok(new { UpdatedUsername = dto.NewUsername, Message = "User updated successfully" });
+});
 
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
