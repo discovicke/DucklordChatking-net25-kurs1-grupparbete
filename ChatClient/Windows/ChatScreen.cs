@@ -109,9 +109,6 @@ namespace ChatClient.Windows
             }
             //TODO: Text not visible when hovering
 
-            // Client Version
-            Raylib.DrawText("DuckLord v.0.0.1", 10, 580, 10, Colors.TextColor);
-
             Raylib.EndDrawing();
 
          }

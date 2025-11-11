@@ -21,9 +21,11 @@ public class Program
             bool mousePressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
             
             // --- UI ---
-            // StartScreen.Run();
+              StartScreen.Run();
             // RegisterScreen.Run();
-             ChatScreen.Run();
+            // ChatScreen.Run();
+
+            Raylib.DrawText("DuckLord v.0.0.1", 10, 580, 10, Colors.TextColor);
         }
 
         Raylib.CloseWindow();
