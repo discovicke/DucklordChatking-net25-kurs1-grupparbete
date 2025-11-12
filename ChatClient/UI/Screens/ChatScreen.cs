@@ -21,6 +21,9 @@ namespace ChatClient.UI.Screens
 
         // Chat window shit: List of messages that are drawn every frame
         private static List<MessageDTO> messages = new List<MessageDTO>();
+        private static double lastUpdateTime = 0;
+
+
 
         //Input from user
         private static string inputText = "";
@@ -55,6 +58,23 @@ namespace ChatClient.UI.Screens
             {
                 AppState.CurrentScreen = Screen.Start;
             }
+
+            // Chat window shit
+            double currentTime = Raylib.GetTime(); // Raylib.GetTime() seconds since start
+            if (currentTime - lastUpdateTime >= 1.0) // 1 second has passed
+            {
+                lastUpdateTime = currentTime;
+
+                if (messageSender != null)
+                {
+                    var recieve = messageSender.ReceiveHistory();
+                    if (recieve != null && recieve.Any())
+                    {
+                        messages = recieve.ToList();
+                    }
+                }
+            }
+
 
             int rectX = 0;
             int rectY = 0;
