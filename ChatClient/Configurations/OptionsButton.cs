@@ -11,10 +11,8 @@ namespace ChatClient.Configurations
 
         public override void Draw()
         {
-            if (AppState.CanGoBack)
-            {
-                base.Draw();
-            }
+               base.Draw();
+            
         }
 
         public override void Update()
