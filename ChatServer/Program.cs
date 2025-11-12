@@ -59,23 +59,21 @@ app.MapPost("/login", (UserDTO dto) =>
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
   {
-    return Results.BadRequest(new ApiResponseFail("Username and password are required."));
+    return Results.BadRequest(new ApiFailResponse("Username and password are required."));
   }
 
   var user = userStore.GetByUsername(dto.Username);
 
   if (user != null && user.Password == dto.Password)
   {
-    return Results.Ok(new ApiResponseWithUsername(user.Username, "Login successful."));
+    return Results.Ok(new ApiSuccessResponseWithUsername(user.Username, "Login successful."));
   }
 
-  return Results.BadRequest(new ApiResponseFail("Invalid username or password."));
+  return Results.BadRequest(new ApiFailResponse("Invalid username or password."));
 })
 // API Docs through OpenAPI & ScalarUI
-.WithSummary("User Login")
-.WithDescription("Validates a `username` and `password`. If the credentials match a stored account, the server returns the user's username and confirms the login.")
-.Produces<ApiResponseWithUsername>(StatusCodes.Status200OK)
-.Produces<ApiResponseFail>(StatusCodes.Status400BadRequest)
+.Produces<ApiSuccessResponseWithUsername>(StatusCodes.Status200OK)
+.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
 .WithSummary("User Login")
 .WithDescription("Validates username and password.");
 
@@ -84,27 +82,29 @@ app.MapPost("/register", (UserDTO dto) =>
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
   {
-    return Results.BadRequest(new { Message = "Username and password are required" });
+    return Results.BadRequest(new ApiFailResponse("Username and password are required"));
   }
 
   // Attempt to add user
   if (!userStore.Add(dto.Username, dto.Password))
   {
-    return Results.BadRequest(new { Message = "Username already exists" });
+    return Results.BadRequest(new ApiFailResponse("Username already exists."));
   }
 
   var newUser = userStore.GetByUsername(dto.Username);
   if (newUser == null)
   {
-    return Results.BadRequest(new { Message = "Failed to add user" });
+    return Results.BadRequest(new ApiFailResponse("Failed to add user."));
   }
 
-  return Results.Ok(new { UserID = newUser.Id, Message = "Registration successful" }); // TODO: refactor the Add() in UserStore to return the User object, avoiding the issue here.
+  return Results.Ok(new ApiSuccessResponseWithUsername(newUser.Username, "Registration successful."));
 })
 // API Docs through OpenAPI & ScalarUI
+.Produces<ApiSuccessResponseWithUsername>(StatusCodes.Status200OK)
+.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
 .WithSummary("Register User Account")
 .WithDescription("Creates a new user account using the provided `username` and `password`. The server stores the account and returns the assigned user ID on success.");
-// TODO: Implement .Produces
+
 
 app.MapGet("/users", () =>
 {
