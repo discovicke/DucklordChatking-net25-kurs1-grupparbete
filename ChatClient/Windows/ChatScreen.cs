@@ -5,6 +5,7 @@ using System.Numerics;
 using ChatClient.Configurations;
 using ChatClient.Data;
 using Raylib_cs;
+using Shared;
 
 
 
@@ -19,6 +20,10 @@ namespace ChatClient.Windows
         }
 
         private static SelectedField selected = SelectedField.None;
+
+        // New message list?
+        private static List<MessageDTO> messages = new List<MessageDTO>();
+
 
         //Input from user
         private static string inputText = "";
@@ -47,6 +52,7 @@ namespace ChatClient.Windows
             // ChatWindow-test
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Colors.BackgroundColor);
+
 
             // Logo
             Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
@@ -84,6 +90,19 @@ namespace ChatClient.Windows
             textField.Update();
             textField.Draw();
 
+            // Chat window shit
+            int startX = (int)rectX + 90;
+            int startY = (int)rectY + 90;
+            int lineHeight = 20;
+
+            foreach (var msg in messages)
+            {
+                string text = $"{msg.Timestamp} - {msg.Sender} : {msg.Content}";
+                Raylib.DrawText(text, startX, startY, 15, Colors.TextColor);
+                startY += lineHeight;
+            }
+
+
             // Mouse Logic
             if (MouseInput.IsLeftClick(typeWindow))
             {
@@ -107,16 +126,29 @@ namespace ChatClient.Windows
                         {
                             Log.Success("Message sent successfully");
                             Console.WriteLine("Message sent successfully");
+
+                            //Chat window shit
+                            messages.Add(new MessageDTO
+                            {
+                                Sender = "DuckLord", // Change to real user later
+                                Content = textField.Text,
+                                Timestamp = DateTime.UtcNow
+                            });
                         }
 
                     }
 
+                }
+
                     // Empty text field
                     textField.Clear();
-                }
+                
             }
 
             Raylib.EndDrawing();
         }
+
     }
+
 }
+  
