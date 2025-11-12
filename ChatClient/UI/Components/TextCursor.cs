@@ -4,7 +4,7 @@ namespace ChatClient.UI.Components
     {
         private int position;
         private float blinkTimer;
-        private bool visible = true;
+        private bool visible = false;
         private const float BlinkInterval = 0.5f;
 
         public int Position
@@ -14,6 +14,12 @@ namespace ChatClient.UI.Components
         }
 
         public bool IsVisible => visible;
+        
+        public void ResetInvisible()
+        {
+            visible = false;
+            blinkTimer = 0f;
+        }
 
         public void Update(float deltaTime)
         {

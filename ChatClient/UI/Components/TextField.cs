@@ -36,7 +36,7 @@ namespace ChatClient.UI.Components
                 Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, Color.Black);
             }
 
-            renderer.Draw(Text, cursor);
+            renderer.Draw(Text, cursor, IsSelected);
         }
 
         public override void Update()
@@ -44,10 +44,12 @@ namespace ChatClient.UI.Components
             if (MouseInput.IsLeftClick(Rect))
             {
                 IsSelected = true;
+                cursor.ResetBlink();
             }
             else if (Raylib.IsMouseButtonPressed(MouseButton.Left) && !MouseInput.IsHovered(Rect))
             {
                 IsSelected = false;
+                cursor.ResetInvisible();
             }
 
             if (!IsSelected) return;

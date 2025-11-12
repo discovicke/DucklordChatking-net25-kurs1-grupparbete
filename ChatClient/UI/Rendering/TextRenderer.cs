@@ -7,7 +7,7 @@ namespace ChatClient.UI.Rendering
     public class TextRenderer
     {
         private const int FontSize = 20;
-        private const int Padding = 5;
+        private const int Padding = 4;
         private const int LineSpacing = 2;
 
         private int scrollOffset;
@@ -16,8 +16,7 @@ namespace ChatClient.UI.Rendering
         private readonly bool isPassword;
         private readonly bool allowMultiline;
 
-        
-        
+
         public TextRenderer(Rectangle bounds, Color textColor, bool isPassword, bool allowMultiline)
         {
             this.bounds = bounds;
@@ -26,7 +25,7 @@ namespace ChatClient.UI.Rendering
             this.allowMultiline = allowMultiline;
         }
 
-        public void Draw(string text, TextCursor cursor)
+        public void Draw(string text, TextCursor cursor, bool isSelected)
         {
             int textX = (int)(bounds.X + Padding);
             int textY = (int)(bounds.Y + Padding);
@@ -44,7 +43,7 @@ namespace ChatClient.UI.Rendering
 
             Raylib.EndScissorMode();
 
-            if (cursor.IsVisible)
+            if (isSelected && cursor.IsVisible)
             {
                 DrawCaret(text, textX, textY, cursor);
             }
@@ -123,7 +122,7 @@ namespace ChatClient.UI.Rendering
             string left = cursor.Position > 0 ? text.Substring(0, cursor.Position) : "";
             int leftWidth = isPassword
                 ? Raylib.MeasureText(new string('*', left.Length), FontSize)
-                : Raylib.MeasureText(left, FontSize);            
+                : Raylib.MeasureText(left, FontSize);
             int caretXLocal = leftWidth - scrollOffset;
 
             if (caretXLocal < 0)

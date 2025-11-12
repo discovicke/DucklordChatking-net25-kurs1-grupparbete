@@ -66,6 +66,10 @@ namespace ChatClient.UI.Screens
             {
                 AppState.CurrentScreen = Screen.Start;
                 Log.Info("New user registerd, switching to start screen");
+                passwordField.Clear();
+                passwordFieldC.Clear();
+                userField.Clear();
+                idField.Clear();
             }
             
             //Back button
