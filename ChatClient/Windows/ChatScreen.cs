@@ -38,14 +38,14 @@ namespace ChatClient.Windows
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: true
         );
-        
+
         // Back button
         private static BackButton backButton = new BackButton(new Rectangle(10, 10, 100, 30));
 
 
         // Adds a message sender to the text field
         private static MessageHandler? messageSender = new MessageHandler(new HttpClient
-            { BaseAddress = new Uri("http://192.168.20.17:5201/scalar/") });
+            { BaseAddress = new Uri("http://192.168.20.17:5201/") });
 
         public static void Run()
         {
@@ -80,7 +80,7 @@ namespace ChatClient.Windows
             //Back button
             backButton.Update();
             backButton.Draw();
-            
+
             // Send button
             Button sendButton = new Button(sendButtonRect, "Send", Colors.TextFieldColor, Colors.HoverColor,
                 Colors.TextColor);
@@ -142,7 +142,7 @@ namespace ChatClient.Windows
 
                     // Empty text field
                     textField.Clear();
-                
+
             }
 
             Raylib.EndDrawing();
@@ -151,4 +151,4 @@ namespace ChatClient.Windows
     }
 
 }
-  
+
