@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Numerics;
 using ChatClient.Configurations;
@@ -21,9 +22,9 @@ namespace ChatClient.Windows
 
         private static SelectedField selected = SelectedField.None;
 
-        // New message list?
-        private static List<MessageDTO> messages = new List<MessageDTO>();
 
+        // Chat window shit: List of messages that are drawn every frame
+        private static List<MessageDTO> messages = new List<MessageDTO>();
 
         //Input from user
         private static string inputText = "";
@@ -42,17 +43,14 @@ namespace ChatClient.Windows
         // Back button
         private static BackButton backButton = new BackButton(new Rectangle(10, 10, 100, 30));
 
-
         // Adds a message sender to the text field
         private static MessageHandler? messageSender = new MessageHandler(new HttpClient
-            { BaseAddress = new Uri("http://192.168.20.17:5201/") });
+        { BaseAddress = new Uri("http://192.168.20.17:5201/") });
 
         public static void Run()
         {
-            // ChatWindow-test
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Colors.BackgroundColor);
-
 
             // Logo
             Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
@@ -66,8 +64,6 @@ namespace ChatClient.Windows
             int rectY = 0;
             int rectWidth = 0;
             int rectHeight = 0;
-
-            // TODO: Move rectVARIABLES to configuration classes?
 
             // Rectangles
             Rectangle typeWindow = new Rectangle(rectX + 50, rectY + 450, rectWidth + 550, rectHeight + 100);
@@ -90,18 +86,19 @@ namespace ChatClient.Windows
             textField.Update();
             textField.Draw();
 
-            // Chat window shit
-            int startX = (int)rectX + 90;
-            int startY = (int)rectY + 90;
+
+            // Chat window shit: Draw all messages from messages every frame
+            int startX = (int)chatWindow.X + 10;
+            int startY = (int)chatWindow.Y + 10;
             int lineHeight = 20;
 
             foreach (var msg in messages)
             {
-                string text = $"{msg.Timestamp} - {msg.Sender} : {msg.Content}";
+                string sender = string.IsNullOrWhiteSpace(msg.Sender) ? "Unknown" : msg.Sender;
+                string text = $"{msg.Timestamp}  -  {sender} :  {msg.Content}";
                 Raylib.DrawText(text, startX, startY, 15, Colors.TextColor);
-                startY += lineHeight;
+                startY += lineHeight; 
             }
-
 
             // Mouse Logic
             if (MouseInput.IsLeftClick(typeWindow))
@@ -111,12 +108,15 @@ namespace ChatClient.Windows
             else if (sendButton.IsClicked() || Raylib.IsKeyPressed(KeyboardKey.Enter) && !Raylib.IsKeyDown(KeyboardKey.LeftShift))
             {
                 Log.Info("Send button clicked");
-                // Click on Send: save message and clear input field
                 if (!string.IsNullOrWhiteSpace(textField.Text))
                 {
                     if (messageSender != null)
                     {
                         bool success = messageSender.SendMessage(textField.Text);
+
+                        // Chat window shit: Get history and update messages
+                        var recieve = messageSender.ReceiveHistory();
+
                         if (!success)
                         {
                             Log.Error("Failed to send message!");
@@ -127,28 +127,22 @@ namespace ChatClient.Windows
                             Log.Success("Message sent successfully");
                             Console.WriteLine("Message sent successfully");
 
-                            //Chat window shit
-                            messages.Add(new MessageDTO
+                            if (recieve != null && recieve.Any())
                             {
-                                Sender = "DuckLord", // Change to real user later
-                                Content = textField.Text,
-                                Timestamp = DateTime.Now,
-                            });
+
+                                // Chat window shit: Update message-list and draw it automaticly next fram
+                                messages = recieve.ToList();
+                            }
                         }
-
                     }
-
-                }
 
                     // Empty text field
                     textField.Clear();
-
+                }
             }
 
             Raylib.EndDrawing();
         }
-
     }
-
 }
 
