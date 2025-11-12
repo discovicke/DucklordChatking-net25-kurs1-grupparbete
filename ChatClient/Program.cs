@@ -34,6 +34,9 @@ public class Program
                 case Screen.Chat:
                     ChatScreen.Run();
                     break;
+                case Screen.Options:
+                    OptionsWindow.Run();
+                    break;
             }
 
             Raylib.DrawText("DuckLord v.0.0.1", 10, 580, 10, Colors.TextColor);
