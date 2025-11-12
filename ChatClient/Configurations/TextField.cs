@@ -78,8 +78,29 @@ namespace ChatClient.Configurations
             scrollOffset = Math.Clamp(scrollOffset, 0, maxScroll);
             Raylib.DrawText(Text, textX - scrollOffset, textY, FontSize, TextColor);
         }
+        private void ResetCaretBlink()
+        {
+            CreatBlinkTimer = 0f;
+            CreatVisible = true;
+        }
 
-        
+        private void MoveCursorLeft()
+        {
+            if (CursorPositon > 0)
+            {
+                CursorPositon--;
+                ResetCaretBlink();
+            }
+        }
+        private void MoveCursorRight()
+        {
+            if (CursorPositon < Text.Length)
+            {
+                CursorPositon++;
+                ResetCaretBlink();
+            }
+        }
+
 
         //---
         //private void DrawSingleLineText(int textX, int textY)
