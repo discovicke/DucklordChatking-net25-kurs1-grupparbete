@@ -85,7 +85,7 @@ namespace ChatClient.Windows
             {
                 selected = SelectedField.TypeWindow;
             }
-            else if (sendButton.IsClicked() || Raylib.IsKeyPressed(KeyboardKey.Enter))
+            else if (sendButton.IsClicked() || Raylib.IsKeyPressed(KeyboardKey.Enter) && !Raylib.IsKeyDown(KeyboardKey.LeftShift))
             {
                 Log.Info("Send button clicked");
                 // Click on Send: save message and clear input field

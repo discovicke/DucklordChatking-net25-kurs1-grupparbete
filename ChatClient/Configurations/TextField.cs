@@ -19,9 +19,11 @@ namespace ChatClient.Configurations
         private float CreatBlinkTimer = 0f;
         private bool CreatVisible = true;
         private int scrollOffset = 0; // For single line text
-
+        private int CursorPositon { get; set; } = 0;
         private const int FontSize = 20;
         private const int Padding = 5;
+        // private bool IsPassword { get; } = isPassword;
+        // private string PasswordMask { get; } = string.IsNullOrEmpty(passwordMask) ? "•" : passwordMask;
 
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor, bool allowMultiline = false)
         {
@@ -42,10 +44,10 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, TextColor);
             }
-            
+
             int textX = (int)(Rect.X + Padding);
             int textY = (int)(Rect.Y + Padding);
-            
+
             Raylib.BeginScissorMode((int)Rect.X, (int)Rect.Y, (int)Rect.Width, (int)Rect.Height);
             // Checks if text is multiline or single line for text drawing
             if (AllowMultiline)
@@ -88,11 +90,16 @@ namespace ChatClient.Configurations
         {
             var lines = WrapText(Text, (int)Rect.Width - Padding * 2);
             int currentY = textY;
+            var manualLines = Text.Split('\n');
 
-            foreach (var line in lines)
+            foreach (var i in manualLines)
             {
-                Raylib.DrawText(line, textX, currentY, FontSize, TextColor);
-                currentY += FontSize + 2; // Radavstånd
+                var wrappedLines = WrapText(i, (int)Rect.Width - Padding * 2);
+                foreach (var line in wrappedLines)
+                {
+                    Raylib.DrawText(line, textX, currentY, FontSize, TextColor);
+                    currentY += FontSize + 2; // Radavstånd
+                }
             }
         }
 
@@ -126,20 +133,20 @@ namespace ChatClient.Configurations
 
             return lines.Count > 0 ? lines : new List<string> { "" };
         }
-        
+
         // Draws caret at the end of the text
         // TODO: Change caret position with arrow keys and mouse click
         private void DrawCaret(int textX, int textY)
         {
             int textWidth = Raylib.MeasureText(Text, FontSize);
             int caretX = AllowMultiline ? textX + textWidth : textX - scrollOffset + textWidth;
-            
+
             if (AllowMultiline)
             {
                 var lines = WrapText(Text, (int)Rect.Width - Padding * 2);
                 int lineCount = lines.Count;
                 textY += (lineCount - 1) * (FontSize + 2);
-                
+
                 if (lines.Count > 0)
                 {
                     int lastLineWidth = Raylib.MeasureText(lines[^1], FontSize);
@@ -175,7 +182,7 @@ namespace ChatClient.Configurations
                     CreatVisible = !CreatVisible;
                 }
             }
-            
+
             if (!IsSelected)
             {
                 return;
@@ -191,23 +198,35 @@ namespace ChatClient.Configurations
                 {
                     // Converts to Unicode to accept all even åäö
                     Text += char.ConvertFromUtf32(key);
+                    CursorPositon++;
                     CreatBlinkTimer = 0f;
                     CreatVisible = true;
                 }
-
-
                 key = Raylib.GetCharPressed();
+
             }
-            
-            // Backspace
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 ||
-                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && Text.Length > 0)
+            //  Enter adds newline only if multiline
+            if (AllowMultiline
+                && (Raylib.IsKeyDown(KeyboardKey.LeftShift) && Raylib.IsKeyPressed(KeyboardKey.Enter) || Raylib.IsKeyDown(KeyboardKey.RightShift))
+                && Raylib.IsKeyPressed(KeyboardKey.Enter))
             {
-                Text = Text.Substring(0, Text.Length - 1);
+                Text = Text.Insert(CursorPositon, "\n");
                 CreatBlinkTimer = 0f;
+                CursorPositon++;
                 CreatVisible = true;
             }
-            
+
+
+            // Backspace
+            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && CursorPositon > 0 ||
+                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && CursorPositon > 0)
+            {
+                Text = Text.Remove( CursorPositon - 1,1);
+                CreatBlinkTimer = 0f;
+                CursorPositon--;
+                CreatVisible = true;
+            }
+
             // TODO: Text row break when hitting border
 
             // TODO: Scroll logicZ
