@@ -6,7 +6,7 @@ namespace ChatClient.UI.Components
     public class OptionsButton : Button
     {
         public OptionsButton(Rectangle rect)
-            : base(rect, "← Options", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor)
+            : base(rect, "Ducktions", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor)
         {
         }
         
@@ -17,13 +17,6 @@ namespace ChatClient.UI.Components
             
         }
 
-        public override void Update()
-        {
-            if (AppState.CanGoBack && IsClicked())
-            {
-                AppState.GoBack();
-                Log.Info($"Navigated back to {AppState.CurrentScreen}");
-            }
-        }
+      
     }
 }

@@ -15,11 +15,10 @@ namespace ChatClient.Screens
         // Loade Logo
         private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
 
-        private static TextField Ducktions = new TextField(
-            new Rectangle(500, 300, 150, 25),
-            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
-            allowMultiline: false
+        private static OptionsButton Ducktions = new OptionsButton(
+            new Rectangle(300, 400, 150, 25)
         );
+        private static BackButton Back = new BackButton(new Rectangle(300, 400, 150, 25));
 
         private static TextField Kalle = new TextField(
             new Rectangle(300, 300, 150, 25),
@@ -61,6 +60,9 @@ namespace ChatClient.Screens
 
             Ducktions.Update();
             Ducktions.Draw();
+            
+            Back.Update();
+            Back.Draw();
 
             // Logo
             Raylib.DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);

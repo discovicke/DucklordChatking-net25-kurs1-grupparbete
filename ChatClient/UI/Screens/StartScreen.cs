@@ -35,7 +35,7 @@ namespace ChatClient.UI.Screens
         );
 
         private static OptionsButton Ducktions = new OptionsButton(
-            new Rectangle(500, 300, 150, 25)
+            new Rectangle(300, 500, 150, 25)
             );
 
         public static void Run()
