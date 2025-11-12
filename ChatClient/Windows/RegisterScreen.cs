@@ -30,13 +30,15 @@ namespace ChatClient.Windows
         private static TextField passwordField = new TextField(
             new Rectangle(300, 400, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
-            allowMultiline: false
+            allowMultiline: false,
+            isPassword: true
         );
 
         private static TextField passwordFieldC = new TextField(
             new Rectangle(300, 450, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
-            allowMultiline: false
+            allowMultiline: false,
+            isPassword: true
         );
 
         private static Button registerButton = new Button(

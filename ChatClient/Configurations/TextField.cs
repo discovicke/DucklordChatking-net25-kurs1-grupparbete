@@ -15,6 +15,7 @@ namespace ChatClient.Configurations
         private Color TextColor { get; set; }
         private bool IsSelected { get; set; } = false;
         private bool AllowMultiline { get; set; } = false;
+        private bool IsPassword { get; }
 
         private float CreatBlinkTimer = 0f;
         private bool CreatVisible = true;
@@ -26,13 +27,14 @@ namespace ChatClient.Configurations
         // private string PasswordMask { get; } = string.IsNullOrEmpty(passwordMask) ? "•" : passwordMask;
 
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
-            bool allowMultiline = false)
+            bool allowMultiline = false, bool isPassword = false)
         {
             Rect = rect;
             BackgroundColor = backgroundColor;
             HoverColor = hoverColor;
             TextColor = textColor;
             AllowMultiline = allowMultiline;
+            IsPassword = isPassword;
         }
 
         // TODO: Ctrl+A, Ctr+C, Ctr+V
@@ -72,11 +74,13 @@ namespace ChatClient.Configurations
 
         private void DrawSingleLineText(int textX, int textY)
         {
+            if (IsPassword) { Text = new string('*', Text.Length); }
+            var displayText = Text;
             int availableWidth = (int)Rect.Width - Padding * 2;
             int textWidth = Raylib.MeasureText(Text, FontSize);
             int maxScroll = Math.Max(0, textWidth - availableWidth);
             scrollOffset = Math.Clamp(scrollOffset, 0, maxScroll);
-            Raylib.DrawText(Text, textX - scrollOffset, textY, FontSize, TextColor);
+            Raylib.DrawText(displayText, textX - scrollOffset, textY, FontSize, TextColor);
         }
         private void ResetCaretBlink()
         {
@@ -127,28 +131,7 @@ namespace ChatClient.Configurations
 
             scrollOffset = Math.Clamp(scrollOffset, 0, maxScroll);
         }
-
-
-        //---
-        //private void DrawSingleLineText(int textX, int textY)
-        //{
-        //    // Count text width and scroll if needed
-        //    int textWidth = Raylib.MeasureText(Text, FontSize);
-        //    int availableWidth = (int)Rect.Width - Padding * 2;
-        //
-        //    if (textWidth > availableWidth)
-        //    {
-        //        scrollOffset = textWidth - availableWidth;
-        //    }
-        //    else
-        //    {
-        //        scrollOffset = 0;
-        //    }
-        //
-        //    Raylib.DrawText(Text, textX - scrollOffset, textY, FontSize, TextColor);
-        //}
-        //-----
-
+        
         // Responsible for drawing multiline text with rowbreak
         private void DrawMultilineText(int textX, int textY)
         {
