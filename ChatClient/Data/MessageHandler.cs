@@ -56,7 +56,7 @@ namespace ChatClient.Data
             }
         }
 
-        public async Task<bool> ReceiveHistory(int? take = null)
+        public bool ReceiveHistory(int? take = null)
         {
             try
             {
@@ -64,12 +64,16 @@ namespace ChatClient.Data
                     ? $"/messages/history?take={take}"
                     : "/messages/history";
 
-                var response = await httpClient.GetAsync(url);
+                // Blockera tills resultatet kommer
+                var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
 
                 if (!response.IsSuccessStatusCode)
                     return false;
 
-                var messages = await response.Content.ReadFromJsonAsync<List<MessageDTO>>();
+                var messages = response.Content
+                    .ReadFromJsonAsync<List<MessageDTO>>()
+                    .GetAwaiter()
+                    .GetResult();
 
                 if (messages == null)
                     return false;
@@ -87,5 +91,6 @@ namespace ChatClient.Data
                 return false;
             }
         }
+
     }
 }
