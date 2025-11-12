@@ -13,6 +13,8 @@ namespace ChatClient.UI.Components
         private readonly bool AllowMultiline;
         private readonly TextCursor cursor;
         private readonly TextRenderer renderer;
+        private bool backspaceHandledThisFrame;
+
 
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
             bool allowMultiline = false, bool isPassword = false)
@@ -73,16 +75,22 @@ namespace ChatClient.UI.Components
             while (key > 0)
             {
                 if (key >= 32)
-                {
                     InsertText(char.ConvertFromUtf32(key));
-                }
 
                 key = Raylib.GetCharPressed();
             }
 
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace))
+            bool backspacePressed = Raylib.IsKeyPressed(KeyboardKey.Backspace) 
+                                    || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace);
+
+            if (backspacePressed && !backspaceHandledThisFrame)
             {
                 DeleteCharacter();
+                backspaceHandledThisFrame = true;
+            }
+            else if (!backspacePressed)
+            {
+                backspaceHandledThisFrame = false;
             }
         }
 
@@ -119,10 +127,11 @@ namespace ChatClient.UI.Components
 
         private void DeleteCharacter()
         {
-            if (cursor.Position > 0)
+            if (cursor.Position > 0 && Text.Length > 0)
             {
-                Text = Text.Remove(cursor.Position - 1, 1);
-                cursor.Position--;
+                int removeIndex = Math.Clamp(cursor.Position - 1, 0, Text.Length - 1);
+                Text = Text.Remove(removeIndex, 1);
+                cursor.Position = removeIndex;
                 cursor.ResetBlink();
             }
         }

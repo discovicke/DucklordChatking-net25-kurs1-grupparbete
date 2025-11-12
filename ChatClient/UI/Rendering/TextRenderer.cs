@@ -74,16 +74,18 @@ namespace ChatClient.UI.Rendering
         private (int x, int y) GetCaretPixelPosition(string text, int textX, int textY, TextCursor cursor)
         {
             int pos = Math.Clamp(cursor.Position, 0, text.Length);
+    
+            string displayText = isPassword ? new string('*', text.Length) : text;
 
             if (!allowMultiline)
             {
-                string left = pos > 0 ? text.Substring(0, pos) : "";
+                string left = pos > 0 ? displayText.Substring(0, pos) : "";
                 int leftWidth = Raylib.MeasureText(left, FontSize);
                 return (textX - scrollOffset + leftWidth, textY);
             }
 
             int availableWidth = (int)bounds.Width - Padding * 2;
-            string preText = pos > 0 ? text.Substring(0, pos) : "";
+            string preText = pos > 0 ? displayText.Substring(0, pos) : "";
             var paras = preText.Split('\n');
 
             int linesBefore = 0;
@@ -113,9 +115,8 @@ namespace ChatClient.UI.Rendering
             int maxScroll = Math.Max(0, textWidth - availableWidth);
 
             string left = cursor.Position > 0 ? text.Substring(0, cursor.Position) : "";
-            int leftWidth = isPassword
-                ? Raylib.MeasureText(new string('*', left.Length), FontSize)
-                : Raylib.MeasureText(left, FontSize);
+            string displayLeft = isPassword ? new string('*', left.Length) : left;
+            int leftWidth = Raylib.MeasureText(displayLeft, FontSize);
             int caretXLocal = leftWidth - scrollOffset;
 
             if (caretXLocal < 0)

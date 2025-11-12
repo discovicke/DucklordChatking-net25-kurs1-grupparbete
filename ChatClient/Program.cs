@@ -18,6 +18,7 @@ public class Program
         string appVersion = "DuckLord v.0.0.2";
 
         Raylib.InitWindow(800, 600, appVersion);
+        Raylib.SetTargetFPS(60);
         Console.WriteLine($"Log path: {AppDomain.CurrentDomain.BaseDirectory}log.txt");
         Log.Write("Program started.");
         
