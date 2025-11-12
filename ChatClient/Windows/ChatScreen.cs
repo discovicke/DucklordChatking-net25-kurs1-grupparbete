@@ -33,6 +33,10 @@ namespace ChatClient.Windows
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: true
         );
+        
+        // Back button
+        private static BackButton backButton = new BackButton(new Rectangle(10, 10, 100, 30));
+
 
         // Adds a message sender to the text field
         private static MessageHandler? messageSender = new MessageHandler(new HttpClient
@@ -67,10 +71,10 @@ namespace ChatClient.Windows
             // ChatWindow
             Raylib.DrawRectangleRounded(chatWindow, 0.1f, 10, Colors.HoverColor);
 
-
-            // TypeWindow
-            //Raylib.DrawRectangleRounded(typeWindow, 0.3f, 10, Colors.TextFieldColor);
-
+            //Back button
+            backButton.Update();
+            backButton.Draw();
+            
             // Send button
             Button sendButton = new Button(sendButtonRect, "Send", Colors.TextFieldColor, Colors.HoverColor,
                 Colors.TextColor);

@@ -23,7 +23,8 @@ namespace ChatClient.Configurations
         private const int FontSize = 20;
         private const int Padding = 5;
 
-        public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor, bool allowMultiline = false)
+        public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
+            bool allowMultiline = false)
         {
             Rect = rect;
             BackgroundColor = backgroundColor;
@@ -31,6 +32,7 @@ namespace ChatClient.Configurations
             TextColor = textColor;
             AllowMultiline = allowMultiline;
         }
+
         // TODO: Ctrl+A, Ctr+C, Ctr+V
         // TODO: Ctrl+ArrowKey to move cursor over words and not characters
         public override void Draw()
@@ -42,10 +44,10 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, TextColor);
             }
-            
+
             int textX = (int)(Rect.X + Padding);
             int textY = (int)(Rect.Y + Padding);
-            
+
             Raylib.BeginScissorMode((int)Rect.X, (int)Rect.Y, (int)Rect.Width, (int)Rect.Height);
             // Checks if text is multiline or single line for text drawing
             if (AllowMultiline)
@@ -56,6 +58,7 @@ namespace ChatClient.Configurations
             {
                 DrawSingleLineText(textX, textY);
             }
+
             Raylib.EndScissorMode();
 
             if (IsSelected && CreatVisible)
@@ -126,20 +129,20 @@ namespace ChatClient.Configurations
 
             return lines.Count > 0 ? lines : new List<string> { "" };
         }
-        
+
         // Draws caret at the end of the text
         // TODO: Change caret position with arrow keys and mouse click
         private void DrawCaret(int textX, int textY)
         {
             int textWidth = Raylib.MeasureText(Text, FontSize);
             int caretX = AllowMultiline ? textX + textWidth : textX - scrollOffset + textWidth;
-            
+
             if (AllowMultiline)
             {
                 var lines = WrapText(Text, (int)Rect.Width - Padding * 2);
                 int lineCount = lines.Count;
                 textY += (lineCount - 1) * (FontSize + 2);
-                
+
                 if (lines.Count > 0)
                 {
                     int lastLineWidth = Raylib.MeasureText(lines[^1], FontSize);
@@ -175,7 +178,7 @@ namespace ChatClient.Configurations
                     CreatVisible = !CreatVisible;
                 }
             }
-            
+
             if (!IsSelected)
             {
                 return;
@@ -198,7 +201,7 @@ namespace ChatClient.Configurations
 
                 key = Raylib.GetCharPressed();
             }
-            
+
             // Backspace
             if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 ||
                 Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && Text.Length > 0)
@@ -207,7 +210,7 @@ namespace ChatClient.Configurations
                 CreatBlinkTimer = 0f;
                 CreatVisible = true;
             }
-            
+
             // TODO: Text row break when hitting border
 
             // TODO: Scroll logicZ
