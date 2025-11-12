@@ -1,4 +1,4 @@
-namespace ChatClient.Configurations
+﻿namespace ChatClient.Configurations
 {
     public enum Screen
     {

@@ -1,4 +1,4 @@
-namespace ChatServer.Hubs;
+﻿namespace ChatServer.Hubs;
 
 using Microsoft.AspNetCore.SignalR;
 
