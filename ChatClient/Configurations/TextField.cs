@@ -101,7 +101,7 @@ namespace ChatClient.Configurations
                 foreach (var line in wrappedLines)
                 {
                     Raylib.DrawText(line, textX, currentY, FontSize, TextColor);
-                    currentY += FontSize + 2; // Radavstånd
+                    currentY += FontSize + 2; // line spacing
                 }
             }
         }
@@ -136,31 +136,54 @@ namespace ChatClient.Configurations
 
             return lines.Count > 0 ? lines : new List<string> { "" };
         }
+        private (int caretX, int caretY) GetCaretPixelPosition(int textX, int textY)
+        {
+            int cursor = Math.Clamp(CursorPositon, 0, Text.Length);
 
+            if (!AllowMultiline)
+            {
+                string left = cursor > 0 ? Text.Substring(0, cursor) : "";
+                int leftWidth = Raylib.MeasureText(left, FontSize);
+                int caretX = textX - scrollOffset + leftWidth;
+                int caretY = textY;
+                return (caretX, caretY);
+            }
+
+            int availableWidth = (int)Rect.Width - Padding * 2;
+
+            // Text up to the cursor
+            string preText = cursor > 0 ? Text.Substring(0, cursor) : "";
+
+            // Split into manual paragraphs up to the cursor
+            var paras = preText.Split('\n');
+
+            // Count fully completed wrapped lines before the last paragraph
+            int linesBefore = 0;
+            for (int i = 0; i < paras.Length - 1; i++)
+            {
+                linesBefore += WrapText(paras[i], availableWidth).Count;
+            }
+
+            // Wrap the last partial paragraph and measure its last line
+            string lastPara = paras.Length > 0 ? paras[^1] : "";
+            var wrappedLast = WrapText(lastPara, availableWidth);
+            string lastLine = wrappedLast.Count > 0 ? wrappedLast[^1] : "";
+            int lastLineWidth = Raylib.MeasureText(lastLine, FontSize);
+
+            int caretLineIndex = linesBefore + Math.Max(0, wrappedLast.Count - 1);
+            int caretXPos = textX + lastLineWidth;
+            int caretYPos = textY + caretLineIndex * (FontSize + 2);
+            return (caretXPos, caretYPos);
+        }
         // Draws caret at the end of the text
         // TODO: Change caret position with arrow keys and mouse click
         private void DrawCaret(int textX, int textY)
         {
-            int textWidth = Raylib.MeasureText(Text, FontSize);
-            int caretX = AllowMultiline ? textX + textWidth : textX - scrollOffset + textWidth;
-
-            if (AllowMultiline)
-            {
-                var lines = WrapText(Text, (int)Rect.Width - Padding * 2);
-                int lineCount = lines.Count;
-                textY += (lineCount - 1) * (FontSize + 2);
-
-                if (lines.Count > 0)
-                {
-                    int lastLineWidth = Raylib.MeasureText(lines[^1], FontSize);
-                    caretX = textX + lastLineWidth;
-                }
-            }
-
-            int caretTop = textY;
-            int caretBottom = caretTop + FontSize;
-            Raylib.DrawLine(caretX, caretTop, caretX, caretBottom, TextColor);
+            var (cx, cy) = GetCaretPixelPosition(textX, textY); // ADDED: use helper for clarity
+            Raylib.DrawLine(cx, cy, cx, cy + FontSize, TextColor);
         }
+
+
 
         // Get call every frame after MouseInput.Update() to handle click and text-input.
         public override void Update()
