@@ -47,6 +47,12 @@ namespace ChatClient.Windows
                 Log.Info("User logged in, switching to chat screen");
             }
 
+            if (MouseInput.IsLeftClick(registerButton.Rect))
+            {
+                AppState.CurrentScreen = Screen.Register;
+                Log.Info("User want to register, switching to register screen");
+            }
+
             // Update and draw fields/buttons
             userField.Update();
             userField.Draw();

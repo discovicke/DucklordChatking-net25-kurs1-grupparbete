@@ -49,7 +49,7 @@ namespace ChatClient.Windows
             DrawText("Confirm password:", 220, 405, 15, Colors.TextFieldColor);
 
             // Button
-            if (MouseInput.IsLeftClick(loginButton.Rect))
+            if (MouseInput.IsLeftClick(registerButton.Rect))
             {
                 AppState.CurrentScreen = Screen.Start;
                 Log.Info("New user registerd, switching to start screen");
