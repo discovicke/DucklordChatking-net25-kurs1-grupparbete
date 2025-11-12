@@ -1,11 +1,10 @@
-﻿using Raylib_cs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using ChatClient.Configurations;
+using ChatClient.Data;
+using Raylib_cs;
 using static Raylib_cs.Raylib;
 
 
@@ -19,17 +18,20 @@ namespace ChatClient.Windows
         // Create text fields and button
         private static TextField userField = new TextField(
             new Rectangle(300, 300, 150, 25),
-            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
+            allowMultiline: false
         );
 
         private static TextField passwordField = new TextField(
             new Rectangle(300, 350, 150, 25),
-            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
+            allowMultiline: false
         );
 
         private static TextField passwordFieldC = new TextField(
             new Rectangle(300, 400, 150, 25),
-            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
+            Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
+            allowMultiline: false
         );
 
         private static Button registerButton = new Button(
@@ -66,7 +68,7 @@ namespace ChatClient.Windows
             passwordFieldC.Draw();
 
             registerButton.Draw();
-            
+
             // Logo
             DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);
 

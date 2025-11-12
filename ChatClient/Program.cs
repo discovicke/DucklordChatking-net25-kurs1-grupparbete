@@ -3,6 +3,7 @@ using ChatClient.Data;
 using ChatClient.Windows;
 using Raylib_cs;
 
+
 namespace ChatClient;
 
 public class Program
@@ -27,9 +28,9 @@ public class Program
                 case Screen.Start:
                     StartScreen.Run();
                     break;
-                //case Screen.Register:
-                //    RegisterScreen.Run();
-                //    break;
+                case Screen.Register:
+                    RegisterScreen.Run();
+                    break;
                 case Screen.Chat:
                     ChatScreen.Run();
                     break;
