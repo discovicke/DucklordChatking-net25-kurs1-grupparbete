@@ -30,7 +30,7 @@ namespace ChatClient.UI.Screens
         private static string userMessage = "";
 
         // Load logo
-        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
+        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.2.png");
 
         // Text field for user input
         private static TextField textField = new TextField(
@@ -52,7 +52,7 @@ namespace ChatClient.UI.Screens
             Raylib.ClearBackground(Colors.BackgroundColor);
 
             // Logo
-            Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.15f, Color.White);
+            Raylib.DrawTextureEx(logo, new Vector2(620, 25), 0, 0.14f, Color.White);
             var tillbakaknapp = new Rectangle(620, 25, 150, 250);
             if (MouseInput.IsLeftClick(tillbakaknapp))
             {

@@ -14,36 +14,36 @@ namespace ChatClient.UI.Screens
     public class RegisterScreen
     {
         // Load logo 
-        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
+        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.2.png");
 
         // Create text fields and button
         private static TextField idField = new TextField(
-            new Rectangle(300, 300, 150, 25),
+            new Rectangle(325, 300, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: false
         );
         private static TextField userField = new TextField(
-            new Rectangle(300, 350, 150, 25),
+            new Rectangle(325, 350, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: false
         );
 
         private static TextField passwordField = new TextField(
-            new Rectangle(300, 400, 150, 25),
+            new Rectangle(325, 400, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: false,
             isPassword: true
         );
 
         private static TextField passwordFieldC = new TextField(
-            new Rectangle(300, 450, 150, 25),
+            new Rectangle(325, 450, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: false,
             isPassword: true
         );
 
         private static Button registerButton = new Button(
-            new Rectangle(325, 500, 100, 25),
+            new Rectangle(350, 500, 100, 25),
             "Register", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
         );
         
@@ -56,10 +56,10 @@ namespace ChatClient.UI.Screens
             Raylib.ClearBackground(Colors.BackgroundColor);
 
             // Draw text 
-            Raylib.DrawText("Register ID:", 160, 305, 15, Colors.TextFieldColor);
-            Raylib.DrawText("New username:", 160, 355, 15, Colors.TextFieldColor);
-            Raylib.DrawText("New password:", 160, 405, 15, Colors.TextFieldColor);
-            Raylib.DrawText("Confirm password:", 160, 455, 15, Colors.TextFieldColor);
+            Raylib.DrawText("Register ID:", 180, 305, 15, Colors.TextFieldColor);
+            Raylib.DrawText("New username:", 180, 355, 15, Colors.TextFieldColor);
+            Raylib.DrawText("New password:", 180, 405, 15, Colors.TextFieldColor);
+            Raylib.DrawText("Confirm password:", 180, 455, 15, Colors.TextFieldColor);
 
             // Button
             if (MouseInput.IsLeftClick(registerButton.Rect))
@@ -100,7 +100,7 @@ namespace ChatClient.UI.Screens
             registerButton.Draw();
 
             // Logo
-            Raylib.DrawTextureEx(logo, new Vector2(300, 50), 0, 0.15f, Color.White);
+            Raylib.DrawTextureEx(logo, new Vector2(300, 0), 0, 0.14f, Color.White);
 
             Raylib.EndDrawing();
         }

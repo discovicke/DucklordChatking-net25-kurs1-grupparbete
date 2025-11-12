@@ -7,7 +7,7 @@ namespace ChatClient.UI.Screens
 {
     public class StartScreen
     {
-        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
+        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.2.png");
         
         // UI Components
         private static TextField userField = new TextField(
