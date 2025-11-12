@@ -43,7 +43,9 @@ namespace ChatClient.Windows
             new Rectangle(325, 500, 100, 25),
             "Register", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor
         );
-
+        
+        // Back button
+        private static BackButton backButton = new BackButton(new Rectangle(10, 10, 100, 30));
 
         public static void Run()
         {
@@ -62,6 +64,10 @@ namespace ChatClient.Windows
                 AppState.CurrentScreen = Screen.Start;
                 Log.Info("New user registerd, switching to start screen");
             }
+            
+            //Back button
+            backButton.Update();
+            backButton.Draw();
 
             // Update and draw fields
             idField.Update();

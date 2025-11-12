@@ -19,11 +19,14 @@ namespace ChatClient.Configurations
         private float CreatBlinkTimer = 0f;
         private bool CreatVisible = true;
         private int scrollOffset = 0; // For single line text
-
+        private int CursorPositon { get; set; } = 0;
         private const int FontSize = 20;
         private const int Padding = 5;
+        // private bool IsPassword { get; } = isPassword;
+        // private string PasswordMask { get; } = string.IsNullOrEmpty(passwordMask) ? "•" : passwordMask;
 
-        public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor, bool allowMultiline = false)
+        public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
+            bool allowMultiline = false)
         {
             Rect = rect;
             BackgroundColor = backgroundColor;
@@ -31,6 +34,7 @@ namespace ChatClient.Configurations
             TextColor = textColor;
             AllowMultiline = allowMultiline;
         }
+
         // TODO: Ctrl+A, Ctr+C, Ctr+V
         // TODO: Ctrl+ArrowKey to move cursor over words and not characters
         public override void Draw()
@@ -42,10 +46,10 @@ namespace ChatClient.Configurations
             {
                 Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, TextColor);
             }
-            
+
             int textX = (int)(Rect.X + Padding);
             int textY = (int)(Rect.Y + Padding);
-            
+
             Raylib.BeginScissorMode((int)Rect.X, (int)Rect.Y, (int)Rect.Width, (int)Rect.Height);
             // Checks if text is multiline or single line for text drawing
             if (AllowMultiline)
@@ -56,6 +60,7 @@ namespace ChatClient.Configurations
             {
                 DrawSingleLineText(textX, textY);
             }
+
             Raylib.EndScissorMode();
 
             if (IsSelected && CreatVisible)
@@ -88,11 +93,16 @@ namespace ChatClient.Configurations
         {
             var lines = WrapText(Text, (int)Rect.Width - Padding * 2);
             int currentY = textY;
+            var manualLines = Text.Split('\n');
 
-            foreach (var line in lines)
+            foreach (var i in manualLines)
             {
-                Raylib.DrawText(line, textX, currentY, FontSize, TextColor);
-                currentY += FontSize + 2; // Radavstånd
+                var wrappedLines = WrapText(i, (int)Rect.Width - Padding * 2);
+                foreach (var line in wrappedLines)
+                {
+                    Raylib.DrawText(line, textX, currentY, FontSize, TextColor);
+                    currentY += FontSize + 2; // line spacing
+                }
             }
         }
 
@@ -126,31 +136,54 @@ namespace ChatClient.Configurations
 
             return lines.Count > 0 ? lines : new List<string> { "" };
         }
-        
+        private (int caretX, int caretY) GetCaretPixelPosition(int textX, int textY)
+        {
+            int cursor = Math.Clamp(CursorPositon, 0, Text.Length);
+
+            if (!AllowMultiline)
+            {
+                string left = cursor > 0 ? Text.Substring(0, cursor) : "";
+                int leftWidth = Raylib.MeasureText(left, FontSize);
+                int caretX = textX - scrollOffset + leftWidth;
+                int caretY = textY;
+                return (caretX, caretY);
+            }
+
+            int availableWidth = (int)Rect.Width - Padding * 2;
+
+            // Text up to the cursor
+            string preText = cursor > 0 ? Text.Substring(0, cursor) : "";
+
+            // Split into manual paragraphs up to the cursor
+            var paras = preText.Split('\n');
+
+            // Count fully completed wrapped lines before the last paragraph
+            int linesBefore = 0;
+            for (int i = 0; i < paras.Length - 1; i++)
+            {
+                linesBefore += WrapText(paras[i], availableWidth).Count;
+            }
+
+            // Wrap the last partial paragraph and measure its last line
+            string lastPara = paras.Length > 0 ? paras[^1] : "";
+            var wrappedLast = WrapText(lastPara, availableWidth);
+            string lastLine = wrappedLast.Count > 0 ? wrappedLast[^1] : "";
+            int lastLineWidth = Raylib.MeasureText(lastLine, FontSize);
+
+            int caretLineIndex = linesBefore + Math.Max(0, wrappedLast.Count - 1);
+            int caretXPos = textX + lastLineWidth;
+            int caretYPos = textY + caretLineIndex * (FontSize + 2);
+            return (caretXPos, caretYPos);
+        }
         // Draws caret at the end of the text
         // TODO: Change caret position with arrow keys and mouse click
         private void DrawCaret(int textX, int textY)
         {
-            int textWidth = Raylib.MeasureText(Text, FontSize);
-            int caretX = AllowMultiline ? textX + textWidth : textX - scrollOffset + textWidth;
-            
-            if (AllowMultiline)
-            {
-                var lines = WrapText(Text, (int)Rect.Width - Padding * 2);
-                int lineCount = lines.Count;
-                textY += (lineCount - 1) * (FontSize + 2);
-                
-                if (lines.Count > 0)
-                {
-                    int lastLineWidth = Raylib.MeasureText(lines[^1], FontSize);
-                    caretX = textX + lastLineWidth;
-                }
-            }
-
-            int caretTop = textY;
-            int caretBottom = caretTop + FontSize;
-            Raylib.DrawLine(caretX, caretTop, caretX, caretBottom, TextColor);
+            var (cx, cy) = GetCaretPixelPosition(textX, textY); // ADDED: use helper for clarity
+            Raylib.DrawLine(cx, cy, cx, cy + FontSize, TextColor);
         }
+
+
 
         // Get call every frame after MouseInput.Update() to handle click and text-input.
         public override void Update()
@@ -175,7 +208,7 @@ namespace ChatClient.Configurations
                     CreatVisible = !CreatVisible;
                 }
             }
-            
+
             if (!IsSelected)
             {
                 return;
@@ -190,24 +223,40 @@ namespace ChatClient.Configurations
                 if (key >= 32)
                 {
                     // Converts to Unicode to accept all even åäö
-                    Text += char.ConvertFromUtf32(key);
+                    var s = char.ConvertFromUtf32(key);
+                    CursorPositon = Math.Clamp(CursorPositon, 0, Text.Length);
+                    Text = Text.Insert(CursorPositon, s);
+                    CursorPositon += s.Length;
                     CreatBlinkTimer = 0f;
                     CreatVisible = true;
                 }
-
-
                 key = Raylib.GetCharPressed();
+
             }
-            
-            // Backspace
-            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && Text.Length > 0 ||
-                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && Text.Length > 0)
+            //  Enter adds newline only if multiline
+            if (AllowMultiline
+                 && (Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift))
+                 && Raylib.IsKeyPressed(KeyboardKey.Enter))
             {
-                Text = Text.Substring(0, Text.Length - 1);
+                CursorPositon = Math.Clamp(CursorPositon, 0, Text.Length);
+                Text = Text.Insert(CursorPositon, "\n");
+                CursorPositon++;
                 CreatBlinkTimer = 0f;
                 CreatVisible = true;
             }
-            
+
+
+            // Backspace
+            if (Raylib.IsKeyPressed(KeyboardKey.Backspace) && CursorPositon > 0 ||
+                Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace) && CursorPositon > 0)
+            {
+                CursorPositon = Math.Clamp(CursorPositon, 0, Text.Length);
+                Text = Text.Remove(CursorPositon - 1, 1);
+                CreatBlinkTimer = 0f;
+                CursorPositon--;
+                CreatVisible = true;
+            }
+
             // TODO: Text row break when hitting border
 
             // TODO: Scroll logicZ
@@ -215,6 +264,11 @@ namespace ChatClient.Configurations
             // TODO: Font?
         }
 
-        public void Clear() => Text = string.Empty;
+        public void Clear()
+        {
+            Text = string.Empty;
+            CursorPositon = 0;
+        }
+
     }
 }

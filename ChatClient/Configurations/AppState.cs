@@ -9,6 +9,35 @@
 
     public static class AppState
     {
-        public static Screen CurrentScreen { get; set; } = Screen.Start;
+        private static Stack<Screen> screenHistory = new Stack<Screen>();
+        private static Screen currentScreen = Screen.Start;
+
+        public static Screen CurrentScreen
+        {
+            get => currentScreen;
+            set
+            {
+                if (currentScreen != value)
+                {
+                    screenHistory.Push(currentScreen);
+                    currentScreen = value;
+                }
+            }
+        }
+
+        public static bool CanGoBack => screenHistory.Count > 0;
+
+        public static void GoBack()
+        {
+            if (CanGoBack)
+            {
+                currentScreen = screenHistory.Pop();
+            }
+        }
+
+        public static void ClearHistory()
+        {
+            screenHistory.Clear();
+        }
     }
 }
