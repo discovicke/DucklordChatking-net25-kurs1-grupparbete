@@ -9,6 +9,7 @@ namespace ChatClient.UI.Components
             : base(rect, "← Options", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor)
         {
         }
+        
 
         public override void Draw()
         {

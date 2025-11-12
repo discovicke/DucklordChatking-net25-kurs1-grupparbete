@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Numerics;
+﻿using System.Numerics;
 using ChatClient.Core;
 using ChatClient.Data;
 using ChatClient.UI.Components;
@@ -45,8 +41,7 @@ namespace ChatClient.UI.Screens
 
         // Adds a message sender to the text field
         private static MessageHandler? messageSender = new MessageHandler(new HttpClient
-        { BaseAddress = new Uri("http://192.168.20.17:5201/") });
-            { BaseAddress = new Uri("http://192.168.20.17:5201/scalar/") });
+            { BaseAddress = new Uri("http://192.168.20.17:5201/") });
 
         public static void Run()
         {
@@ -98,7 +93,7 @@ namespace ChatClient.UI.Screens
                 string sender = string.IsNullOrWhiteSpace(msg.Sender) ? "Unknown" : msg.Sender;
                 string text = $"{msg.Timestamp}  -  {sender} :  {msg.Content}";
                 Raylib.DrawText(text, startX, startY, 15, Colors.TextColor);
-                startY += lineHeight; 
+                startY += lineHeight;
             }
 
             // Mouse Logic
@@ -131,7 +126,6 @@ namespace ChatClient.UI.Screens
 
                             if (recieve != null && recieve.Any())
                             {
-
                                 // Chat window shit: Update message-list and draw it automaticly next fram
                                 messages = recieve.ToList();
                             }
@@ -141,13 +135,11 @@ namespace ChatClient.UI.Screens
                     // Empty text field
                     textField.Clear();
                 }
-                    textField.Clear();
 
+                textField.Clear();
             }
 
             Raylib.EndDrawing();
+        }
+    }
 }
-
-
-}
-

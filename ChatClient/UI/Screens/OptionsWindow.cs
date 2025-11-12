@@ -1,11 +1,12 @@
-﻿using ChatClient.Configurations;
-using Raylib_cs;
+﻿using Raylib_cs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ChatClient.UI;
+using ChatClient.UI.Components;
 
 namespace ChatClient.Screens
 {
@@ -14,16 +15,18 @@ namespace ChatClient.Screens
         // Loade Logo
         private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.0.png");
 
-        private static TextField Ducktions= new TextField(
+        private static TextField Ducktions = new TextField(
             new Rectangle(500, 300, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: false
         );
+
         private static TextField Kalle = new TextField(
             new Rectangle(300, 300, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
             allowMultiline: false
         );
+
         private static TextField userField = new TextField(
             new Rectangle(300, 350, 150, 25),
             Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor,
@@ -50,8 +53,7 @@ namespace ChatClient.Screens
         );
 
 
-
-        public static void Run() 
+        public static void Run()
         {
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Colors.BackgroundColor);
