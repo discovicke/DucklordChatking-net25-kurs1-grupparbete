@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
 using static ChatServer.Models.Responses;
 
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
 builder.Services.AddOpenApi(options =>
@@ -247,6 +246,31 @@ app.MapGet("/messages/history", (int? take) =>
 .Produces<ApiSuccessResponseWithMessageList>(StatusCodes.Status200OK)
 .WithSummary("Get Message History")
 .WithDescription("Returns chat messages in chronological order (oldest to newest). If the optional `take` query parameter is used, the server selects the newest messages first and then returns them in chronological order. For example, `GET /messages/history?take=10` returns the 10 most recent messages, ordered from oldest to newest.");
+#endregion
+
+#region CLEAR MESSAGE HISTORY
+app.MapPost("/messages/clear", () =>
+{
+  // Attempt to clear all stored messages
+  var cleared = messageStore.ClearAll();
+
+  if (!cleared)
+  {
+    return Results.BadRequest(
+      new ApiFailResponse("Message history could not be cleared. The store may be uninitialized.")
+    );
+  }
+
+  return Results.Ok(
+    new ApiSuccessResponse("All messages have been successfully cleared.")
+  );
+})
+// API Docs through OpenAPI & ScalarUI
+.WithBadge("Danger Zone", BadgePosition.Before, "#ff3b30")
+.Produces<ApiSuccessResponse>(StatusCodes.Status200OK)
+.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
+.WithSummary("Clear Message History")
+.WithDescription("Deletes all stored chat messages from the server's history. This action cannot be undone and affects all users.");
 #endregion
 
 #region HEALTH CHECK
