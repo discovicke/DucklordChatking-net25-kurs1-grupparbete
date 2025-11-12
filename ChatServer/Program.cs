@@ -166,27 +166,28 @@ app.MapPost("/user/delete", (UserDTO dto) =>
   // Validate input
   if (string.IsNullOrWhiteSpace(dto.Username))
   {
-    return Results.BadRequest(new { Message = "Username is required." });
+    return Results.BadRequest(new ApiFailResponse("Username is required."));
   }
   if (string.IsNullOrWhiteSpace(dto.Password))
   {
-    return Results.BadRequest(new { Message = "Password is required." });
+    return Results.BadRequest(new ApiFailResponse("Password is required."));
   }
 
   // Delete logic
   var deleted = userStore.Remove(dto.Username);
   if (!deleted)
   {
-    return Results.BadRequest(new { Message = "User not found or could not be deleted." });
+    return Results.BadRequest(new ApiFailResponse("User not found or could not be deleted."));
   }
 
-  return Results.Ok(new { Message = "User deleted successfully." });
+  return Results.Ok(new ApiSuccessResponse("User deleted successfully."));
 
 })
 // API Docs through OpenAPI & ScalarUI
+.Produces<ApiSuccessResponse>(StatusCodes.Status200OK)
+.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
 .WithSummary("Delete User Account")
 .WithDescription("Deletes a user account based on the provided `username` and `password`. If the credentials match a stored account, the user is removed from the server and can no longer log in.");
-// TODO: Implement .Produces
 
 
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
@@ -226,8 +227,6 @@ app.MapGet("/messages/history", (int? take) =>
 .WithSummary("Get Message History")
 .WithDescription("Returns chat messages in chronological order (oldest to newest). If the optional `take` query parameter is used, the server selects the newest messages first and then returns them in chronological order. For example, `GET /messages/history?take=10` returns the 10 most recent messages, ordered from oldest to newest.");
 // TODO: Implement .Produces
-
-
 
 
 // Map the SignalR ChatHub to the /chat endpoint
