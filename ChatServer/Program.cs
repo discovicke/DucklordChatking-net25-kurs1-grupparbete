@@ -131,10 +131,10 @@ app.MapGet("/users", () =>
   }
 
   return Results.Ok(
-      new ApiSuccessResponseWithUsernameList(usernames)
+      new ApiSuccessResponseWithUsernames(usernames)
   );
 })
-.Produces<ApiSuccessResponseWithUsernameList>(StatusCodes.Status200OK)
+.Produces<ApiSuccessResponseWithUsernames>(StatusCodes.Status200OK)
 .Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
 .WithSummary("List All Usernames")
 .WithDescription("Returns every registered username. If no users exist, returns an error.");
@@ -243,7 +243,7 @@ app.MapGet("/messages/history", (int? take) =>
   return Results.Ok(messages);
 })
 // API Docs through OpenAPI & ScalarUI
-.Produces<ApiSuccessResponseWithMessageList>(StatusCodes.Status200OK)
+.Produces<ApiSuccessResponseWithMessages>(StatusCodes.Status200OK)
 .WithSummary("Get Message History")
 .WithDescription("Returns chat messages in chronological order (oldest to newest). If the optional `take` query parameter is used, the server selects the newest messages first and then returns them in chronological order. For example, `GET /messages/history?take=10` returns the 10 most recent messages, ordered from oldest to newest.");
 #endregion
