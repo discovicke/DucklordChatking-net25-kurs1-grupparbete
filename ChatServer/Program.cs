@@ -246,6 +246,15 @@ app.MapGet("/messages/history", (int? take) =>
 .WithDescription("Returns chat messages in chronological order (oldest to newest). If the optional `take` query parameter is used, the server selects the newest messages first and then returns them in chronological order. For example, `GET /messages/history?take=10` returns the 10 most recent messages, ordered from oldest to newest.");
 #endregion
 
+#region HEALTH CHECK
+app.MapGet("health", () => Results.Ok("OK"))
+.WithMetadata(new HttpMethodMetadata(["HEAD"]))
+.WithSummary("Health Check")
+.WithDescription("Simple endpoint for uptime monitoring. Returns `OK` if the server is running. Supports GET And HEAD requests as well.")
+.WithMetadata(new HttpMethodMetadata(["HEAD"]))
+.ExcludeFromApiReference();
+#endregion
+
 // Map the SignalR ChatHub to the /chat endpoint
 app.MapHub<ChatHub>("/chat");
 
