@@ -108,12 +108,31 @@ app.MapPost("/register", (UserDTO dto) =>
 
 app.MapGet("/users", () =>
 {
-  return Results.Ok(userStore.GetAllUsernames());
+  var usernames = userStore.GetAllUsernames();
+
+  // Validation and error handling
+  if (usernames == null)
+  {
+    return Results.BadRequest(
+        new ApiFailResponse("List of usernames could not be retrieved.")
+    );
+  }
+
+  if (!usernames.Any())
+  {
+    return Results.BadRequest(
+        new ApiFailResponse("No users in list.")
+    );
+  }
+
+  return Results.Ok(
+      new ApiSuccessResponseWithUsernameList(usernames, "Usernames retrieved successfully.")
+  );
 })
-// API Docs through OpenAPI & ScalarUI
+.Produces<ApiSuccessResponseWithUsernameList>(StatusCodes.Status200OK)
+.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
 .WithSummary("List All Usernames")
-.WithDescription("Returns every registered username as a simple list of strings. The response does not include passwords or any other account information.");
-// TODO: Implement .Produces
+.WithDescription("Returns every registered username. If no users exist, returns an error.");
 
 
 app.MapPost("/user/update", (UpdateUserDTO dto) =>
