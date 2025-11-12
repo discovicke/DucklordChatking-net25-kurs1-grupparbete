@@ -278,8 +278,7 @@ app.MapGet("health", () => Results.Ok("OK"))
 .WithMetadata(new HttpMethodMetadata(["HEAD"]))
 .WithSummary("Health Check")
 .WithDescription("Simple endpoint for uptime monitoring. Returns `OK` if the server is running. Supports GET And HEAD requests as well.")
-.WithMetadata(new HttpMethodMetadata(["HEAD"]))
-.ExcludeFromApiReference();
+.WithMetadata(new HttpMethodMetadata(["HEAD"]));
 #endregion
 
 // Map the SignalR ChatHub to the /chat endpoint
