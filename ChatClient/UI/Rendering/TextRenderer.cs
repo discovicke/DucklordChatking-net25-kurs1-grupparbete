@@ -1,7 +1,8 @@
 using Raylib_cs;
 using System.Collections.Generic;
+using ChatClient.UI.Components;
 
-namespace ChatClient.Configurations
+namespace ChatClient.UI.Rendering
 {
     public class TextRenderer
     {
@@ -15,6 +16,8 @@ namespace ChatClient.Configurations
         private readonly bool isPassword;
         private readonly bool allowMultiline;
 
+        
+        
         public TextRenderer(Rectangle bounds, Color textColor, bool isPassword, bool allowMultiline)
         {
             this.bounds = bounds;
@@ -49,7 +52,7 @@ namespace ChatClient.Configurations
 
         private void DrawSingleLineText(string text, int textX, int textY, TextCursor cursor)
         {
-            string displayText = isPassword ? new string('•', text.Length) : text;
+            string displayText = isPassword ? new string('*', text.Length) : text;
             AdjustScrollForCaret(text, cursor);
             Raylib.DrawText(displayText, textX - scrollOffset, textY, FontSize, textColor);
         }
@@ -118,7 +121,9 @@ namespace ChatClient.Configurations
             int maxScroll = Math.Max(0, textWidth - availableWidth);
 
             string left = cursor.Position > 0 ? text.Substring(0, cursor.Position) : "";
-            int leftWidth = Raylib.MeasureText(left, FontSize);
+            int leftWidth = isPassword
+                ? Raylib.MeasureText(new string('*', left.Length), FontSize)
+                : Raylib.MeasureText(left, FontSize);            
             int caretXLocal = leftWidth - scrollOffset;
 
             if (caretXLocal < 0)
