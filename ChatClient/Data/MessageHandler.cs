@@ -56,5 +56,33 @@ namespace ChatClient.Data
                 return false;
             }
         }
+
+        public List<MessageDTO>? ReceiveHistory(int? take = null)
+        {
+            try
+            {
+                var url = take.HasValue
+                    ? $"/messages/history?take={take}"
+                    : "/messages/history";
+
+                var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
+
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var messages = response.Content
+                    .ReadFromJsonAsync<List<MessageDTO>>()
+                    .GetAwaiter()
+                    .GetResult();
+
+                return messages;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error receiving history: {ex.Message}");
+                return null;
+            }
+        }
+
     }
 }

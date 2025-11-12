@@ -231,7 +231,7 @@ app.MapGet("/messages/history", (int? take) =>
         ? messageStore.GetLast(take.Value)
         : messageStore.GetAll();
 
-  return Results.Ok(new ApiSuccessResponseWithMessageList(messages, "Retrieved message history."));
+  return Results.Ok(messages);
 })
 // API Docs through OpenAPI & ScalarUI
 .Produces<ApiSuccessResponseWithMessageList>(StatusCodes.Status200OK)

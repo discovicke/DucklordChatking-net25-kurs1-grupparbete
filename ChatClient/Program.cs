@@ -1,5 +1,6 @@
 ﻿using ChatClient.Core;
 using ChatClient.Data;
+using ChatClient.Screens;
 using ChatClient.UI;
 using ChatClient.UI.Screens;
 using Raylib_cs;
@@ -34,6 +35,9 @@ public class Program
                     break;
                 case Screen.Chat:
                     ChatScreen.Run();
+                    break;
+                case Screen.Options:
+                    OptionsWindow.Run();
                     break;
             }
 

@@ -4,7 +4,8 @@
     {
         Start,
         Register,
-        Chat
+        Chat,
+        Options
     }
 
     public static class AppState
