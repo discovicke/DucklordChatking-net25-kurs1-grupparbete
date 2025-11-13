@@ -9,11 +9,11 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
     private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
 
     private readonly TextField newUsername = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "OptionsScreen_NewUsername");
     private readonly TextField newPassword = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "OptionsScreen_NewPassword");
     private readonly TextField confirmPassword = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "OptionsScreen_ConfirmPassword");
     
     private readonly Button confirmButton = new(new Rectangle(), "Confirm", 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);

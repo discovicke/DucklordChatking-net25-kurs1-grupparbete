@@ -30,8 +30,13 @@ public class ChatScreenLogic(
             var text = inputField.Text;
             if (!string.IsNullOrWhiteSpace(text))
             {
+                Log.Info($"[ChatScreenLogic] Sending message: '{text.Replace("\n", "\\n")}'");
                 onSend(text);
                 inputField.Clear();
+            }
+            else
+            {
+                Log.Info("[ChatScreenLogic] Send attempted with empty message");
             }
         }
     }

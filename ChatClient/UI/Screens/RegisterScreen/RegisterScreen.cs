@@ -9,13 +9,13 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
     private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
 
     private readonly TextField idField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "RegisterScreen_ID");
     private readonly TextField userField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "RegisterScreen_Username");
     private readonly TextField passField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "RegisterScreen_Password");
     private readonly TextField passConfirmField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "RegisterScreen_PasswordConfirm");
 
     private readonly Button registerButton = new(new Rectangle(), "Register", 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);

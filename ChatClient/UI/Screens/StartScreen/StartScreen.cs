@@ -9,9 +9,9 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
     private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
 
     private readonly TextField userField = new(new Rectangle(0, 0, 0, 0), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "StartScreen_Username");
     private readonly TextField passwordField = new(new Rectangle(0, 0, 0, 0), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "StartScreen_Password");
 
     private readonly Button registerButton = new(new Rectangle(0, 0, 0, 0), "Register", 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);

@@ -12,7 +12,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
 
     private readonly TextField inputField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, true);
+        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, true, false, "ChatScreen_MessageInput");
     private readonly Button sendButton = new(new Rectangle(), "Send", 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));

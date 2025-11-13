@@ -22,6 +22,7 @@ public class RegisterScreenLogic(
 
         if (MouseInput.IsLeftClick(registerButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
         {
+            Log.Info($"[RegisterScreenLogic] Registration attempt - ID: '{idField.Text}', Username: '{userField.Text}'");
             // TODO: Validation & persistence
             Clear();
             AppState.CurrentScreen = Screen.Start;
@@ -37,6 +38,7 @@ public class RegisterScreenLogic(
 
     private void Clear()
     {
+        Log.Info("[RegisterScreenLogic] Clearing all fields");
         idField.Clear();
         userField.Clear();
         passField.Clear();

@@ -35,30 +35,29 @@ namespace ChatClient.UI.Screens
 
         private void Login()
         {
-            // TODO: Add authentication logic here
-            // if (string.IsNullOrWhiteSpace(userField.Text)) return;
-            
+            Log.Info($"[StartScreenLogic] Login attempt - Username: '{userField.Text}'");
             AppState.CurrentScreen = Screen.Chat;
-            Log.Info("User logged in, switching to chat screen");
+            Log.Info("[StartScreenLogic] User logged in, switching to chat screen");
             ClearFields();
         }
 
         private void NavigateToRegister()
         {
+            Log.Info("[StartScreenLogic] Navigating to register screen");
             AppState.CurrentScreen = Screen.Register;
-            Log.Info("User wants to register, switching to register screen");
             ClearFields();
         }
 
         private void NavigateToOptions()
         {
+            Log.Info("[StartScreenLogic] Navigating to options screen");
             AppState.CurrentScreen = Screen.Options;
-            Log.Info("User pressed options / Ducktions screen");
             ClearFields();
         }
 
         private void ClearFields()
         {
+            Log.Info("[StartScreenLogic] Clearing all fields");
             userField.Clear();
             passwordField.Clear();
         }

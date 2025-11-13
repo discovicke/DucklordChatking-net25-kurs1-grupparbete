@@ -45,7 +45,14 @@ namespace ChatClient.UI.Components
         {
             bool hovered = IsHovered();
             bool pressed = Raylib.IsMouseButtonPressed(MouseButton.Left);
-            return hovered && pressed;
+            bool clicked = hovered && pressed;
+            
+            if (clicked)
+            {
+                Log.Info($"[Button] '{Text}' clicked");
+            }
+            
+            return clicked;
         }
 
         public override void Update() { }

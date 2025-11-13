@@ -20,6 +20,7 @@ public class OptionsScreenLogic(
         confirmButton.Update();
         if (confirmButton.IsClicked())
         {
+            Log.Info($"[OptionsScreenLogic] Settings confirmed - New username: '{userField.Text}'");
             // TODO: Save settings
             Clear();
             AppState.GoBack();
@@ -35,6 +36,7 @@ public class OptionsScreenLogic(
 
     private void Clear()
     {
+        Log.Info("[OptionsScreenLogic] Clearing all fields");
         userField.Clear();
         passField.Clear();
         passConfirmField.Clear();
