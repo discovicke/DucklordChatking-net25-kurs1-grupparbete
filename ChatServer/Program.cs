@@ -160,22 +160,22 @@ app.MapPost("/user/update", (UpdateUserDTO dto) =>
   // Attempt update
   var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
 
-  // 409: conflict (username exists OR old username missing)
-  // TODO: break this up so what the conflict issue is becomes clear, that is if it is "Username exists" or "Old username missing"
+  // 409: conflict (old username missing or new one already taken)
+  // TODO: break this up so what the conflict issue is becomes clear
   if (!updated)
   {
     return Results.Conflict();
   }
 
-  // 200: success: return the new username as content
-  return Results.Ok(dto.NewUsername);
+  // 204: update succeeded, no body needed
+  return Results.NoContent();
 })
-.Produces<string>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status409Conflict)
 .WithSummary("Update User Account")
 .WithDescription(
-    "Updates a user's account. Returns `200` with the new username as content when the update succeeds. " +
+    "Updates a user's account. Returns `204` when the update succeeds. " +
     "Returns `409` when the old username does not exist or the new username is already taken. " +
     "Returns `400` when the request content is missing the old or new username."
 );
