@@ -57,9 +57,7 @@ var messages = app.MapGroup("/messages").WithTags("Messages");
 var system = app.MapGroup("/system").WithTags("System");
 
 
-
-
-
+// ENDPOINTS
 #region LOGIN
 auth.MapPost("/login", (UserDTO dto) =>
 {
@@ -77,14 +75,19 @@ auth.MapPost("/login", (UserDTO dto) =>
     return Results.Unauthorized();
   }
 
+  // Update the auth token
+  user.AuthToken = Guid.NewGuid().ToString();
+
   // 200: success
-  return Results.Ok();
+  return Results.Ok(user.AuthToken);
 })
 .Produces(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status401Unauthorized)
 .WithSummary("User Login")
-.WithDescription("Validates username and password and returns `401` if credentials are invalid, or `400` for invalid input.");
+.WithDescription("Validates username and password. On success, creates a new session Auth-token for the user and returns it in the response body of status `200`. " +
+"Returns `401` when the credentials are incorrect and `400` when the request is missing a username or password. " +
+"The session token functions as proof that the caller has authenticated and must be included in subsequent requests that require access control.");
 #endregion
 
 #region REGISTER
