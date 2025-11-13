@@ -261,23 +261,28 @@ app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 #region GET MESSAGE HISTORY (WITH OPTIONAL TAKE PARAMETER)
 app.MapGet("/messages/history", (int? take) =>
 {
-
-  // If take is provided, it must be a positive number
+  // 400: invalid query parameter
   if (take.HasValue && take.Value <= 0)
   {
-    return Results.BadRequest(new ApiFailResponse("Query parameter 'take' must be greater than 0."));
+    return Results.BadRequest();
   }
 
   var messages = take.HasValue
-        ? messageStore.GetLast(take.Value)
-        : messageStore.GetAll();
+      ? messageStore.GetLast(take.Value)
+      : messageStore.GetAll();
 
+  // 200: always OK, returns empty list if no messages exist
   return Results.Ok(messages);
 })
-// API Docs through OpenAPI & ScalarUI
-.Produces<ApiSuccessResponseWithMessages>(StatusCodes.Status200OK)
+.Produces<IEnumerable<MessageDTO>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status400BadRequest)
 .WithSummary("Get Message History")
-.WithDescription("Returns chat messages in chronological order (oldest to newest). If the optional `take` query parameter is used, the server selects the newest messages first and then returns them in chronological order. For example, `GET /messages/history?take=10` returns the 10 most recent messages, ordered from oldest to newest.");
+.WithDescription(
+    "Returns `200` with the list of stored messages as content. " +
+    "Returns `400` when the `take` query parameter is present but not greater than zero. " +
+    "If `take` is omitted, the entire message history is returned. " +
+    "If `take` is provided, the server selects the newest messages first and returns them in chronological order."
+);
 #endregion
 
 #region CLEAR MESSAGE HISTORY
