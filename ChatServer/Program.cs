@@ -184,31 +184,42 @@ app.MapPost("/user/update", (UpdateUserDTO dto) =>
 #region DELETE USER
 app.MapPost("/user/delete", (UserDTO dto) =>
 {
-  // Validate input
-  if (string.IsNullOrWhiteSpace(dto.Username))
+  // 400: invalid input
+  if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
   {
-    return Results.BadRequest(new ApiFailResponse("Username is required."));
-  }
-  if (string.IsNullOrWhiteSpace(dto.Password))
-  {
-    return Results.BadRequest(new ApiFailResponse("Password is required."));
+    return Results.BadRequest();
   }
 
-  // Delete logic
+  // 401: Verify credentials before deletion
+  var user = userStore.GetByUsername(dto.Username);
+  if (user == null || user.Password != dto.Password)
+  {
+    return Results.Unauthorized();
+  }
+
+  // Attempt deletion
   var deleted = userStore.Remove(dto.Username);
+
+  // 500: unexpected failure
   if (!deleted)
   {
-    return Results.BadRequest(new ApiFailResponse("User not found or could not be deleted."));
+    return Results.StatusCode(StatusCodes.Status500InternalServerError);
   }
 
-  return Results.Ok(new ApiSuccessResponse("User deleted successfully."));
-
+  // 204: deletion successful, no content needed
+  return Results.NoContent();
 })
-// API Docs through OpenAPI & ScalarUI
-.Produces<ApiSuccessResponse>(StatusCodes.Status200OK)
-.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Delete User Account")
-.WithDescription("Deletes a user account based on the provided `username` and `password`. If the credentials match a stored account, the user is removed from the server and can no longer log in.");
+.WithDescription(
+    "Deletes a user account. Returns `204` when the account is successfully deleted. " +
+    "Returns `401` when the provided credentials do not match any stored user. " +
+    "Returns `400` when the request content is missing a username or password. " +
+    "Returns `500` when the user could not be deleted after successful credential verification."
+);
 #endregion
 
 #region SEND MESSAGE
