@@ -26,7 +26,7 @@ namespace ChatClient.UI.Screens
             // Dynamic sizing based on screen dimensions
             float fieldWidth = screenWidth * 0.3f;
             float fieldHeight = screenHeight * 0.05f;
-            float buttonWidth = screenWidth * 0.125f;
+            float buttonWidth = screenWidth * 0.25f;
             float buttonHeight = screenHeight * 0.05f;
             float gap = screenHeight * 0.02f;
             // Starting top position (Y axis) for first column
