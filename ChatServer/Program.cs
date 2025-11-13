@@ -3,7 +3,6 @@ using ChatServer.Store;
 using ChatServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
-using static ChatServer.Models.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
