@@ -13,7 +13,7 @@ namespace ChatClient.Screens
     public class OptionsWindow
     {
         // Loade Logo
-        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.2.png");
+        private static Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
         /*
         private static OptionsButton Ducktions = new OptionsButton(
             new Rectangle(300, 400, 150, 25)

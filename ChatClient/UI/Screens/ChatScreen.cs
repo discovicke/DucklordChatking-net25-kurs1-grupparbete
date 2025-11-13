@@ -30,7 +30,7 @@ namespace ChatClient.UI.Screens
         private static string userMessage = "";
 
         // Load logo
-        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.2.png");
+        private static Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
 
         // Text field for user input
         private static TextField textField = new TextField(

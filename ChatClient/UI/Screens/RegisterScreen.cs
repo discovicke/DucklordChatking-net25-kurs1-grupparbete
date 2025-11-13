@@ -14,7 +14,7 @@ namespace ChatClient.UI.Screens
     public class RegisterScreen
     {
         // Load logo 
-        private static Texture2D logo = Raylib.LoadTexture(@"Bilder/DuckLord1.2.png");
+        private static Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
 
         // Create text fields and button
         private static TextField idField = new TextField(
