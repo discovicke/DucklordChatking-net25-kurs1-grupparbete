@@ -148,32 +148,37 @@ app.MapGet("/users", () =>
 );
 #endregion
 
-
 #region UPDATE USER CREDENTIALS
 app.MapPost("/user/update", (UpdateUserDTO dto) =>
 {
-  // Validate input
+  // 400: invalid input
   if (string.IsNullOrWhiteSpace(dto.OldUsername) || string.IsNullOrWhiteSpace(dto.NewUsername))
   {
-    return Results.BadRequest(new ApiFailResponse("Old and new username are required."));
+    return Results.BadRequest();
   }
 
+  // Attempt update
   var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
 
+  // 409: conflict (username exists OR old username missing)
+  // TODO: break this up so what the conflict issue is becomes clear, that is if it is "Username exists" or "Old username missing"
   if (!updated)
   {
-    return Results.BadRequest(new ApiFailResponse(
-        "Update failed. The old username might not exist or the new username is already taken."
-    ));
+    return Results.Conflict();
   }
 
-  return Results.Ok(new ApiSuccessResponseWithUsername(dto.NewUsername, "User updated successfully."));
+  // 200: success: return the new username as content
+  return Results.Ok(dto.NewUsername);
 })
-// API Docs through OpenAPI & ScalarUI
-.Produces<ApiSuccessResponseWithUsername>(StatusCodes.Status200OK)
-.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
+.Produces<string>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status409Conflict)
 .WithSummary("Update User Account")
-.WithDescription("Changes a user's account information. The request must include the current `OldUsername` and the desired `NewUsername`. If a `Password` is provided, it replaces the existing password. If `Password` is omitted, the existing password stays the same.");
+.WithDescription(
+    "Updates a user's account. Returns `200` with the new username as content when the update succeeds. " +
+    "Returns `409` when the old username does not exist or the new username is already taken. " +
+    "Returns `400` when the request content is missing the old or new username."
+);
 #endregion
 
 #region DELETE USER
