@@ -1,6 +1,5 @@
 ﻿using ChatClient.Core;
 using ChatClient.Data;
-using ChatClient.Screens;
 using ChatClient.UI;
 using ChatClient.UI.Components;
 using ChatClient.UI.Screens;
@@ -30,21 +29,7 @@ public class Program
             
             // --- UI ---
             // Tracks current screen and runs it.
-            switch (AppState.CurrentScreen)
-            {
-                case Screen.Start:
-                    StartScreen.Run();
-                    break;
-                case Screen.Register:
-                    RegisterScreen.Run();
-                    break;
-                case Screen.Chat:
-                    ChatScreen.Run();
-                    break;
-                case Screen.Options:
-                    OptionsWindow.Run();
-                    break;
-            }
+            ScreenRouter.RunCurrent();
 
             Raylib.DrawText($"{appVersion}", 10, 580, 10, Colors.TextColor);
         }
