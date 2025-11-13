@@ -21,6 +21,10 @@ public class Program
         
         Raylib.InitWindow(800, 600, appVersion);
         Raylib.SetTargetFPS(60);
+        
+        // Load all resources (fonts, textures, etc.)
+        ResourceLoader.LoadAll();
+        
         Console.WriteLine($"Log path: {AppDomain.CurrentDomain.BaseDirectory}log.txt");
         Log.Write("Program started.");
         
@@ -44,7 +48,7 @@ public class Program
             const int padding = 10;
             
             Raylib.DrawTextEx(
-                Fonts.regularFont,
+                ResourceLoader.RegularFont,
                 $"{appVersion}",
                 new Vector2(padding, screenHeight - fontSize - padding),
                 fontSize,
@@ -55,6 +59,8 @@ public class Program
             Raylib.EndDrawing();
         }
 
+        // Unload all resources before closing
+        ResourceLoader.UnloadAll();
         Raylib.CloseWindow();
         Log.Write("Program closed.");
     }

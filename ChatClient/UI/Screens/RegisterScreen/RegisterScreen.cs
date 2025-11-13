@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using ChatClient.Core;
 using ChatClient.UI.Components;
 using Raylib_cs;
 
@@ -6,9 +7,7 @@ namespace ChatClient.UI.Screens;
 
 public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 {
-    private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2slim.png");
-
-    private readonly TextField idField = new(new Rectangle(), 
+    private readonly TextField idField = new(new Rectangle(),
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "RegisterScreen_ID");
     private readonly TextField userField = new(new Rectangle(), 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "RegisterScreen_Username");
@@ -26,7 +25,7 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
         logic = new RegisterScreenLogic(idField, userField, passField, passConfirmField, registerButton, backButton);
     }
 
-    protected override RegisterScreenLayout.LayoutData CalculateLayout() => RegisterScreenLayout.Calculate(logo.Width);
+    protected override RegisterScreenLayout.LayoutData CalculateLayout() => RegisterScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
 
     protected override void ApplyLayout(RegisterScreenLayout.LayoutData layout)
     {
@@ -65,7 +64,7 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
         registerButton.Draw();
         backButton.Draw();
 
-        Raylib.DrawTextureEx(logo, 
+        Raylib.DrawTextureEx(ResourceLoader.LogoTexture, 
             new Vector2(layout.LogoX, layout.LogoY), 
             0f, layout.LogoScale, Color.White);
     }

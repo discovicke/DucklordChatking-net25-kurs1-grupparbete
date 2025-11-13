@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using ChatClient.Core;
 using ChatClient.UI.Components;
 using Raylib_cs;
 
@@ -6,9 +7,7 @@ namespace ChatClient.UI.Screens;
 
 public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
 {
-    private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2slim.png");
-
-    private readonly TextField newUsername = new(new Rectangle(), 
+    private readonly TextField newUsername = new(new Rectangle(),
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "OptionsScreen_NewUsername");
     private readonly TextField newPassword = new(new Rectangle(), 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "OptionsScreen_NewPassword");
@@ -24,7 +23,7 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
         logic = new OptionsScreenLogic(newUsername, newPassword, confirmPassword, confirmButton, backButton);
     }
 
-    protected override OptionsScreenLayout.LayoutData CalculateLayout() => OptionsScreenLayout.Calculate(logo.Width);
+    protected override OptionsScreenLayout.LayoutData CalculateLayout() => OptionsScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
 
     protected override void ApplyLayout(OptionsScreenLayout.LayoutData layout)
     {
@@ -57,7 +56,7 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
         confirmButton.Draw();
         backButton.Draw();
 
-        Raylib.DrawTextureEx(logo, 
+        Raylib.DrawTextureEx(ResourceLoader.LogoTexture, 
             new Vector2(layout.LogoX, layout.LogoY), 
             0f, layout.LogoScale, Color.White);
     }

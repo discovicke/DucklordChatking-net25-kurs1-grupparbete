@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using ChatClient.Core;
 using ChatClient.UI.Components;
 using Raylib_cs;
 
@@ -6,7 +7,6 @@ namespace ChatClient.UI.Screens;
 
 public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
 {
-    private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2slim.png");
 
     private readonly TextField userField = new(new Rectangle(0, 0, 0, 0), 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "StartScreen_Username");
@@ -24,7 +24,7 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
         logic = new StartScreenLogic(userField, passwordField, loginButton, registerButton, optionsButton);
     }
 
-    protected override StartScreenLayout.LayoutData CalculateLayout() => StartScreenLayout.Calculate(logo.Width);
+    protected override StartScreenLayout.LayoutData CalculateLayout() => StartScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
 
     protected override void ApplyLayout(StartScreenLayout.LayoutData layout)
     {
@@ -54,7 +54,7 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
         loginButton.Draw();
         optionsButton.Draw();
 
-        Raylib.DrawTextureEx(logo, 
+        Raylib.DrawTextureEx(ResourceLoader.LogoTexture, 
             new Vector2(layout.LogoX, layout.LogoY), 
             0f, layout.LogoScale, Color.White);
 
