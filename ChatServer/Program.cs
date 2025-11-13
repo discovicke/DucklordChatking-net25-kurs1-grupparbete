@@ -225,30 +225,37 @@ app.MapPost("/user/delete", (UserDTO dto) =>
 #region SEND MESSAGE
 app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
-  // Validate basic input
-  if (string.IsNullOrWhiteSpace(dto.Content))
-    return Results.BadRequest(new ApiFailResponse("Message content cannot be empty."));
+  // 400: missing sender or content
+  if (string.IsNullOrWhiteSpace(dto.Content) || string.IsNullOrWhiteSpace(dto.Sender))
+  {
+    return Results.BadRequest();
+  }
 
-  // Look up the user
-  if (string.IsNullOrWhiteSpace(dto.Sender))
-    return Results.BadRequest(new ApiFailResponse("Sender cannot be empty."));
-
-  // Add message to store (history and lookup)
+  // Attempt to store the message
   var added = messageStore.Add(dto.Sender, dto.Content);
-  if (!added)
-    return Results.BadRequest(new ApiFailResponse("Failed to store message.")); // Unlikely to occur unless sender validation fails, but included for safety.
 
-  // Broadcast to all SignalR Clients
+  // 500: something unexpected went wrong storing the message
+  if (!added)
+  {
+    return Results.StatusCode(StatusCodes.Status500InternalServerError);
+  }
+
+  // Broadcast to all SignalR clients
   await hub.Clients.All.SendAsync("ReceiveMessage", dto.Sender, dto.Content);
 
-
-  return Results.Ok(new ApiSuccessResponse("Message stored and broadcasted."));
+  // 204: message stored & broadcasted, no response body needed
+  return Results.NoContent();
 })
-// API Docs through OpenAPI & ScalarUI
-.Produces<ApiSuccessResponse>(StatusCodes.Status200OK)
-.Produces<ApiFailResponse>(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Send Message")
-.WithDescription("Sends a chat message through HTTP and broadcasts it to all connected SignalR clients via the `ReceiveMessage` hub method. The message is saved to the server history and becomes available through `/messages/history`.");
+.WithDescription(
+    "Stores a chat message and broadcasts it to all connected SignalR clients. " +
+    "Returns `204` when the message is successfully stored and broadcasted. " +
+    "Returns `400` when the request content lacks a sender or message text. " +
+    "Returns `500` when the message cannot be stored."
+);
 #endregion
 
 #region GET MESSAGE HISTORY (WITH OPTIONAL TAKE PARAMETER)
