@@ -153,9 +153,9 @@ namespace ChatClient.UI.Components
             Text = string.Empty;
             cursor.Reset();
         }
-
+        // TODO: Mouse click to get position in text
+        // TODO: Crtl backspace to  delete one word
         // TODO: Scroll logicZ
-
         // TODO: Font?
     }
 }
