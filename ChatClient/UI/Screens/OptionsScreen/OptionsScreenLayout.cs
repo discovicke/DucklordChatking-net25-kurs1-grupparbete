@@ -13,10 +13,11 @@ public static class OptionsScreenLayout
 
     public static LayoutData Calculate(int logoWidth)
     {
-        float w = Raylib.GetScreenWidth();
-        float h = Raylib.GetScreenHeight();
-
-        var wrap = new UIWrapper(); wrap.SetToFullWindow();
+        var wrap = new UIWrapper(); 
+        wrap.SetToFullWindow(); // Must call this to get current window dimensions
+        
+        float w = wrap.Width;
+        float h = wrap.Height;
 
         float fieldW = w * 0.30f;
         float fieldH = h * 0.05f;

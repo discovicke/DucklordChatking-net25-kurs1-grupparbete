@@ -13,10 +13,11 @@ public static class ChatScreenLayout
 
     public static LayoutData Calculate(int logoWidth)
     {
-        float w = Raylib.GetScreenWidth();
-        float h = Raylib.GetScreenHeight();
-
-        var wrap = new UIWrapper(); wrap.SetToFullWindow();
+        var wrap = new UIWrapper(); 
+        wrap.SetToFullWindow(); // Must call this to get current window dimensions
+        
+        float w = wrap.Width;
+        float h = wrap.Height;
 
         float chatW = w * 0.70f;
         float chatH = h * 0.65f;

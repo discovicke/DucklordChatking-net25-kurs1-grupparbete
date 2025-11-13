@@ -15,11 +15,13 @@ namespace ChatClient.UI.Screens
         public static LayoutData Calculate(int logoWidth)
         {
             // Create UI wrapper for layout
-            // Covers full window
-            float screenWidth = Raylib.GetScreenWidth();
-            float screenHeight = Raylib.GetScreenHeight();
+            // Covers full window - must be called each time to get current window size
             var wrapper = new UIWrapper();
-            wrapper.SetToFullWindow();
+            wrapper.SetToFullWindow(); // This updates Width/Height based on current window size
+            
+            // Use wrapper dimensions for all calculations
+            float screenWidth = wrapper.Width;
+            float screenHeight = wrapper.Height;
             
             // Dynamic sizing based on screen dimensions
             float fieldWidth = screenWidth * 0.3f;
