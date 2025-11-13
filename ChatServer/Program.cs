@@ -35,16 +35,13 @@ app.MapGet("/docs", () => Results.Redirect("/scalar/", permanent: false)).Exclud
 // so other devices on the local network can connect using the server machine's IP.
 builder.WebHost.UseUrls("http://0.0.0.0:5201");
 
-// Scalar and OpenAPI are only intended for development testing
-if (app.Environment.IsDevelopment())
-{
-  app.MapOpenApi();                // exposes /openapi/v1.json
-  app.MapScalarApiReference(opt => // exposes visual UI at /scalar
+// Scalar and OpenAPI are open even in production now to make debugging easier
+app.MapOpenApi();                // exposes /openapi/v1.json
+app.MapScalarApiReference(opt => // exposes visual UI at /scalar
 {
   opt.Title = "Ducklord's Server API Docs";
   opt.Theme = ScalarTheme.Default;
 });
-}
 
 // Create a single shared UserStore instance.
 // The store contains both dictionaries (by username and by id).
@@ -312,7 +309,6 @@ app.MapPost("/messages/clear", () =>
     "Returns `500` when the server is unable to clear the message store."
 );
 #endregion
-
 
 #region HEALTH CHECK
 app.MapGet("/health", () => Results.Ok("OK"))
