@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using ChatClient.Core;
 using ChatClient.UI.Components;
 using Raylib_cs;

@@ -15,7 +15,7 @@ public class Program
     // TODO: Tab & Ctrl + Tab for switching between fields
     public static void Main()
     {
-        string appVersion = "DuckLord v.0.0.2";
+        string appVersion = "2 girls, 1 duck v.0.1.1";
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
 
         
