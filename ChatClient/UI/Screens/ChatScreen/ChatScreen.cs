@@ -9,7 +9,7 @@ namespace ChatClient.UI.Screens;
 public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 {
     // TODO: Add content loader
-    private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2.png");
+    private readonly Texture2D logo = Raylib.LoadTexture(@"Resources/DuckLord1.2slim.png");
 
     private readonly TextField inputField = new(new Rectangle(), 
         Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, true, false, "ChatScreen_MessageInput");
