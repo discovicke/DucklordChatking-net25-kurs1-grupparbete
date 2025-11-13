@@ -35,31 +35,33 @@ app.MapGet("/docs", () => Results.Redirect("/scalar/", permanent: false)).Exclud
 // so other devices on the local network can connect using the server machine's IP.
 builder.WebHost.UseUrls("http://0.0.0.0:5201");
 
-// Scalar and OpenAPI are only intended for development testing
-if (app.Environment.IsDevelopment())
-{
-  app.MapOpenApi();                // exposes /openapi/v1.json
-  app.MapScalarApiReference(opt => // exposes visual UI at /scalar
+// Scalar and OpenAPI are open even in production now to make debugging easier
+app.MapOpenApi();                // exposes /openapi/v1.json
+app.MapScalarApiReference(opt => // exposes visual UI at /scalar
 {
   opt.Title = "Ducklord's Server API Docs";
   opt.Theme = ScalarTheme.Default;
 });
-}
 
-// Create a single shared UserStore instance.
-// The store contains both dictionaries (by username and by id).
+// Stores
 UserStore userStore = new();
-
-// Create a single shared MessageStore instance
-// The store contains both a list and dictionary (for ID lookup).
-// It requires a reference to the UserStore to validate senders.
 MessageStore messageStore = new(userStore);
 
 // Add one user for testing
 userStore.Add("Ducklord", "chatking");
 
+// Endpoint grouping
+var auth = app.MapGroup("/auth").WithTags("Authentication");
+var users = app.MapGroup("/users").WithTags("Users");
+var messages = app.MapGroup("/messages").WithTags("Messages");
+var system = app.MapGroup("/system").WithTags("System");
+
+
+
+
+
 #region LOGIN
-app.MapPost("/login", (UserDTO dto) =>
+auth.MapPost("/login", (UserDTO dto) =>
 {
   // 400: invalid request shape
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -82,11 +84,11 @@ app.MapPost("/login", (UserDTO dto) =>
 .Produces(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status401Unauthorized)
 .WithSummary("User Login")
-.WithDescription("Validates username and password and returns 401 if credentials are invalid, or 400 for invalid input.");
+.WithDescription("Validates username and password and returns `401` if credentials are invalid, or `400` for invalid input.");
 #endregion
 
 #region REGISTER
-app.MapPost("/register", (UserDTO dto) =>
+auth.MapPost("/register", (UserDTO dto) =>
 {
   // 400: invalid request shape
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -108,7 +110,7 @@ app.MapPost("/register", (UserDTO dto) =>
   }
 
   // 201: created, return the username
-  return Results.Created("/register", newUser.Username);
+  return Results.Created("/auth/register", newUser.Username);
 })
 .Produces(StatusCodes.Status201Created)
 .Produces(StatusCodes.Status400BadRequest)
@@ -122,7 +124,7 @@ app.MapPost("/register", (UserDTO dto) =>
 #endregion
 
 #region LIST USERS
-app.MapGet("/users", () =>
+users.MapGet("", () =>
 {
   var usernames = userStore.GetAllUsernames();
 
@@ -152,7 +154,7 @@ app.MapGet("/users", () =>
 #endregion
 
 #region UPDATE USER CREDENTIALS
-app.MapPost("/user/update", (UpdateUserDTO dto) =>
+users.MapPost("/update", (UpdateUserDTO dto) =>
 {
   // 400: invalid input
   if (string.IsNullOrWhiteSpace(dto.OldUsername) || string.IsNullOrWhiteSpace(dto.NewUsername))
@@ -185,7 +187,7 @@ app.MapPost("/user/update", (UpdateUserDTO dto) =>
 #endregion
 
 #region DELETE USER
-app.MapPost("/user/delete", (UserDTO dto) =>
+users.MapPost("/delete", (UserDTO dto) =>
 {
   // 400: invalid input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
@@ -226,7 +228,7 @@ app.MapPost("/user/delete", (UserDTO dto) =>
 #endregion
 
 #region SEND MESSAGE
-app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
+messages.MapPost("/send", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
   // 400: missing sender or content
   if (string.IsNullOrWhiteSpace(dto.Content) || string.IsNullOrWhiteSpace(dto.Sender))
@@ -262,7 +264,7 @@ app.MapPost("/send-message", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 #endregion
 
 #region GET MESSAGE HISTORY (WITH OPTIONAL TAKE PARAMETER)
-app.MapGet("/messages/history", (int? take) =>
+messages.MapGet("/history", (int? take) =>
 {
   // 400: invalid query parameter
   if (take.HasValue && take.Value <= 0)
@@ -289,7 +291,7 @@ app.MapGet("/messages/history", (int? take) =>
 #endregion
 
 #region CLEAR MESSAGE HISTORY
-app.MapPost("/messages/clear", () =>
+messages.MapPost("/clear", () =>
 {
   // Attempt to clear all stored messages
   var cleared = messageStore.ClearAll();
@@ -303,7 +305,7 @@ app.MapPost("/messages/clear", () =>
   // 204: success, no content
   return Results.NoContent();
 })
-.WithBadge("Danger Zone", BadgePosition.Before, "#ff3b30")
+.WithBadge("Danger Zone 💣", BadgePosition.Before, "#ff3b30")
 .Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Clear Message History")
@@ -313,16 +315,15 @@ app.MapPost("/messages/clear", () =>
 );
 #endregion
 
-
 #region HEALTH CHECK
-app.MapGet("/health", () => Results.Ok("OK"))
+system.MapGet("/health", () => Results.Ok("OK"))
     .WithMetadata(new HttpMethodMetadata(["HEAD"]))
     .WithSummary("Health Check")
     .WithDescription(
         "Provides a simple server health indicator. Returns `200` with the content `OK` when the server is operational. " +
         "Supports both GET and HEAD requests for uptime monitoring."
     )
-    .WithBadge("👩🏻‍⚕️💚", BadgePosition.After, "#e5e5e5")
+    .WithBadge("🩺💚", BadgePosition.After, "#e5e5e5")
     .WithBadge("⚙️ UptimeRobot", BadgePosition.After, "#51ff94");
 #endregion
 

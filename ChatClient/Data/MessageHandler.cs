@@ -39,7 +39,7 @@ namespace ChatClient.Data
 
             try
             {
-                var response = httpClient.PostAsJsonAsync("/send-message", messageDto).Result;
+                var response = httpClient.PostAsJsonAsync("/messages/send", messageDto).Result;
                 if (response.IsSuccessStatusCode)
                 {
                     Log.Success($"Message sent by {messageDto.Sender}");
