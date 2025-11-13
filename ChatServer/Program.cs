@@ -144,7 +144,7 @@ app.MapGet("/users", () =>
 .WithSummary("List All Usernames")
 .WithDescription(
     "Returns `200` with a list of usernames when the list contains users. " +
-    "Returns `204` when the list is empty. Returns `500` when the list of usernames cannot be retrieved (would be a server-side issue)."
+    "Returns `204` when the list is empty. Returns `500` when the list of usernames cannot be retrieved from storage."
 );
 #endregion
 
