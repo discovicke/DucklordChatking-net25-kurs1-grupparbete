@@ -16,6 +16,7 @@ namespace ChatClient.UI.Components
         // - Add font support
         public string Text { get; private set; } = string.Empty;
         private string FieldName { get; set; } = "TextField";
+        private string PlaceholderText { get; set; } = "";
 
         private bool IsSelected { get; set; }
         private readonly bool AllowMultiline;
@@ -25,30 +26,59 @@ namespace ChatClient.UI.Components
 
 
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
-            bool allowMultiline = false, bool isPassword = false, string fieldName = "TextField")
+            bool allowMultiline = false, bool isPassword = false, string fieldName = "TextField", string placeholderText = "")
         {
             Rect = rect;
             BackgroundColor = backgroundColor;
             HoverColor = hoverColor;
             AllowMultiline = allowMultiline;
             FieldName = fieldName;
+            PlaceholderText = placeholderText;
 
             cursor = new TextCursor();
             renderer = new TextRenderer(rect, textColor, isPassword, allowMultiline);
         }
 
+        // TODO: Manage corner roundness
         public override void Draw()
         {
-            var fill = MouseInput.IsHovered(Rect) ? HoverColor : BackgroundColor;
+            // Determine fill color based on state
+            Color fill;
             if (IsSelected)
-                fill = HoverColor;
+                fill = Colors.TextFieldSelected;
+            else if (MouseInput.IsHovered(Rect))
+                fill = Colors.TextFieldHovered;
+            else
+                fill = Colors.TextFieldUnselected;
+            
+            // Draw background
             Raylib.DrawRectangleRounded(Rect, 0.1f, 10, fill);
 
-            // Text field outline
-            Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, 1, Color.Black);
+            // Draw border/outline
+            if (IsSelected || MouseInput.IsHovered(Rect))
+            {
+                Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, 2, Colors.OutlineColor);
+            }
+            else
+            {
+                // Subtle outline when not selected/hovered
+                Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, 1, Colors.OutlineColor);
+            }
 
-
-            renderer.Draw(Text, cursor, IsSelected);
+            // Draw text or placeholder
+            if (string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(PlaceholderText))
+            {
+                // Draw placeholder text (always shown when text is empty)
+                int textX = (int)(Rect.X + 4);
+                int textY = (int)(Rect.Y + 4);
+                Raylib.DrawText(PlaceholderText, textX, textY, 20, Colors.PlaceholderText);
+            }
+            
+            // Always draw actual text and cursor if there is text or field is selected
+            if (!string.IsNullOrEmpty(Text) || IsSelected)
+            {
+                renderer.Draw(Text, cursor, IsSelected);
+            }
         }
 
         public override void Update()
