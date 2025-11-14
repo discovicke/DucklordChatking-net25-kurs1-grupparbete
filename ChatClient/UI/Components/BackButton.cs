@@ -1,4 +1,4 @@
-using ChatClient.Core;
+﻿using ChatClient.Core;
 using Raylib_cs;
 
 namespace ChatClient.UI.Components
@@ -6,7 +6,7 @@ namespace ChatClient.UI.Components
     public class BackButton : Button
     {
         public BackButton(Rectangle rect)
-            : base(rect, "← Back", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor)
+            : base(rect, "← Back", Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor)
         {
         }
 

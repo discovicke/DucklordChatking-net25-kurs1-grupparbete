@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using ChatClient.Core;
 using Shared;
 
 namespace ChatClient.Data;
@@ -7,19 +8,19 @@ public class UserAuth
 {
     private readonly HttpClient httpClient;
 
-    // Production construktor
-    public UserAuth() : this(new HttpClient { BaseAddress = new Uri("http://localhost:5201") })
+    // Production constructor - uses global server config
+    public UserAuth() : this(ServerConfig.CreateHttpClient())
     {
     }
 
-    // Test construktor
+    // Test constructor - allows custom HttpClient for testing
     public UserAuth(HttpClient httpClient)
     {
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         if (this.httpClient.BaseAddress == null)
         {
-            // set default base address
-            this.httpClient.BaseAddress = new Uri("http://localhost:5201");
+            // set default base address from global config
+            this.httpClient.BaseAddress = ServerConfig.BaseUrl;
         }
     }
 
@@ -29,7 +30,7 @@ public class UserAuth
 
         try
         {
-            var response = httpClient.PostAsJsonAsync("/login", userDto).Result;
+            var response = httpClient.PostAsJsonAsync("/auth/login", userDto).Result;
             return response.IsSuccessStatusCode;
         }
         catch

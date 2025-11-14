@@ -11,13 +11,13 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 {
 
     private readonly TextField inputField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, true, false, "ChatScreen_MessageInput");
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        true, false, "ChatScreen_MessageInput", "Type a message... (Shift+Enter for new line)");
     private readonly Button sendButton = new(new Rectangle(), "Send", 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+        Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
-    private readonly MessageHandler? messageSender = new
-        (new HttpClient { BaseAddress = new System.Uri("https://ducklord-server.onrender.com/") });
+    private readonly MessageHandler? messageSender = new(ServerConfig.CreateHttpClient());
     private List<MessageDTO> messages = new();
     private double lastUpdateTime = 0;
 
@@ -39,13 +39,13 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     public override void RenderContent()
     {
         // Logo
-        Raylib.DrawTextureEx(ResourceLoader.LogoTexture, 
+        Raylib.DrawTextureEx(ResourceLoader.LogoTexture,
             new Vector2(layout.LogoX, layout.LogoY), 
             0f, layout.LogoScale, Color.White);
 
-        // Chat window
-        Raylib.DrawRectangleRounded(layout.ChatRect, 
-            0.1f, 10, Colors.HoverColor);
+        // Chat window background
+        Raylib.DrawRectangleRounded(layout.ChatRect, 0.08f, 10, Colors.TextFieldUnselected);
+        Raylib.DrawRectangleRoundedLinesEx(layout.ChatRect, 0.08f, 10, 1, Colors.OutlineColor);
 
         // Pull history ~1/s
         double t = Raylib.GetTime();
@@ -62,6 +62,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         int startX = (int)layout.ChatRect.X + 10;
         int startY = (int)layout.ChatRect.Y + 10;
         int lineH = 20;
+
         foreach (var m in messages)
         {
             string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown" : m.Sender;
@@ -81,6 +82,14 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private void SendMessage(string text)
     {
         if (messageSender == null) return;
+        
+        // Use logged in username or default to "Anonymous"
+        string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername) 
+            ? AppState.LoggedInUsername 
+            : "Anonymous";
+        
+        Log.Info($"[ChatScreen] Sending message as '{sender}': {text}");
+        
         bool ok = messageSender.SendMessage(text);
         var list = messageSender.ReceiveHistory();
         if (ok && list != null && list.Any())

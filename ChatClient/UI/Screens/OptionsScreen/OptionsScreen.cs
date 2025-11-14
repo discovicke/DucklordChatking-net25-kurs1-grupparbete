@@ -7,15 +7,18 @@ namespace ChatClient.UI.Screens;
 
 public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
 {
-    private readonly TextField newUsername = new(new Rectangle(),
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "OptionsScreen_NewUsername");
+    private readonly TextField newUsername = new(new Rectangle(), 
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, false, "OptionsScreen_NewUsername", "New username...");
     private readonly TextField newPassword = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "OptionsScreen_NewPassword");
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, true, "OptionsScreen_NewPassword", "New password...");
     private readonly TextField confirmPassword = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "OptionsScreen_ConfirmPassword");
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, true, "OptionsScreen_ConfirmPassword", "Confirm new password...");
     
     private readonly Button confirmButton = new(new Rectangle(), "Confirm", 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+        Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
     public OptionsScreen()
@@ -39,15 +42,15 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
         Raylib.DrawText("New username:", 
             (int)(layout.UserRect.X - 145), 
             (int)(layout.UserRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
         Raylib.DrawText("New password:", 
             (int)(layout.PassRect.X - 145), 
             (int)(layout.PassRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
         Raylib.DrawText("Confirm password:", 
             (int)(layout.PassConfirmRect.X - 165), 
             (int)(layout.PassConfirmRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
 
         newUsername.Draw();
         newPassword.Draw();

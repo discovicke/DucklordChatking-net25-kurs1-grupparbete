@@ -1,11 +1,9 @@
-using Raylib_cs;
+﻿using Raylib_cs;
 
 namespace ChatClient.Core;
 
-/// <summary>
-/// Centralized resource loader for fonts, textures, and other assets.
-/// Ensures resources are loaded once and properly unloaded on exit.
-/// </summary>
+// Centralized resource loader for fonts, textures, and other assets.
+// Ensures resources are loaded once and properly unloaded on exit.
 public static class ResourceLoader
 {
     // --- Fonts ---
@@ -20,9 +18,10 @@ public static class ResourceLoader
 
     private static bool isLoaded = false;
 
-    /// <summary>
-    /// Load all resources. Call this once at application startup after Raylib.InitWindow().
-    /// </summary>
+    // --- Sounds ---
+    public static Sound ButtonSound { get; private set; }
+
+    // Load all resources. Call this once at application startup after Raylib.InitWindow().
     public static void LoadAll()
     {
         if (isLoaded)
@@ -35,14 +34,13 @@ public static class ResourceLoader
 
         LoadFonts();
         LoadTextures();
+        LoadSounds();
 
         isLoaded = true;
         Log.Success("[ResourceLoader] All resources loaded successfully");
     }
 
-    /// <summary>
-    /// Unload all resources. Call this before Raylib.CloseWindow().
-    /// </summary>
+    // Unload all resources. Call this before Raylib.CloseWindow().
     public static void UnloadAll()
     {
         if (!isLoaded)
@@ -55,6 +53,7 @@ public static class ResourceLoader
 
         UnloadFonts();
         UnloadTextures();
+        UnloadSounds();
 
         isLoaded = false;
         Log.Success("[ResourceLoader] All resources unloaded successfully");
@@ -88,6 +87,13 @@ public static class ResourceLoader
         Log.Info("[ResourceLoader] Textures loaded");
     }
 
+    private static void LoadSounds()
+    {
+        ButtonSound = Raylib.LoadSound("Resources/Duckquack.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.ButtonSound, 0.1f);
+        Log.Info("[ResourceLoader] Sounds loades");
+    }
+
     private static void UnloadFonts()
     {
         Raylib.UnloadFont(ExtraLightFont);
@@ -103,6 +109,12 @@ public static class ResourceLoader
     {
         Raylib.UnloadTexture(LogoTexture);
         Log.Info("[ResourceLoader] Textures unloaded");
+    }
+
+    private static void UnloadSounds()
+    {
+        Raylib.UnloadSound(ButtonSound);
+        Log.Info("[ResourceLoader] Sounds unloaded");
     }
 }
 

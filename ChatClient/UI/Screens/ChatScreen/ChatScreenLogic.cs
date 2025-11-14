@@ -27,6 +27,9 @@ public class ChatScreenLogic(
         bool pressedEnter = Raylib.IsKeyPressed(KeyboardKey.Enter) && !Raylib.IsKeyDown(KeyboardKey.LeftShift);
         if (sendButton.IsClicked() || pressedEnter)
         {
+            // Ducksound when sending message by pressedEnter
+            Raylib.PlaySound(ResourceLoader.ButtonSound);
+
             var text = inputField.Text;
             if (!string.IsNullOrWhiteSpace(text))
             {

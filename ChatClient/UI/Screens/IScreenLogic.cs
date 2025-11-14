@@ -1,4 +1,4 @@
-namespace ChatClient.UI.Screens;
+﻿namespace ChatClient.UI.Screens;
 
 public interface IScreenLogic
 {
