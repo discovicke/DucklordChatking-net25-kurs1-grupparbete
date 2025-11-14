@@ -17,11 +17,6 @@ public class UserAuth
     public UserAuth(HttpClient httpClient)
     {
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        if (this.httpClient.BaseAddress == null)
-        {
-            // set default base address from global config
-            this.httpClient.BaseAddress = ServerConfig.BaseUrl;
-        }
     }
 
     public bool Login(string username, string password)

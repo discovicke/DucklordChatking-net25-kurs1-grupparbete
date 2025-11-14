@@ -8,17 +8,27 @@ namespace ChatClient.Core;
 public static class ServerConfig
 {
     private const string SERVER_URL = "https://ducklord-server.onrender.com/";
-    
+
     // Alternative URLs for easy switching if server down:
     // private const string SERVER_URL = "http://localhost:5201/";
-    
-    // Get the configured server base URL
-    public static Uri BaseUrl => new Uri(SERVER_URL);
-    
-    // Create a new HttpClient configured with the server base URL
+
+    private static readonly HttpClient sharedClient = new()
+    {
+        BaseAddress = new Uri(SERVER_URL)
+    };
+
     public static HttpClient CreateHttpClient()
     {
-        return new HttpClient { BaseAddress = BaseUrl };
+        // If we already have a token stored, ensure it is attached
+        if (!string.IsNullOrWhiteSpace(AppState.SessionAuthToken))
+        {
+            if (!sharedClient.DefaultRequestHeaders.Contains("SessionAuthToken"))
+            {
+                sharedClient.DefaultRequestHeaders.Add("SessionAuthToken", AppState.SessionAuthToken);
+            }
+        }
+
+        return sharedClient;
     }
 }
 

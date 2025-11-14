@@ -10,14 +10,14 @@ namespace ChatClient.UI.Screens;
 public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 {
 
-    private readonly TextField inputField = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+    private readonly TextField inputField = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         true, false, "ChatScreen_MessageInput", "Quack a message... (Shift+Enter for new line)");
-    private readonly Button sendButton = new(new Rectangle(), "Send", 
+    private readonly Button sendButton = new(new Rectangle(), "Send",
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
-    private readonly MessageHandler? messageHandler = new(ServerConfig.CreateHttpClient());
+    private readonly MessageHandler messageHandler = new(ServerConfig.CreateHttpClient());
     private List<MessageDTO> messages = new();
     private double lastUpdateTime = 0;
 
@@ -26,7 +26,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         logic = new ChatScreenLogic(inputField, sendButton, backButton, SendMessage);
     }
 
-    protected override ChatScreenLayout.LayoutData CalculateLayout() 
+    protected override ChatScreenLayout.LayoutData CalculateLayout()
         => ChatScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
 
     protected override void ApplyLayout(ChatScreenLayout.LayoutData layout)
@@ -40,7 +40,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     {
         // Logo
         Raylib.DrawTextureEx(ResourceLoader.LogoTexture,
-            new Vector2(layout.LogoX, layout.LogoY), 
+            new Vector2(layout.LogoX, layout.LogoY),
             0f, layout.LogoScale, Color.White);
 
         // Chat window background
@@ -68,7 +68,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         {
             string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown Duck" : m.Sender;
             string text = $"{m.Timestamp}  -  {sender} :  {m.Content}";
-            Raylib.DrawTextEx(ResourceLoader.RegularFont, text, 
+            Raylib.DrawTextEx(ResourceLoader.RegularFont, text,
                 new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
             startY += lineH;
         }
@@ -84,14 +84,14 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private void SendMessage(string text)
     {
         if (messageHandler == null) return;
-        
+
         // Use logged in username or default to "Anonymous Duck"
-        string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername) 
-            ? AppState.LoggedInUsername 
+        string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername)
+            ? AppState.LoggedInUsername
             : "Anonymous Duck";
-        
+
         Log.Info($"[ChatScreen] Sending message as '{sender}': {text}");
-        
+
         bool ok = messageHandler.SendMessage(text);
         var list = messageHandler.ReceiveHistory();
         if (ok && list != null && list.Any())
