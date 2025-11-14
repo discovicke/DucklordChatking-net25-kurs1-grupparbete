@@ -26,14 +26,30 @@ public class UserAuth
         try
         {
             var response = httpClient.PostAsJsonAsync("/auth/login", userDto).Result;
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            // Read token from JSON response body
+            var token = response.Content.ReadFromJsonAsync<string>().Result;
+            if (string.IsNullOrWhiteSpace(token))
+                return false;
+
+            // Store identity
+            UserAccount.SetUser(username, password);
+            AppState.LoggedInUsername = username;
+            AppState.SessionAuthToken = token;
+
+            // Attach token to all future requests
+            httpClient.DefaultRequestHeaders.Remove("SessionAuthToken");
+            httpClient.DefaultRequestHeaders.Add("SessionAuthToken", token);
+
+            return true;
         }
         catch
         {
             return false;
         }
     }
-
     public bool Register(string username, string password)
     {
         var userDto = new UserDTO { Username = username, Password = password };
