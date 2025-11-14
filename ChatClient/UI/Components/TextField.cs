@@ -44,10 +44,9 @@ namespace ChatClient.UI.Components
                 fill = HoverColor;
             Raylib.DrawRectangleRounded(Rect, 0.3f, 10, fill);
 
-            if (MouseInput.IsHovered(Rect) || IsSelected)
-            {
-                Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 2, Color.Black);
-            }
+            // Text field outline
+            Raylib.DrawRectangleRoundedLinesEx(Rect, 0.3f, 10, 1, Color.Black);
+
 
             renderer.Draw(Text, cursor, IsSelected);
         }

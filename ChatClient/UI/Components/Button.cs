@@ -27,10 +27,9 @@ namespace ChatClient.UI.Components
             var fill = MouseInput.IsHovered(Rect) ? HoverColorButton : NormalColor;
             Raylib.DrawRectangleRounded(Rect, Rounds, Segments, fill);
 
-            if (MouseInput.IsHovered(Rect))
-            {
-                Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 2, TextColorButton);
-            }
+            // Button Outline
+            Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 3, TextColorButton);
+   
 
             // Dynamic font size - scale down if text doesn't fit
             const int maxFontSize = 20;
