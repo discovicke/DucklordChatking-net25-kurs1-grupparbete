@@ -115,7 +115,7 @@ auth.MapPost("/register", (UserDTO dto) =>
   }
 
   // 201: created, return the username
-  return Results.Created("/auth/register", newUser.Username);
+  return Results.Created("", newUser.Username);
 })
 .Produces(StatusCodes.Status201Created)
 .Produces(StatusCodes.Status400BadRequest)
