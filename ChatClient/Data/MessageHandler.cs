@@ -56,6 +56,22 @@ namespace ChatClient.Data
                 return false;
             }
         }
+        
+        public void SendHeartbeat()
+        {
+            if (string.IsNullOrWhiteSpace(AppState.LoggedInUsername))
+                return;
+
+            try
+            {
+                var heartbeatDto = new { Username = AppState.LoggedInUsername };
+                httpClient.PostAsJsonAsync("/users/heartbeat", heartbeatDto).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Heartbeat failed: {ex.Message}");
+            }
+        }
 
         public List<MessageDTO>? ReceiveHistory(int? take = null)
         {

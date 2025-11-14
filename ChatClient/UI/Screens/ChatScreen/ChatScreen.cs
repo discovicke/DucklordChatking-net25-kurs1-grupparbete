@@ -17,7 +17,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
-    private readonly MessageHandler? messageSender = new(ServerConfig.CreateHttpClient());
+    private readonly MessageHandler? messageHandler = new(ServerConfig.CreateHttpClient());
     private List<MessageDTO> messages = new();
     private double lastUpdateTime = 0;
 
@@ -52,7 +52,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         if (t - lastUpdateTime >= 1.0)
         {
             lastUpdateTime = t;
-            var list = messageSender?.ReceiveHistory();
+            var list = messageHandler?.ReceiveHistory();
+            messageHandler.SendHeartbeat();
             if (list != null && list.Any()) messages = list.ToList();
         }
 
@@ -82,7 +83,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     private void SendMessage(string text)
     {
-        if (messageSender == null) return;
+        if (messageHandler == null) return;
         
         // Use logged in username or default to "Anonymous Duck"
         string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername) 
@@ -91,8 +92,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         
         Log.Info($"[ChatScreen] Sending message as '{sender}': {text}");
         
-        bool ok = messageSender.SendMessage(text);
-        var list = messageSender.ReceiveHistory();
+        bool ok = messageHandler.SendMessage(text);
+        var list = messageHandler.ReceiveHistory();
         if (ok && list != null && list.Any())
         {
             messages = list.ToList();
