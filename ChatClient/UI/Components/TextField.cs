@@ -90,6 +90,7 @@ namespace ChatClient.UI.Components
                 return;
             }
 
+            // Normal character input
             int key = Raylib.GetCharPressed();
             while (key > 0)
             {
@@ -99,7 +100,8 @@ namespace ChatClient.UI.Components
                 key = Raylib.GetCharPressed();
             }
 
-            bool backspacePressed = (Raylib.IsKeyPressed(KeyboardKey.Backspace) && !backspaceHandledThisFrame) 
+            // Backspace handling (single press / repeat)
+            bool backspacePressed = (Raylib.IsKeyPressed(KeyboardKey.Backspace) && !backspaceHandledThisFrame)
                                     || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace);
 
             if (backspacePressed)
@@ -111,6 +113,26 @@ namespace ChatClient.UI.Components
             {
                 backspaceHandledThisFrame = false;
             }
+
+            // Clipboard / copy-paste / cut handling
+            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
+
+       
+            // Copy: Ctrl + C
+            if (ctrlDown && Raylib.IsKeyPressed(KeyboardKey.C))
+            {
+                try
+                {
+                    Raylib.SetClipboardText(Text ?? string.Empty);
+                    Log.Info($"[{FieldName}] Copied to clipboard - Length: {(Text?.Length ?? 0)}");
+                }
+                catch (Exception ex)
+                {
+                    Log.Info($"[{FieldName}] Copy failed: {ex.Message}");
+                }
+            }
+
+        
         }
 
         private void HandleNavigation()
