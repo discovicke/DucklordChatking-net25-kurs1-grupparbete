@@ -8,6 +8,7 @@ public class UserStore
   private readonly Dictionary<string, User> usersByUsername =
       new(StringComparer.OrdinalIgnoreCase);  // Change stringcomparer setting to ignore case sensitivity
   private readonly Dictionary<int, User> usersById = [];
+  private readonly Dictionary<string, User> usersBySessionAuthToken = [];
 
   // User ID counter
   private int nextId = 1;
@@ -160,6 +161,12 @@ public class UserStore
     return user;
   }
 
+  public User? GetBySessionAuthToken(string token)
+  {
+    usersBySessionAuthToken.TryGetValue(token, out var user);
+    return user;
+  }
+
   #region GET ALL USER[NAMES]
   /// <summary>
   /// Returns a collection of all usernames currently stored.
@@ -173,4 +180,24 @@ public class UserStore
   {
     return usersByUsername.Keys;
   }
+
+  public string AssignNewSessionAuthToken(User user)
+  {
+    // Remove old token if one exists
+    if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+    {
+      usersBySessionAuthToken.Remove(user.SessionAuthToken);
+    }
+
+    // Generate new token
+    string newToken = Guid.NewGuid().ToString();
+    user.SessionAuthToken = newToken;
+
+    // Add mapping
+    usersBySessionAuthToken[newToken] = user;
+
+    return newToken;
+  }
+
+
 }
