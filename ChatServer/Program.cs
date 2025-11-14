@@ -178,7 +178,7 @@ users.MapPost("/update", (HttpContext context, UpdateUserDTO dto) =>
 
   // 403: authorization (self or admin)
   if (!AuthRules.IsSelfOrAdmin(caller, dto.OldUsername))
-    return Results.Forbid();
+    return Results.StatusCode(StatusCodes.Status403Forbidden);
 
   // Attempt update
   var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
@@ -352,7 +352,7 @@ messages.MapPost("/clear", (HttpContext context) =>
 
   // 403: authorization, admin-only operation
   if (!caller.IsAdmin)
-    return Results.Forbid();
+    return Results.StatusCode(StatusCodes.Status403Forbidden);
 
   // Attempt to clear all stored messages
   var cleared = messageStore.ClearAll();
