@@ -1,9 +1,6 @@
-﻿using Shared;
-using ChatServer.Store;
+﻿using ChatServer.Store;
 using ChatServer.Hubs;
-using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
-using ChatServer.Auth;
 using ChatServer.Configuration;
 using ChatServer.Endpoints;
 
