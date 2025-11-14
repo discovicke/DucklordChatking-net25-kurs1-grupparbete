@@ -7,17 +7,21 @@ namespace ChatClient.UI.Screens;
 
 public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 {
-    private readonly TextField idField = new(new Rectangle(),
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "RegisterScreen_ID");
+    private readonly TextField idField = new(new Rectangle(), 
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, false, "RegisterScreen_ID", "Enter registration ID...");
     private readonly TextField userField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, false, "RegisterScreen_Username");
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, false, "RegisterScreen_Username", "Choose username...");
     private readonly TextField passField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "RegisterScreen_Password");
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, true, "RegisterScreen_Password", "Choose password...");
     private readonly TextField passConfirmField = new(new Rectangle(), 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor, false, true, "RegisterScreen_PasswordConfirm");
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+        false, true, "RegisterScreen_PasswordConfirm", "Confirm password...");
 
     private readonly Button registerButton = new(new Rectangle(), "Register", 
-        Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor);
+        Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
     public RegisterScreen()
@@ -42,19 +46,19 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
         Raylib.DrawText("Register ID:", 
             (int)(layout.IdRect.X - 145), 
             (int)(layout.IdRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
         Raylib.DrawText("New username:", 
             (int)(layout.UserRect.X - 145), 
             (int)(layout.UserRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
         Raylib.DrawText("New password:", 
             (int)(layout.PassRect.X - 145), 
             (int)(layout.PassRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
         Raylib.DrawText("Confirm password:", 
             (int)(layout.PassConfirmRect.X - 165), 
             (int)(layout.PassConfirmRect.Y + 5), 
-            15, Colors.TextFieldColor);
+            15, Colors.TextColor);
 
         idField.Draw();
         userField.Draw();

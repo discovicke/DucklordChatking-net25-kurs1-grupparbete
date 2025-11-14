@@ -1,4 +1,4 @@
-﻿using ChatClient.Core;
+﻿﻿using ChatClient.Core;
 using Raylib_cs;
 
 namespace ChatClient.UI.Components
@@ -6,7 +6,7 @@ namespace ChatClient.UI.Components
     public class OptionsButton : Button
     {
         public OptionsButton(Rectangle rect)
-            : base(rect, "Ducktions", Colors.TextFieldColor, Colors.HoverColor, Colors.TextColor)
+            : base(rect, "Ducktions", Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor)
         {
         }
 

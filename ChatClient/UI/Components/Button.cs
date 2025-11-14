@@ -9,6 +9,7 @@ namespace ChatClient.UI.Components
         private string Text;
         private Color NormalColor;
         private Color HoverColorButton;
+        private Color PressedColorButton;
         private Color TextColorButton;
         private float Rounds = 0.3f;
         private int Segments = 10;
@@ -19,17 +20,51 @@ namespace ChatClient.UI.Components
             Text = text;
             NormalColor = normalColor;
             HoverColorButton = hoverColor;
+            PressedColorButton = Colors.ButtonPressed; // Add pressed state
             TextColorButton = textColor;
+        }
+
+        // Simplified constructor using Colors.cs defaults
+        public Button(Rectangle rect, string text)
+        {
+            Rect = rect;
+            Text = text;
+            NormalColor = Colors.ButtonDefault;
+            HoverColorButton = Colors.ButtonHovered;
+            PressedColorButton = Colors.ButtonPressed;
+            TextColorButton = Colors.TextColor;
         }
 
         public override void Draw()
         {
-            var fill = MouseInput.IsHovered(Rect) ? HoverColorButton : NormalColor;
+            bool isHovered = MouseInput.IsHovered(Rect);
+            bool isPressed = isHovered && Raylib.IsMouseButtonDown(MouseButton.Left);
+            
+            // Determine fill color based on state
+            Color fill;
+            if (isPressed)
+                fill = PressedColorButton;
+            else if (isHovered)
+                fill = HoverColorButton;
+            else
+                fill = NormalColor;
+            
+            // Draw button background
             Raylib.DrawRectangleRounded(Rect, Rounds, Segments, fill);
 
-            // Button Outline
-            Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 3, TextColorButton);
-   
+            // Draw border/outline - accent color on hover, outline when pressed
+            if (isPressed)
+            {
+                Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 3, Colors.OutlineColor);
+            }
+            else if (isHovered)
+            {
+                Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 3, Colors.AccentColor);
+            }
+            else
+            {
+                Raylib.DrawRectangleRoundedLinesEx(Rect, Rounds, Segments, 2, Colors.OutlineColor);
+            }
 
             // Dynamic font size - scale down if text doesn't fit
             const int maxFontSize = 20;
