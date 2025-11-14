@@ -28,9 +28,12 @@ namespace ChatClient.UI
         public static Color Success = new Color(120, 255, 200, 255); 
         public static Color Fail = new Color(255, 130, 120, 255);
         
+        
         // Text colors
         public static Color TextColor = new Color(20, 40, 50, 255);
         public static Color PlaceholderText = new Color(140, 170, 180, 255);
         public static Color SubtleText = new Color(10, 70, 95);
+        public static Color InputText = new Color(20, 40, 50, 255); // mörk text
+        public static Color UiText = new Color(230, 240, 245, 255); // ljus text (på paneler)
     }
 }
