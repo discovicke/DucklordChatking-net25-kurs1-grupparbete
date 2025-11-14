@@ -345,8 +345,18 @@ messages.MapGet("/history", (HttpContext context, int? take) =>
 #endregion
 
 #region CLEAR MESSAGE HISTORY
-messages.MapPost("/clear", () =>
+messages.MapPost("/clear", (HttpContext context) =>
 {
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+  {
+    return Results.Unauthorized();
+  }
+
+  // 403: authorization, admin-only operation
+  if (!caller.IsAdmin)
+    return Results.Forbid();
+
   // Attempt to clear all stored messages
   var cleared = messageStore.ClearAll();
 
@@ -361,12 +371,17 @@ messages.MapPost("/clear", () =>
 })
 .WithBadge("Danger Zone 💣", BadgePosition.Before, "#ff3b30")
 .Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
 .Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Clear Message History")
 .WithDescription(
-    "Clears all stored chat messages. Returns `204` when the message history is successfully cleared. " +
-    "Returns `500` when the server is unable to clear the message store."
-);
+    "Removes all stored chat messages. Available only to authenticated administrators. " +
+    "A successful operation returns `204`. Unauthenticated attempts receive `401`, " +
+    "while callers lacking administrative privileges receive `403`. " +
+    "Unexpected storage failures result in `500`."
+)
+.WithBadge("🔐 Admin Only", BadgePosition.Before, "#ff8585");
 #endregion
 
 #region HEALTH CHECK
