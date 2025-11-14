@@ -24,26 +24,17 @@ userStore.Add("Ducklord", "chatking", isAdmin: true);
 userStore.Add("Scalar", "APIDOCS", isAdmin: true);
 Console.WriteLine(userStore.GetByUsername("Scalar")?.SessionAuthToken ?? "Token retrieval error: user not found or no token assigned. Ask server admin to generate one"); // Debug token print
 
-// Redirect root && /docs → /scalar/
-app.MapGet("/", () => Results.Redirect("/scalar/", permanent: false)).ExcludeFromApiReference();
-app.MapGet("/docs", () => Results.Redirect("/scalar/", permanent: false)).ExcludeFromApiReference();
-
-// Endpoint grouping
-var auth = app.MapGroup("/auth").WithTags("Authentication");
-var users = app.MapGroup("/users").WithTags("Users");
-var messages = app.MapGroup("/messages").WithTags("Messages");
-var system = app.MapGroup("/system").WithTags("System");
-
-// Configure the server to listen on all network interfaces on port 5201,
-// so other devices on the local network can connect using the server machine's IP.
-builder.WebHost.UseUrls("http://0.0.0.0:5201");
+// Configure the web host, only works on localhost
+builder.WebHost.UseUrls("http://localhost:5201");
 
 // Scalar and OpenAPI are open even in production now to make debugging easier
 app.MapOpenApi();                // exposes /openapi/v1.json
 app.MapScalarApiReference(opt => // exposes visual UI at /scalar
 {
   opt.Title = "Ducklord's Server API Docs";
-  opt.Theme = ScalarTheme.Default;
+  opt.Theme = ScalarTheme.DeepSpace;
+  opt.HideClientButton = true;
+  opt.ExpandAllResponses = true;
 
   // Automatically pick as the active scheme
   opt.AddPreferredSecuritySchemes("SessionAuth");
@@ -57,6 +48,18 @@ app.MapScalarApiReference(opt => // exposes visual UI at /scalar
 
 
 // ENDPOINTS
+
+// Endpoint grouping
+var auth = app.MapGroup("/auth").WithTags("Authentication");
+var users = app.MapGroup("/users").WithTags("Users");
+var messages = app.MapGroup("/messages").WithTags("Messages");
+var system = app.MapGroup("/system").WithTags("System");
+
+// Redirect root && /docs → /scalar/
+app.MapGet("/", () => Results.Redirect("/scalar/", permanent: false)).ExcludeFromApiReference();
+app.MapGet("/docs", () => Results.Redirect("/scalar/", permanent: false)).ExcludeFromApiReference();
+
+
 #region LOGIN
 auth.MapPost("/login", (UserDTO dto) =>
 {
