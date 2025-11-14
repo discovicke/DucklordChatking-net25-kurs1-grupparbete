@@ -21,6 +21,10 @@ public class Program
         
         Raylib.InitWindow(800, 600, appVersion);
         Raylib.SetTargetFPS(60);
+
+        // For ducksound
+        Raylib.InitAudioDevice();
+
         
         // Load all resources (fonts, textures, etc.)
         ResourceLoader.LoadAll();

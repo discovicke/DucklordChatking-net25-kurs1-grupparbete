@@ -1,4 +1,4 @@
-using Raylib_cs;
+﻿using Raylib_cs;
 
 namespace ChatClient.Core;
 
@@ -18,6 +18,9 @@ public static class ResourceLoader
 
     private static bool isLoaded = false;
 
+    // --- Sounds ---
+    public static Sound ButtonSound { get; private set; }
+
     // Load all resources. Call this once at application startup after Raylib.InitWindow().
     public static void LoadAll()
     {
@@ -31,6 +34,7 @@ public static class ResourceLoader
 
         LoadFonts();
         LoadTextures();
+        LoadSounds();
 
         isLoaded = true;
         Log.Success("[ResourceLoader] All resources loaded successfully");
@@ -49,6 +53,7 @@ public static class ResourceLoader
 
         UnloadFonts();
         UnloadTextures();
+        UnloadSounds();
 
         isLoaded = false;
         Log.Success("[ResourceLoader] All resources unloaded successfully");
@@ -82,6 +87,12 @@ public static class ResourceLoader
         Log.Info("[ResourceLoader] Textures loaded");
     }
 
+    private static void LoadSounds()
+    {
+        ButtonSound = Raylib.LoadSound("Resources/Duckquack.mp3");
+        Log.Info("[ResourceLoader] Sounds loades");
+    }
+
     private static void UnloadFonts()
     {
         Raylib.UnloadFont(ExtraLightFont);
@@ -97,6 +108,12 @@ public static class ResourceLoader
     {
         Raylib.UnloadTexture(LogoTexture);
         Log.Info("[ResourceLoader] Textures unloaded");
+    }
+
+    private static void UnloadSounds()
+    {
+        Raylib.UnloadSound(ButtonSound);
+        Log.Info("[ResourceLoader] Sounds unloaded");
     }
 }
 
