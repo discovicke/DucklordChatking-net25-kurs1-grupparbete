@@ -157,6 +157,31 @@ namespace ChatClient.UI.Components
             }
 
 
+            // Cut: Ctrl + X
+
+            if (ctrlDown && Raylib.IsKeyPressed(KeyboardKey.X))
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        Raylib.SetClipboardText(Text);
+                        Log.Info($"[{FieldName}] Cut to clipboard - Previous text: '{Text.Replace("\n", "\\n")}'");
+                        Text = string.Empty;
+                        cursor.Position = 0;
+                        cursor.ResetBlink();
+                    }
+                    else
+                    {
+                        Log.Info($"[{FieldName}] Cut requested but field is empty");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Info($"[{FieldName}] Cut failed: {ex.Message}");
+                }
+            }
+
         }
 
         private void HandleNavigation()
