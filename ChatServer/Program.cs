@@ -3,6 +3,8 @@ using ChatServer.Store;
 using ChatServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
+using ChatServer.Auth;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
@@ -164,22 +166,31 @@ users.MapGet("", (HttpContext context) =>
 #endregion
 
 #region UPDATE USER CREDENTIALS
-users.MapPost("/update", (UpdateUserDTO dto) =>
+users.MapPost("/update", (HttpContext context, UpdateUserDTO dto) =>
 {
+
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+    return Results.Unauthorized();
+
   // 400: invalid input
   if (string.IsNullOrWhiteSpace(dto.OldUsername) || string.IsNullOrWhiteSpace(dto.NewUsername))
   {
     return Results.BadRequest();
   }
 
+  // 403: authorization (self or admin)
+  if (!AuthRules.IsSelfOrAdmin(caller, dto.OldUsername))
+    return Results.Forbid();
+
   // Attempt update
   var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
 
-  // 409: conflict (old username missing or new one already taken)
+
   // TODO: break this up so what the conflict issue is becomes clear
   if (!updated)
   {
-    return Results.Conflict();
+    return Results.Conflict(); // 409: conflict (old username missing or new one already taken)
   }
 
   // 204: update succeeded, no body needed
@@ -187,13 +198,16 @@ users.MapPost("/update", (UpdateUserDTO dto) =>
 })
 .Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
 .Produces(StatusCodes.Status409Conflict)
 .WithSummary("Update User Account")
 .WithDescription(
-    "Updates a user's account. Returns `204` when the update succeeds. " +
-    "Returns `409` when the old username does not exist or the new username is already taken. " +
-    "Returns `400` when the request content is missing the old or new username."
-);
+    "Allows authenticated users to update their own account details. Administrators may update any account. " +
+    "Successful updates return `204`. Conflicts in username availability yield `409`, " +
+    "and callers without the right permissions receive `403`."
+)
+.WithBadge("🔐 Auth Required", BadgePosition.Before, "#ffd966");
 #endregion
 
 #region DELETE USER
