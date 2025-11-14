@@ -13,8 +13,13 @@
         private static Stack<Screen> screenHistory = new Stack<Screen>();
         private static Screen currentScreen = Screen.Start;
 
+
         // Logged in user information
         public static string LoggedInUsername { get; set; } = string.Empty;
+
+        // Session auth token
+        public static string SessionAuthToken { get; set; } = string.Empty;
+
 
         public static Screen CurrentScreen
         {
