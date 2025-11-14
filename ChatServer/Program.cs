@@ -4,28 +4,12 @@ using ChatServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
 using ChatServer.Auth;
+using ChatServer.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
-builder.Services.AddOpenApi(options =>
-{
-  // add Scalar transformers
-  options.AddScalarTransformers();
-
-  // add metadata to the OpenAPI document
-  options.AddDocumentTransformer((document, context, ct) =>
-  {
-    document.Info = new()
-    {
-      Title = "Ducklord Chatking's Super Secure Server API Docs",
-      Version = "v0.0.2",
-      Description = "Backend for a lightweight chat system. Supports account creation, login, updating and deleting users, " +
-    "sending chat messages, retrieving message history, and real-time broadcasting through SignalR."
-    };
-    return Task.CompletedTask;
-  });
-});
+builder.Services.AddCustomOpenApi(); // Register the OpenAPI custom configuration which is found in the OpenApiConfiguration.cs Class
 
 var app = builder.Build();
 
