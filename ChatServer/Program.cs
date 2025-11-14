@@ -3,33 +3,36 @@ using ChatServer.Store;
 using ChatServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
+using ChatServer.Auth;
+using ChatServer.Configuration;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(); // Register the SignalR service
-builder.Services.AddOpenApi(options =>
-{
-  // add Scalar transformers
-  options.AddScalarTransformers();
-
-  // add metadata to the OpenAPI document
-  options.AddDocumentTransformer((document, context, ct) =>
-  {
-    document.Info = new()
-    {
-      Title = "Ducklord Chatking's Super Secure Server API Docs",
-      Version = "v0.0.2",
-      Description = "Backend for a lightweight chat system. Supports account creation, login, updating and deleting users, " +
-    "sending chat messages, retrieving message history, and real-time broadcasting through SignalR."
-    };
-    return Task.CompletedTask;
-  });
-});
+builder.Services.AddCustomOpenApi(); // Register the OpenAPI custom configuration which is found in the OpenApiConfiguration.cs Class
 
 var app = builder.Build();
+
+// Stores
+UserStore userStore = new();
+MessageStore messageStore = new(userStore);
+
+// Add one user for general testing
+userStore.Add("Ducklord", "chatking", isAdmin: true);
+
+// This user is used to allow Scalar UI to send test requests
+userStore.Add("Scalar", "APIDOCS", isAdmin: true);
+Console.WriteLine(userStore.GetByUsername("Scalar")?.SessionAuthToken ?? "Token retrieval error: user not found or no token assigned. Ask server admin to generate one"); // Debug token print
 
 // Redirect root && /docs → /scalar/
 app.MapGet("/", () => Results.Redirect("/scalar/", permanent: false)).ExcludeFromApiReference();
 app.MapGet("/docs", () => Results.Redirect("/scalar/", permanent: false)).ExcludeFromApiReference();
+
+// Endpoint grouping
+var auth = app.MapGroup("/auth").WithTags("Authentication");
+var users = app.MapGroup("/users").WithTags("Users");
+var messages = app.MapGroup("/messages").WithTags("Messages");
+var system = app.MapGroup("/system").WithTags("System");
 
 // Configure the server to listen on all network interfaces on port 5201,
 // so other devices on the local network can connect using the server machine's IP.
@@ -41,25 +44,19 @@ app.MapScalarApiReference(opt => // exposes visual UI at /scalar
 {
   opt.Title = "Ducklord's Server API Docs";
   opt.Theme = ScalarTheme.Default;
+
+  // Automatically pick as the active scheme
+  opt.AddPreferredSecuritySchemes("SessionAuth");
+  opt.AddApiKeyAuthentication("SessionAuth", apiKey =>
+  {
+    apiKey.Name = "AuthSessionToken";
+    apiKey.Value = userStore.GetByUsername("Scalar")?.SessionAuthToken
+                   ?? "Token retrieval error: user not found or no token assigned. Ask server admin to generate one";
+  });
 });
 
-// Stores
-UserStore userStore = new();
-MessageStore messageStore = new(userStore);
 
-// Add one user for testing
-userStore.Add("Ducklord", "chatking");
-
-// Endpoint grouping
-var auth = app.MapGroup("/auth").WithTags("Authentication");
-var users = app.MapGroup("/users").WithTags("Users");
-var messages = app.MapGroup("/messages").WithTags("Messages");
-var system = app.MapGroup("/system").WithTags("System");
-
-
-// Serbian boy
-
-
+// ENDPOINTS
 #region LOGIN
 auth.MapPost("/login", (UserDTO dto) =>
 {
@@ -77,14 +74,19 @@ auth.MapPost("/login", (UserDTO dto) =>
     return Results.Unauthorized();
   }
 
+  // Update the auth token
+  var token = userStore.AssignNewSessionAuthToken(user);
+
   // 200: success
-  return Results.Ok();
+  return Results.Ok(token);
 })
 .Produces(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status401Unauthorized)
 .WithSummary("User Login")
-.WithDescription("Validates username and password and returns `401` if credentials are invalid, or `400` for invalid input.");
+.WithDescription("Validates username and password. On success, creates a new session Auth-token for the user and returns it in the response body of status `200`. " +
+"Returns `401` when the credentials are incorrect and `400` when the request is missing a username or password. " +
+"The session token functions as proof that the caller has authenticated and must be included in subsequent requests that require access control.");
 #endregion
 
 #region REGISTER
@@ -124,8 +126,12 @@ auth.MapPost("/register", (UserDTO dto) =>
 #endregion
 
 #region LIST USERS
-users.MapGet("", () =>
+users.MapGet("", (HttpContext context) =>
 {
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var user))
+    return Results.Unauthorized();
+
   var usernames = userStore.GetAllUsernames();
 
   // 500: unexpected storage failure
@@ -144,32 +150,44 @@ users.MapGet("", () =>
   return Results.Ok(usernames);
 })
 .Produces<IEnumerable<string>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
 .Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("List All Usernames")
 .WithDescription(
-    "Returns `200` with a list of usernames when the list contains users. " +
-    "Returns `204` when the list is empty. Returns `500` when the list of usernames cannot be retrieved from storage."
-);
+    "Provides the complete list of registered usernames for authenticated callers. " +
+    "A successful lookup yields a `200` response with the usernames, or `204` when the store is empty. " +
+    "Unauthenticated requests receive `401`, and any internal retrieval failure results in `500`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
 #endregion
 
 #region UPDATE USER CREDENTIALS
-users.MapPost("/update", (UpdateUserDTO dto) =>
+users.MapPost("/update", (HttpContext context, UpdateUserDTO dto) =>
 {
+
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+    return Results.Unauthorized();
+
   // 400: invalid input
   if (string.IsNullOrWhiteSpace(dto.OldUsername) || string.IsNullOrWhiteSpace(dto.NewUsername))
   {
     return Results.BadRequest();
   }
 
+  // 403: authorization (self or admin)
+  if (!AuthRules.IsSelfOrAdmin(caller, dto.OldUsername))
+    return Results.StatusCode(StatusCodes.Status403Forbidden);
+
   // Attempt update
   var updated = userStore.Update(dto.OldUsername, dto.NewUsername, dto.Password);
 
-  // 409: conflict (old username missing or new one already taken)
+
   // TODO: break this up so what the conflict issue is becomes clear
   if (!updated)
   {
-    return Results.Conflict();
+    return Results.Conflict(); // 409: conflict (old username missing or new one already taken)
   }
 
   // 204: update succeeded, no body needed
@@ -177,18 +195,25 @@ users.MapPost("/update", (UpdateUserDTO dto) =>
 })
 .Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
 .Produces(StatusCodes.Status409Conflict)
 .WithSummary("Update User Account")
 .WithDescription(
-    "Updates a user's account. Returns `204` when the update succeeds. " +
-    "Returns `409` when the old username does not exist or the new username is already taken. " +
-    "Returns `400` when the request content is missing the old or new username."
-);
+    "Allows authenticated users to update their own account details. Administrators may update any account. " +
+    "Successful updates return `204`. Conflicts in username availability yield `409`, " +
+    "and callers without the right permissions receive `403`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
 #endregion
 
 #region DELETE USER
-users.MapPost("/delete", (UserDTO dto) =>
+users.MapPost("/delete", (HttpContext context, UserDTO dto) =>
 {
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+    return Results.Unauthorized();
+
   // 400: invalid input
   if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
   {
@@ -196,11 +221,16 @@ users.MapPost("/delete", (UserDTO dto) =>
   }
 
   // 401: Verify credentials before deletion
-  var user = userStore.GetByUsername(dto.Username);
-  if (user == null || user.Password != dto.Password)
+  // Lookup target user
+  var targetUser = userStore.GetByUsername(dto.Username);
+  if (targetUser == null || targetUser.Password != dto.Password)
   {
-    return Results.Unauthorized();
+    return Results.Unauthorized(); // 401: wrong credentials or no such user
   }
+
+  // 403: authorization (self or admin)
+  if (!AuthRules.IsSelfOrAdmin(caller, dto.Username))
+    return Results.StatusCode(StatusCodes.Status403Forbidden);
 
   // Attempt deletion
   var deleted = userStore.Remove(dto.Username);
@@ -217,23 +247,34 @@ users.MapPost("/delete", (UserDTO dto) =>
 .Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
 .Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Delete User Account")
 .WithDescription(
-    "Deletes a user account. Returns `204` when the account is successfully deleted. " +
-    "Returns `401` when the provided credentials do not match any stored user. " +
-    "Returns `400` when the request content is missing a username or password. " +
-    "Returns `500` when the user could not be deleted after successful credential verification."
-);
+    "Authenticated users may delete their own account, while administrators may remove any account. " +
+    "A successful deletion returns `204`. Invalid credentials result in `401`, insufficient permissions in `403`, " +
+    "and unexpected storage failures in `500`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
 #endregion
 
 #region SEND MESSAGE
-messages.MapPost("/send", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
+messages.MapPost("/send", async (HttpContext context, MessageDTO dto, IHubContext<ChatHub> hub) =>
 {
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+    return Results.Unauthorized();
+
   // 400: missing sender or content
   if (string.IsNullOrWhiteSpace(dto.Content) || string.IsNullOrWhiteSpace(dto.Sender))
   {
     return Results.BadRequest();
+  }
+
+  // 403: sender must match authenticated user
+  if (!AuthRules.IsSelf(caller, dto.Sender))
+  {
+    return Results.StatusCode(StatusCodes.Status403Forbidden);
   }
 
   // Attempt to store the message
@@ -253,19 +294,28 @@ messages.MapPost("/send", async (MessageDTO dto, IHubContext<ChatHub> hub) =>
 })
 .Produces(StatusCodes.Status204NoContent)
 .Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
 .Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Send Message")
 .WithDescription(
-    "Stores a chat message and broadcasts it to all connected SignalR clients. " +
-    "Returns `204` when the message is successfully stored and broadcasted. " +
-    "Returns `400` when the request content lacks a sender or message text. " +
-    "Returns `500` when the message cannot be stored."
-);
+    "Handles the submission of a new chat message from an authenticated caller. " +
+    "A valid request stores the message, broadcasts it to all connected clients, and concludes with `204`. " +
+    "Missing fields lead to `400`, unauthenticated attempts receive `401`, and a sender mismatch produces `403`. " +
+    "Unexpected storage issues return `500`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
 #endregion
 
 #region GET MESSAGE HISTORY (WITH OPTIONAL TAKE PARAMETER)
-messages.MapGet("/history", (int? take) =>
+messages.MapGet("/history", (HttpContext context, int? take) =>
 {
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+  {
+    return Results.Unauthorized();
+  }
+
   // 400: invalid query parameter
   if (take.HasValue && take.Value <= 0)
   {
@@ -281,18 +331,29 @@ messages.MapGet("/history", (int? take) =>
 })
 .Produces<IEnumerable<MessageDTO>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
 .WithSummary("Get Message History")
 .WithDescription(
-    "Returns `200` with the list of stored messages as content. " +
-    "Returns `400` when the `take` query parameter is present but not greater than zero. " +
-    "If `take` is omitted, the entire message history is returned. " +
-    "If `take` is provided, the server selects the newest messages first and returns them in chronological order."
-);
+   "Provides access to the stored chat history for authenticated callers. " +
+   "A successful retrieval returns `200` with the messages, while invalid query values result in `400`. " +
+   "Unauthenticated requests receive `401`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
 #endregion
 
 #region CLEAR MESSAGE HISTORY
-messages.MapPost("/clear", () =>
+messages.MapPost("/clear", (HttpContext context) =>
 {
+  // 401: authentication required
+  if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+  {
+    return Results.Unauthorized();
+  }
+
+  // 403: authorization, admin-only operation
+  if (!caller.IsAdmin)
+    return Results.StatusCode(StatusCodes.Status403Forbidden);
+
   // Attempt to clear all stored messages
   var cleared = messageStore.ClearAll();
 
@@ -307,12 +368,17 @@ messages.MapPost("/clear", () =>
 })
 .WithBadge("Danger Zone 💣", BadgePosition.Before, "#ff3b30")
 .Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
 .Produces(StatusCodes.Status500InternalServerError)
 .WithSummary("Clear Message History")
 .WithDescription(
-    "Clears all stored chat messages. Returns `204` when the message history is successfully cleared. " +
-    "Returns `500` when the server is unable to clear the message store."
-);
+    "Removes all stored chat messages. Available only to authenticated administrators. " +
+    "A successful operation returns `204`. Unauthenticated attempts receive `401`, " +
+    "while callers lacking administrative privileges receive `403`. " +
+    "Unexpected storage failures result in `500`."
+)
+.WithBadge("Admin Only 🔐", BadgePosition.Before, "#707fff");
 #endregion
 
 #region HEALTH CHECK

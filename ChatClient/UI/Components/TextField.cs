@@ -7,6 +7,9 @@ namespace ChatClient.UI.Components
 {
     public class TextField : UIComponent
     {
+        // TODO Bugg FIX!!! ctrl + z should return to last text state
+        // TODO Ctrl+c and Ctrl+ v write text and adds the copyed text. it should only paste the current text.
+
         // TODO:
         // - Add scroll logic
         // - Add copy/paste support (Ctrl + C / Ctrl + V)
