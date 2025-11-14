@@ -48,7 +48,7 @@ UserStore userStore = new();
 MessageStore messageStore = new(userStore);
 
 // Add one user for testing
-userStore.Add("Ducklord", "chatking");
+userStore.Add("Ducklord", "chatking", isAdmin: true);
 
 // Endpoint grouping
 var auth = app.MapGroup("/auth").WithTags("Authentication");
