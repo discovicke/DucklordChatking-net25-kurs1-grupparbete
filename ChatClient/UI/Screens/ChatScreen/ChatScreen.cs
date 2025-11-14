@@ -27,7 +27,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     }
 
     protected override ChatScreenLayout.LayoutData CalculateLayout() 
-        => ChatScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
+        => ChatScreenLayout.Calculate(ResourceLoader.LogoTexture.Width, ResourceLoader.LogoTexture.Height);
 
     protected override void ApplyLayout(ChatScreenLayout.LayoutData layout)
     {
@@ -72,6 +72,13 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
                 new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
             startY += lineH;
         }
+        
+        // User list panel
+        Raylib.DrawRectangleRounded(layout.UserListRect, 0.08f, 10, Colors.PanelColor);
+        Raylib.DrawRectangleRoundedLinesEx(layout.UserListRect, 0.08f, 10, 1, Colors.OutlineColor);
+
+        // Placeholder user lists
+        DrawUserList();
 
         // Input + send
         inputField.Draw();
@@ -97,6 +104,48 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         if (ok && list != null && list.Any())
         {
             messages = list.ToList();
+        }
+    }
+    
+    private void DrawUserList()
+    {
+        // Placeholder data
+        var onlineUsers = new[] { "Ducklord", "QuackyMcQuack", "DaffyDev" };
+        var offlineUsers = new[] { "SleepyDuck", "LazyFeathers" };
+
+        float x = layout.UserListRect.X + 10;
+        float y = layout.UserListRect.Y + 10;
+        const float lineH = 22;
+        const float fontSize = 14;
+
+        // Online header
+        Raylib.DrawTextEx(ResourceLoader.BoldFont, "ONLINE", 
+            new Vector2(x, y), fontSize, 0.5f, Colors.AccentColor);
+        y += lineH;
+
+        // Online users
+        foreach (var user in onlineUsers)
+        {
+            Raylib.DrawCircle((int)x + 5, (int)y + 7, 4f, Colors.AccentColor);
+            Raylib.DrawTextEx(ResourceLoader.RegularFont, user, 
+                new Vector2(x + 15, y), fontSize, 0.5f, Colors.TextColor);
+            y += lineH;
+        }
+
+        y += 10; // Extra spacing
+
+        // Offline header
+        Raylib.DrawTextEx(ResourceLoader.BoldFont, "OFFLINE", 
+            new Vector2(x, y), fontSize, 0.5f, Colors.SubtleText);
+        y += lineH;
+
+        // Offline users
+        foreach (var user in offlineUsers)
+        {
+            Raylib.DrawCircle((int)x + 5, (int)y + 7, 4f, Colors.SubtleText);
+            Raylib.DrawTextEx(ResourceLoader.RegularFont, user, 
+                new Vector2(x + 15, y), fontSize, 0.5f, Colors.SubtleText);
+            y += lineH;
         }
     }
 }
