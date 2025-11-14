@@ -25,7 +25,9 @@ namespace ChatClient.UI
         
         // Success / Accent / Highlights color
         public static Color AccentColor = Color.Gold;
-
+        public static Color Success = new Color(120, 255, 200, 255); 
+        public static Color Fail = new Color(255, 130, 120, 255);
+        
         // Text colors
         public static Color TextColor = new Color(20, 40, 50, 255);
         public static Color PlaceholderText = new Color(140, 170, 180, 255);

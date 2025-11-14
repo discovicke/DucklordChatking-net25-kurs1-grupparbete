@@ -21,10 +21,11 @@ public static class OptionsScreenLayout
 
         float fieldW = w * 0.30f;
         float fieldH = h * 0.05f;
-        float btnW = w * 0.16f;
+        float btnW = w * 0.25f;
         float btnH = h * 0.05f;
         float gap = h * 0.02f;
-        float colTop = h * 0.40f;
+        float colTop = h * 0.45f;
+
 
         float logoTargetW = w * 0.15f;
         float logoScale = logoWidth > 0 ? logoTargetW / logoWidth : 0.15f;

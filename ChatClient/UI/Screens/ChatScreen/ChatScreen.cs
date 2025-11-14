@@ -12,12 +12,12 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     private readonly TextField inputField = new(new Rectangle(), 
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
-        true, false, "ChatScreen_MessageInput", "Type a message... (Shift+Enter for new line)");
+        true, false, "ChatScreen_MessageInput", "Quack a message... (Shift+Enter for new line)");
     private readonly Button sendButton = new(new Rectangle(), "Send", 
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
-    private readonly MessageHandler? messageSender = new(ServerConfig.CreateHttpClient());
+    private readonly MessageHandler? messageHandler = new(ServerConfig.CreateHttpClient());
     private List<MessageDTO> messages = new();
     private double lastUpdateTime = 0;
 
@@ -52,7 +52,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         if (t - lastUpdateTime >= 1.0)
         {
             lastUpdateTime = t;
-            var list = messageSender?.ReceiveHistory();
+            var list = messageHandler?.ReceiveHistory();
+            messageHandler.SendHeartbeat();
             if (list != null && list.Any()) messages = list.ToList();
         }
 
@@ -65,7 +66,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
         foreach (var m in messages)
         {
-            string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown" : m.Sender;
+            string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown Duck" : m.Sender;
             string text = $"{m.Timestamp}  -  {sender} :  {m.Content}";
             Raylib.DrawTextEx(ResourceLoader.RegularFont, text, 
                 new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
@@ -82,17 +83,17 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     private void SendMessage(string text)
     {
-        if (messageSender == null) return;
+        if (messageHandler == null) return;
         
-        // Use logged in username or default to "Anonymous"
+        // Use logged in username or default to "Anonymous Duck"
         string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername) 
             ? AppState.LoggedInUsername 
-            : "Anonymous";
+            : "Anonymous Duck";
         
         Log.Info($"[ChatScreen] Sending message as '{sender}': {text}");
         
-        bool ok = messageSender.SendMessage(text);
-        var list = messageSender.ReceiveHistory();
+        bool ok = messageHandler.SendMessage(text);
+        var list = messageHandler.ReceiveHistory();
         if (ok && list != null && list.Any())
         {
             messages = list.ToList();

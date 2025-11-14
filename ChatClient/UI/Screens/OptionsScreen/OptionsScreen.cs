@@ -9,7 +9,7 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
 {
     private readonly TextField newUsername = new(new Rectangle(), 
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
-        false, false, "OptionsScreen_NewUsername", "New username...");
+        false, false, "OptionsScreen_NewUsername", "New quackername...");
     private readonly TextField newPassword = new(new Rectangle(), 
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
         false, true, "OptionsScreen_NewPassword", "New password...");
@@ -39,18 +39,6 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
-        const float labelFont = 15;
-        
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "New username:", 
-            new Vector2(layout.UserRect.X - 145, layout.UserRect.Y + 5), 
-            labelFont, 0.5f, Colors.TextColor);
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "New password:", 
-            new Vector2(layout.PassRect.X - 145, layout.PassRect.Y + 5), 
-            labelFont, 0.5f, Colors.TextColor);
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "Confirm password:", 
-            new Vector2(layout.PassConfirmRect.X - 165, layout.PassConfirmRect.Y + 5), 
-            labelFont, 0.5f, Colors.TextColor);
-
         newUsername.Draw();
         newPassword.Draw();
         confirmPassword.Draw();

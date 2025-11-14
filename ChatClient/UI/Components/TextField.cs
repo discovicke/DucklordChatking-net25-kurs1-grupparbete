@@ -189,6 +189,7 @@ namespace ChatClient.UI.Components
 
             clipboardActions.Process();
 
+            // TODO: Kolla under den här kommentaren, Markus... Dubbel klistra in etc? 
             // Clipboard / copy-paste / cut handling
             bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
 
@@ -259,6 +260,7 @@ namespace ChatClient.UI.Components
 
         }
 
+        // TODO Double jump on singleline text, dont know why... Bool as backspace maybe?
         private void HandleNavigation()
         {
             if (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left))

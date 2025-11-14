@@ -1,11 +1,11 @@
 using ChatClient.Core;
+using ChatClient.Data;
 using ChatClient.UI.Components;
 using Raylib_cs;
 
 namespace ChatClient.UI.Screens;
 
 public class RegisterScreenLogic(
-    TextField idField,
     TextField userField,
     TextField passField,
     TextField passConfirmField,
@@ -13,19 +13,20 @@ public class RegisterScreenLogic(
     BackButton backButton
 ) : IScreenLogic
 {
+    private readonly UserAuth userAuth = new UserAuth(ServerConfig.CreateHttpClient());
+    public readonly FeedbackBox FeedbackBox = new();
+
     public void HandleInput()
     {
-        idField.Update();
+        FeedbackBox.Update();
+        
         userField.Update();
         passField.Update();
         passConfirmField.Update();
 
         if (MouseInput.IsLeftClick(registerButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
         {
-            Log.Info($"[RegisterScreenLogic] Registration attempt - ID: '{idField.Text}', Username: '{userField.Text}'");
-            // TODO: Validation & persistence
-            Clear();
-            AppState.CurrentScreen = Screen.Start;
+            TryRegister();
         }
 
         backButton.Update();
@@ -36,10 +37,62 @@ public class RegisterScreenLogic(
         }
     }
 
+    private void TryRegister()
+    {
+        string username = userField.Text.Trim();
+        string password = passField.Text;
+        string passwordConfirm = passConfirmField.Text;
+
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            FeedbackBox.Show("Quackername cannot be empty!", false);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            FeedbackBox.Show("Password cannot be empty!", false);
+            return;
+        }
+
+        if (password != passwordConfirm)
+        {
+            FeedbackBox.Show("Passwords do not match!", false);
+            return;
+        }
+
+        if (password.Length < 8)
+        {
+            FeedbackBox.Show("Password must be at least 8 characters!", false);
+            return;
+        }
+        
+        if (password.Any(char.IsWhiteSpace))
+        {
+            FeedbackBox.Show("Password can not contain blank spaces!", false);
+            return;
+        }
+
+        bool success = userAuth.Register(username, password);
+
+        if (success)
+        {
+            FeedbackBox.Show($"Duckount created! Welcome, {username}!", true);
+            
+            Task.Delay(3000).ContinueWith(_ =>
+            {
+                Clear();
+                AppState.CurrentScreen = Screen.Start;
+            });
+        }
+        else
+        {
+            FeedbackBox.Show("Registration failed! Quackername may be taken.", false);
+        }
+    }
+
     private void Clear()
     {
-        Log.Info("[RegisterScreenLogic] Clearing all fields");
-        idField.Clear();
         userField.Clear();
         passField.Clear();
         passConfirmField.Clear();

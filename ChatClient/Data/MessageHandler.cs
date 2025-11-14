@@ -22,7 +22,7 @@ namespace ChatClient.Data
             //Converts current user and added content to a DTO for sending to server
             var messageDto = new MessageDTO
             {
-                Sender = UserAccount.Username!,
+                Sender = AppState.LoggedInUsername,
                 Content = content,
                 Timestamp = DateTime.UtcNow
             };
@@ -32,9 +32,9 @@ namespace ChatClient.Data
                 return false;
             }
 
-            if (!UserAccount.IsLoggedIn)
+            if (string.IsNullOrWhiteSpace(AppState.LoggedInUsername))
             {
-                throw new InvalidOperationException("Ingen användare inloggad!");
+                throw new InvalidOperationException("Ingen duck inloggad!");
             }
 
             try
@@ -54,6 +54,22 @@ namespace ChatClient.Data
             {
                 Log.Error($"Exception sending message: {ex.Message}");
                 return false;
+            }
+        }
+        
+        public void SendHeartbeat()
+        {
+            if (string.IsNullOrWhiteSpace(AppState.LoggedInUsername))
+                return;
+
+            try
+            {
+                var heartbeatDto = new { Username = AppState.LoggedInUsername };
+                httpClient.PostAsJsonAsync("/users/heartbeat", heartbeatDto).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Heartbeat failed: {ex.Message}");
             }
         }
 
