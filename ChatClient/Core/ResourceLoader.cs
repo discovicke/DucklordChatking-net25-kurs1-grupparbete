@@ -90,6 +90,7 @@ public static class ResourceLoader
     private static void LoadSounds()
     {
         ButtonSound = Raylib.LoadSound("Resources/Duckquack.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.ButtonSound, 0.1f);
         Log.Info("[ResourceLoader] Sounds loades");
     }
 

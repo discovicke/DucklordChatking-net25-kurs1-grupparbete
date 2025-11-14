@@ -25,10 +25,9 @@ public class Program
         // For ducksound
         Raylib.InitAudioDevice();
 
-        
         // Load all resources (fonts, textures, etc.)
         ResourceLoader.LoadAll();
-        
+
         Console.WriteLine($"Log path: {AppDomain.CurrentDomain.BaseDirectory}log.txt");
         Log.Write("Program started.");
         
