@@ -7,14 +7,14 @@ namespace ChatClient.UI.Screens;
 
 public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 {
-    private readonly TextField userField = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
-        false, false, "RegisterScreen_Username", "Choose username...");
-    private readonly TextField passField = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+    private readonly TextField userField = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
+        false, false, "RegisterScreen_Username", "Choose quackername...");
+    private readonly TextField passField = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         false, true, "RegisterScreen_Password", "Choose password...");
-    private readonly TextField passConfirmField = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+    private readonly TextField passConfirmField = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         false, true, "RegisterScreen_PasswordConfirm", "Confirm password...");
 
     private readonly Button registerButton = new(new Rectangle(), "Register", 
@@ -39,18 +39,6 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
-        const float labelFont = 15;
-
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "New username:",
-            new Vector2(layout.UserRect.X - 145, layout.UserRect.Y + 5),
-            labelFont, 0.5f, Colors.TextColor);
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "New password:",
-            new Vector2(layout.PassRect.X - 145, layout.PassRect.Y + 5),
-            labelFont, 0.5f, Colors.TextColor);
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "Confirm password:",
-            new Vector2(layout.PassConfirmRect.X - 165, layout.PassConfirmRect.Y + 5),
-            labelFont, 0.5f, Colors.TextColor);
-
         userField.Draw();
         passField.Draw();
         passConfirmField.Draw();

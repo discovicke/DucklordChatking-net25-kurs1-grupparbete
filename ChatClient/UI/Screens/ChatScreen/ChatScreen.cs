@@ -12,7 +12,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     private readonly TextField inputField = new(new Rectangle(), 
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
-        true, false, "ChatScreen_MessageInput", "Type a message... (Shift+Enter for new line)");
+        true, false, "ChatScreen_MessageInput", "Quack a message... (Shift+Enter for new line)");
     private readonly Button sendButton = new(new Rectangle(), "Send", 
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
@@ -65,7 +65,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
         foreach (var m in messages)
         {
-            string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown" : m.Sender;
+            string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown Duck" : m.Sender;
             string text = $"{m.Timestamp}  -  {sender} :  {m.Content}";
             Raylib.DrawTextEx(ResourceLoader.RegularFont, text, 
                 new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
@@ -84,10 +84,10 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     {
         if (messageSender == null) return;
         
-        // Use logged in username or default to "Anonymous"
+        // Use logged in username or default to "Anonymous Duck"
         string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername) 
             ? AppState.LoggedInUsername 
-            : "Anonymous";
+            : "Anonymous Duck";
         
         Log.Info($"[ChatScreen] Sending message as '{sender}': {text}");
         

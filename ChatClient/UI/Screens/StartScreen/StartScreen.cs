@@ -7,10 +7,9 @@ namespace ChatClient.UI.Screens;
 
 public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
 {
-
     private readonly TextField userField = new(new Rectangle(0, 0, 0, 0),
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
-        false, false, "StartScreen_Username", "Enter username...");
+        false, false, "StartScreen_Username", "Enter quackername...");
 
     private readonly TextField passwordField = new(new Rectangle(0, 0, 0, 0),
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
@@ -43,17 +42,6 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
-        float labelFont = 15;
-        float labelYUser = layout.UserRect.Y + (layout.UserRect.Height - labelFont) / 2f;
-        float labelYPass = layout.PassRect.Y + (layout.PassRect.Height - labelFont) / 2f;
-
-        Raylib.DrawTextEx(ResourceLoader.BoldFont, "QUACKERNAME",
-            new Vector2(layout.UserRect.X - 110, labelYUser),
-            labelFont, 1, Colors.TextColor);
-        Raylib.DrawTextEx(ResourceLoader.BoldFont, "DUCKWORD",
-            new Vector2(layout.PassRect.X - 110, labelYPass),
-            labelFont, 1, Colors.TextColor);
-
         userField.Update();
         userField.Draw();
         passwordField.Update();
@@ -71,7 +59,6 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
         var startLogic = logic as StartScreenLogic;
         startLogic?.FeedbackBox.Draw();
 
-        // DEV MODE indicator (remove before production)
 #if DEBUG
         float screenHeight = layout.ScreenHeight;
         Raylib.DrawTextEx(ResourceLoader.RegularFont, "DEV: Ctrl+Shift+D = Quack Login",
@@ -79,4 +66,3 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
 #endif
     }
 }
-

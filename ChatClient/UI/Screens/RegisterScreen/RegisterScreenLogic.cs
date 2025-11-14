@@ -45,7 +45,7 @@ public class RegisterScreenLogic(
 
         if (string.IsNullOrWhiteSpace(username))
         {
-            FeedbackBox.Show("Duckname cannot be empty!", false);
+            FeedbackBox.Show("Quackername cannot be empty!", false);
             return;
         }
 
@@ -87,7 +87,7 @@ public class RegisterScreenLogic(
         }
         else
         {
-            FeedbackBox.Show("Registration failed! Duckname may be taken.", false);
+            FeedbackBox.Show("Registration failed! Quackername may be taken.", false);
         }
     }
 

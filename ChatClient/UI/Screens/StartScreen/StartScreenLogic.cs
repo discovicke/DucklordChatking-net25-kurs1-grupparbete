@@ -5,7 +5,6 @@ using Raylib_cs;
 
 namespace ChatClient.UI.Screens
 {
-    // "How should all fields and buttons behave?"
     public class StartScreenLogic(
         TextField userField,
         TextField passwordField,
@@ -19,25 +18,14 @@ namespace ChatClient.UI.Screens
         private readonly UserAuth userAuth = new UserAuth(ServerConfig.CreateHttpClient());
         public readonly FeedbackBox FeedbackBox = new();
 
-        
-        // Feedback state
-        public string FeedbackMessage { get; private set; } = "";
-        public bool IsFeedbackSuccess { get; private set; } = false;
-        private double feedbackStartTime = 0;
-        private const double FeedbackDisplayDuration = 3.0; // Show feedback for 3 seconds
-        
         public void HandleInput()
         {
-            // Clear feedback after duration
-            if (!string.IsNullOrEmpty(FeedbackMessage) && Raylib.GetTime() - feedbackStartTime > FeedbackDisplayDuration)
-            {
-                FeedbackMessage = "";
-            }
-            
+            FeedbackBox.Update();
+
             // DEV MODE: Ctrl+Shift+D for instant dev login
-            if (DEV_MODE_ENABLED && 
-                Raylib.IsKeyDown(KeyboardKey.LeftControl) && 
-                Raylib.IsKeyDown(KeyboardKey.LeftShift) && 
+            if (DEV_MODE_ENABLED &&
+                Raylib.IsKeyDown(KeyboardKey.LeftControl) &&
+                Raylib.IsKeyDown(KeyboardKey.LeftShift) &&
                 Raylib.IsKeyPressed(KeyboardKey.D))
             {
                 DevLogin();
@@ -70,23 +58,22 @@ namespace ChatClient.UI.Screens
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                FeedbackBox.Show("Please enter duckname and password!", false);
-                Log.Info("[StartScreenLogic] Login failed - duckname or password empty");
+                FeedbackBox.Show("Please enter quackername and password!", false);
+                Log.Info("[StartScreenLogic] Login failed - Username or password empty");
                 return;
             }
 
-            Log.Info($"[StartScreenLogic] Login attempt - duckname: '{username}'");
+            Log.Info($"[StartScreenLogic] Login attempt - Username: '{username}'");
 
-            // Authenticate with server
             bool success = userAuth.Login(username, password);
 
             if (success)
             {
-                Log.Success($"[StartScreenLogic] Login successful for duck '{username}'");
+                Log.Success($"[StartScreenLogic] Login successful for user '{username}'");
                 AppState.LoggedInUsername = username;
                 FeedbackBox.Show($"Welcome back, {username}!", true);
 
-                Task.Delay(3000).ContinueWith(_ =>
+                Task.Delay(1000).ContinueWith(_ =>
                 {
                     AppState.CurrentScreen = Screen.Chat;
                     ClearFields();
@@ -94,19 +81,11 @@ namespace ChatClient.UI.Screens
             }
             else
             {
-                Log.Error($"[StartScreenLogic] Login failed for duck '{username}' - Invalid credentials");
+                Log.Error($"[StartScreenLogic] Login failed for user '{username}' - Invalid credentials");
                 FeedbackBox.Show("DUCK! Login failed, check your credentials.", false);
             }
         }
 
-        private void ShowFeedback(string message, bool isSuccess)
-        {
-            FeedbackMessage = message;
-            IsFeedbackSuccess = isSuccess;
-            feedbackStartTime = Raylib.GetTime();
-        }
-
-        // DEV MODE: Quick login for development (bypasses server authentication)
         private void DevLogin()
         {
             Log.Info("[StartScreenLogic] DEV MODE: Quack login activated (Ctrl+Shift+D)");
@@ -120,7 +99,6 @@ namespace ChatClient.UI.Screens
             Log.Info("[StartScreenLogic] Navigating to register screen");
             AppState.CurrentScreen = Screen.Register;
             ClearFields();
-            FeedbackMessage = "";
         }
 
         private void NavigateToOptions()
@@ -128,7 +106,6 @@ namespace ChatClient.UI.Screens
             Log.Info("[StartScreenLogic] Navigating to options screen");
             AppState.CurrentScreen = Screen.Options;
             ClearFields();
-            FeedbackMessage = "";
         }
 
         private void ClearFields()
