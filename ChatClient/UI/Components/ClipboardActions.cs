@@ -49,17 +49,28 @@ namespace ChatClient.UI.Components
             if (ctx.UndoStack is null) throw new ArgumentException("UndoStack required", nameof(context));
             if (ctx.ResetCursorToStart is null) throw new ArgumentException("ResetCursorToStart delegate required", nameof(context));
             if (ctx.ResetCursorBlink is null) throw new ArgumentException("ResetCursorBlink delegate required", nameof(context));
-        
 
 
 
-
-
-
-        
 
         }
+        public void Process()
+        {
+            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
+            if (!ctrlDown) return;
 
+            ClipboardAction action = ClipboardAction.None;
+            if (Raylib.IsKeyPressed(KeyboardKey.C)) action = ClipboardAction.Copy;
+            else if (Raylib.IsKeyPressed(KeyboardKey.V)) action = ClipboardAction.Paste;
+            else if (Raylib.IsKeyPressed(KeyboardKey.X)) action = ClipboardAction.Cut;
+            else if (Raylib.IsKeyPressed(KeyboardKey.Z)) action = ClipboardAction.Undo;
+
+
+
+        }
     }
 
+
 }
+
+
