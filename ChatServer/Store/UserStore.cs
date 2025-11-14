@@ -98,6 +98,9 @@ public class UserStore
     if (!usersByUsername.TryGetValue(username, out var user))
       return false;
 
+    if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+      usersBySessionAuthToken.Remove(user.SessionAuthToken);
+
     usersByUsername.Remove(username);
     usersById.Remove(user.Id);
 
@@ -119,7 +122,11 @@ public class UserStore
   public bool Remove(int id)
   {
     if (!usersById.TryGetValue(id, out var user))
+    {
       return false;
+    }
+    if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+      usersBySessionAuthToken.Remove(user.SessionAuthToken);
 
     usersById.Remove(id);
     usersByUsername.Remove(user.Username);
