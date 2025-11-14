@@ -72,11 +72,13 @@ public static class ResourceLoader
         int[] charArray = chars.ToArray();
         int charCount = chars.Count;
 
-        ExtraLightFont = Raylib.LoadFontEx("Resources/CascadiaCode-ExtraLight.ttf", 20, charArray, charCount);
-        LightFont = Raylib.LoadFontEx("Resources/CascadiaCode-Light.ttf", 20, charArray, charCount);
-        MediumFont = Raylib.LoadFontEx("Resources/CascadiaCode-Medium.ttf", 20, charArray, charCount);
-        RegularFont = Raylib.LoadFontEx("Resources/CascadiaCode-Regular.ttf", 20, charArray, charCount);
-        BoldFont = Raylib.LoadFontEx("Resources/CascadiaCode-Bold.ttf", 20, charArray, charCount);
+        // Load fonts at higher resolution (40px) for better quality on all DPI screens
+        // We scale down when rendering for crisp text even on low-DPI displays
+        ExtraLightFont = Raylib.LoadFontEx("Resources/CascadiaCode-ExtraLight.ttf", 40, charArray, charCount);
+        LightFont = Raylib.LoadFontEx("Resources/CascadiaCode-Light.ttf", 40, charArray, charCount);
+        MediumFont = Raylib.LoadFontEx("Resources/CascadiaCode-Medium.ttf", 40, charArray, charCount);
+        RegularFont = Raylib.LoadFontEx("Resources/CascadiaCode-Regular.ttf", 40, charArray, charCount);
+        BoldFont = Raylib.LoadFontEx("Resources/CascadiaCode-Bold.ttf", 40, charArray, charCount);
 
         Log.Info("[ResourceLoader] Fonts loaded");
     }

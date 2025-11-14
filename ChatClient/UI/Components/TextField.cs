@@ -68,10 +68,11 @@ namespace ChatClient.UI.Components
             // Draw text or placeholder
             if (string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(PlaceholderText))
             {
-                // Draw placeholder text (always shown when text is empty)
-                int textX = (int)(Rect.X + 4);
-                int textY = (int)(Rect.Y + 4);
-                Raylib.DrawText(PlaceholderText, textX, textY, 20, Colors.PlaceholderText);
+                // Draw placeholder text (always shown when text is empty) - smaller font size
+                float textX = Rect.X + 4;
+                float textY = Rect.Y + 4;
+                Raylib.DrawTextEx(ResourceLoader.RegularFont, PlaceholderText, 
+                    new System.Numerics.Vector2(textX, textY), 18, 0.5f, Colors.PlaceholderText);
             }
             
             // Always draw actual text and cursor if there is text or field is selected

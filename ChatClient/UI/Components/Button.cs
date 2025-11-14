@@ -72,21 +72,24 @@ namespace ChatClient.UI.Components
             const int padding = 10; // Padding inside button
             
             int fontSize = maxFontSize;
-            int textWidth = Raylib.MeasureText(Text, fontSize);
+            
+            // Measure text with custom BoldFont and reduced spacing (0.5)
+            Vector2 textSize = Raylib.MeasureTextEx(ResourceLoader.BoldFont, Text, fontSize, 0.5f);
             float availableWidth = Rect.Width - (padding * 2);
             float availableHeight = Rect.Height - (padding * 2);
             
             // Scale down font if text is too wide
-            while ((fontSize > minFontSize && textWidth > availableWidth) || (fontSize > maxFontSize && textWidth > availableHeight))
+            while (fontSize > minFontSize && (textSize.X > availableWidth || textSize.Y > availableHeight))
             {
                 fontSize--;
-                textWidth = Raylib.MeasureText(Text, fontSize);
+                textSize = Raylib.MeasureTextEx(ResourceLoader.BoldFont, Text, fontSize, 0.5f);
             }
             
             // Center text in button
-            int x = (int)(Rect.X + (Rect.Width - textWidth) / 2);
-            int y = (int)(Rect.Y + (Rect.Height - fontSize) / 2);
-            Raylib.DrawText(Text, x, y, fontSize, TextColorButton);
+            float x = Rect.X + (Rect.Width - textSize.X) / 2;
+            float y = Rect.Y + (Rect.Height - textSize.Y) / 2;
+            
+            Raylib.DrawTextEx(ResourceLoader.BoldFont, Text, new Vector2(x, y), fontSize, 0.5f, TextColorButton);
         }
 
         public bool IsHovered() => MouseInput.IsHovered(Rect);

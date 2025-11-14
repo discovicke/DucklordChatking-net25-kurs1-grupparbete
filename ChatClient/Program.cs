@@ -15,7 +15,7 @@ public class Program
     // TODO: Tab & Ctrl + Tab for switching between fields
     public static void Main()
     {
-        string appVersion = "2 girls, 1 duck v.0.1.1";
+        string appVersion = "2 girls, 1 duck v.0.2.4";
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
 
         
@@ -47,7 +47,7 @@ public class Program
 
             // Version text in bottom-left corner (always on top, updates position on window resize)
             int screenHeight = Raylib.GetScreenHeight();
-            const int fontSize = 13; // Constant font size - does not scale with window
+            const int fontSize = 10; // Constant font size - does not scale with window
             const int padding = 10;
             
             Raylib.DrawTextEx(
@@ -55,7 +55,7 @@ public class Program
                 $"{appVersion}",
                 new Vector2(padding, screenHeight - fontSize - padding),
                 fontSize,
-                1,
+                0.5f,
                 Colors.SubtleText);
             
             // --- End Frame ---

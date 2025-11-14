@@ -43,22 +43,20 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
-        Raylib.DrawText("Register ID:", 
-            (int)(layout.IdRect.X - 145), 
-            (int)(layout.IdRect.Y + 5), 
-            15, Colors.TextColor);
-        Raylib.DrawText("New username:", 
-            (int)(layout.UserRect.X - 145), 
-            (int)(layout.UserRect.Y + 5), 
-            15, Colors.TextColor);
-        Raylib.DrawText("New password:", 
-            (int)(layout.PassRect.X - 145), 
-            (int)(layout.PassRect.Y + 5), 
-            15, Colors.TextColor);
-        Raylib.DrawText("Confirm password:", 
-            (int)(layout.PassConfirmRect.X - 165), 
-            (int)(layout.PassConfirmRect.Y + 5), 
-            15, Colors.TextColor);
+        const float labelFont = 15;
+        
+        Raylib.DrawTextEx(ResourceLoader.RegularFont, "Register ID:", 
+            new Vector2(layout.IdRect.X - 145, layout.IdRect.Y + 5), 
+            labelFont, 0.5f, Colors.TextColor);
+        Raylib.DrawTextEx(ResourceLoader.RegularFont, "New username:", 
+            new Vector2(layout.UserRect.X - 145, layout.UserRect.Y + 5), 
+            labelFont, 0.5f, Colors.TextColor);
+        Raylib.DrawTextEx(ResourceLoader.RegularFont, "New password:", 
+            new Vector2(layout.PassRect.X - 145, layout.PassRect.Y + 5), 
+            labelFont, 0.5f, Colors.TextColor);
+        Raylib.DrawTextEx(ResourceLoader.RegularFont, "Confirm password:", 
+            new Vector2(layout.PassConfirmRect.X - 165, layout.PassConfirmRect.Y + 5), 
+            labelFont, 0.5f, Colors.TextColor);
 
         idField.Draw();
         userField.Draw();

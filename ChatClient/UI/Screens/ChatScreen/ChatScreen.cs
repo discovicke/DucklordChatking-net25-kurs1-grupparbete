@@ -59,15 +59,16 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         // TODO: Add scrollbar
         // TODO: Add Message Wrapping
         // Draw messages
-        int startX = (int)layout.ChatRect.X + 10;
-        int startY = (int)layout.ChatRect.Y + 10;
-        int lineH = 20;
+        float startX = layout.ChatRect.X + 10;
+        float startY = layout.ChatRect.Y + 10;
+        const float lineH = 20;
 
         foreach (var m in messages)
         {
             string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown" : m.Sender;
             string text = $"{m.Timestamp}  -  {sender} :  {m.Content}";
-            Raylib.DrawText(text, startX, startY, 15, Colors.TextColor);
+            Raylib.DrawTextEx(ResourceLoader.RegularFont, text, 
+                new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
             startY += lineH;
         }
 

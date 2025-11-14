@@ -1,5 +1,7 @@
-﻿using Raylib_cs;
+﻿﻿using Raylib_cs;
 using System.Collections.Generic;
+using System.Numerics;
+using ChatClient.Core;
 using ChatClient.UI.Components;
 
 namespace ChatClient.UI.Rendering
@@ -20,8 +22,8 @@ namespace ChatClient.UI.Rendering
 
         public void Draw(string text, TextCursor cursor, bool isSelected)
         {
-            int textX = (int)(bounds.X + Padding);
-            int textY = (int)(bounds.Y + Padding);
+            float textX = bounds.X + Padding;
+            float textY = bounds.Y + Padding;
 
             Raylib.BeginScissorMode((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
 
@@ -42,16 +44,17 @@ namespace ChatClient.UI.Rendering
             }
         }
 
-        private void DrawSingleLineText(string text, int textX, int textY, TextCursor cursor)
+        private void DrawSingleLineText(string text, float textX, float textY, TextCursor cursor)
         {
             string displayText = isPassword ? new string('*', text.Length) : text;
             AdjustScrollForCaret(displayText, cursor);
-            Raylib.DrawText(displayText, textX - scrollOffset, textY, FontSize, textColor);
+            Raylib.DrawTextEx(ResourceLoader.MediumFont, displayText, 
+                new Vector2(textX - scrollOffset, textY), FontSize, 0.5f, textColor);
         }
 
-        private void DrawMultilineText(string text, int textX, int textY)
+        private void DrawMultilineText(string text, float textX, float textY)
         {
-            int currentY = textY;
+            float currentY = textY;
             var manualLines = text.Split('\n');
 
             foreach (var line in manualLines)
@@ -59,19 +62,20 @@ namespace ChatClient.UI.Rendering
                 var wrappedLines = WrapText(line, (int)bounds.Width - Padding * 2);
                 foreach (var wrappedLine in wrappedLines)
                 {
-                    Raylib.DrawText(wrappedLine, textX, currentY, FontSize, textColor);
+                    Raylib.DrawTextEx(ResourceLoader.MediumFont, wrappedLine, 
+                        new Vector2(textX, currentY), FontSize, 0.5f, textColor);
                     currentY += FontSize + LineSpacing;
                 }
             }
         }
 
-        private void DrawCaret(string text, int textX, int textY, TextCursor cursor)
+        private void DrawCaret(string text, float textX, float textY, TextCursor cursor)
         {
             var (cx, cy) = GetCaretPixelPosition(text, textX, textY, cursor);
-            Raylib.DrawLine(cx, cy, cx, cy + FontSize, textColor);
+            Raylib.DrawLine((int)cx, (int)cy, (int)cx, (int)(cy + FontSize), textColor);
         }
 
-        private (int x, int y) GetCaretPixelPosition(string text, int textX, int textY, TextCursor cursor)
+        private (float x, float y) GetCaretPixelPosition(string text, float textX, float textY, TextCursor cursor)
         {
             int pos = Math.Clamp(cursor.Position, 0, text.Length);
 
@@ -80,7 +84,7 @@ namespace ChatClient.UI.Rendering
             if (!allowMultiline)
             {
                 string left = pos > 0 ? displayText.Substring(0, pos) : "";
-                int leftWidth = Raylib.MeasureText(left, FontSize);
+                float leftWidth = Raylib.MeasureTextEx(ResourceLoader.MediumFont, left, FontSize, 0.5f).X;
                 return (textX - scrollOffset + leftWidth, textY);
             }
 
@@ -97,11 +101,11 @@ namespace ChatClient.UI.Rendering
             string lastPara = paras.Length > 0 ? paras[^1] : "";
             var wrappedLast = WrapText(lastPara, availableWidth);
             string lastLine = wrappedLast.Count > 0 ? wrappedLast[^1] : "";
-            int lastLineWidth = Raylib.MeasureText(lastLine, FontSize);
+            float lastLineWidth = Raylib.MeasureTextEx(ResourceLoader.MediumFont, lastLine, FontSize, 0.5f).X;
 
             int caretLineIndex = linesBefore + Math.Max(0, wrappedLast.Count - 1);
-            int caretX = textX + lastLineWidth;
-            int caretY = textY + caretLineIndex * (FontSize + LineSpacing);
+            float caretX = textX + lastLineWidth;
+            float caretY = textY + caretLineIndex * (FontSize + LineSpacing);
 
             return (caretX, caretY);
         }
@@ -111,12 +115,12 @@ namespace ChatClient.UI.Rendering
             if (allowMultiline) return;
 
             int availableWidth = (int)bounds.Width - Padding * 2;
-            int textWidth = Raylib.MeasureText(text, FontSize);
+            int textWidth = (int)Raylib.MeasureTextEx(ResourceLoader.MediumFont, text, FontSize, 0.5f).X;
             int maxScroll = Math.Max(0, textWidth - availableWidth);
 
             string left = cursor.Position > 0 ? text.Substring(0, cursor.Position) : "";
             string displayLeft = isPassword ? new string('*', left.Length) : left;
-            int leftWidth = Raylib.MeasureText(displayLeft, FontSize);
+            int leftWidth = (int)Raylib.MeasureTextEx(ResourceLoader.MediumFont, displayLeft, FontSize, 0.5f).X;
             int caretXLocal = leftWidth - scrollOffset;
 
             if (caretXLocal < 0)
@@ -142,7 +146,7 @@ namespace ChatClient.UI.Rendering
                 var testLine = string.IsNullOrEmpty(currentLine)
                     ? word
                     : currentLine + " " + word;
-                int lineWidth = Raylib.MeasureText(testLine, FontSize);
+                int lineWidth = (int)Raylib.MeasureTextEx(ResourceLoader.MediumFont, testLine, FontSize, 0.5f).X;
 
                 if (lineWidth > maxWidth)
                 {
@@ -152,7 +156,7 @@ namespace ChatClient.UI.Rendering
                         currentLine = word;
                     }
 
-                    if (Raylib.MeasureText(word, FontSize) > maxWidth)
+                    if (Raylib.MeasureTextEx(ResourceLoader.MediumFont, word, FontSize, 0.5f).X > maxWidth)
                     {
                         var splitWordLines = SplitLongWord(word, maxWidth);
                         lines.AddRange(splitWordLines.GetRange(0, splitWordLines.Count - 1));
@@ -186,7 +190,7 @@ namespace ChatClient.UI.Rendering
             {
                 string test = currentLine + c;
 
-                int testWidth = Raylib.MeasureText(test + "-", FontSize);
+                int testWidth = (int)Raylib.MeasureTextEx(ResourceLoader.MediumFont, test + "-", FontSize, 0.5f).X;
 
                 if (testWidth > maxWidth)
                 {
