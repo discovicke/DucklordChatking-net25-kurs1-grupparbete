@@ -65,4 +65,31 @@ public class ChatMessage
 
         return lines;
     }
+    public void Draw(float x, float y)
+    {
+        // Draw bubble bakgrund
+        var bubbleRect = new Rectangle(x, y, maxWidth + (Padding * 2), Height);
+        Raylib.DrawRectangleRounded(bubbleRect, 0.1f, 8, Colors.PanelColor);
+        Raylib.DrawRectangleRoundedLinesEx(bubbleRect, 0.1f, 8, 1, Colors.OutlineColor);
+
+        // Draw text
+        float textY = y + Padding;
+        bool isHeader = true;
+
+        string sender = string.IsNullOrWhiteSpace(message.Sender) ? "Unknown Duck" : message.Sender;
+        string timestamp = message.Timestamp.ToLocalTime().ToString("HH:mm");
+        string header = $"{timestamp} - {sender}:";
+        int headerLineCount = WrapText(header, ResourceLoader.BoldFont).Count;
+
+        for (int i = 0; i < wrappedLines.Count; i++)
+        {
+            var font = i < headerLineCount ? ResourceLoader.BoldFont : ResourceLoader.RegularFont;
+            var color = i < headerLineCount ? Colors.AccentColor : Colors.UiText;
+
+            Raylib.DrawTextEx(font, wrappedLines[i],
+                new Vector2(x + Padding, textY), FontSize, 0.5f, color);
+            
+            textY += LineSpacing;
+        }
+    }
 }

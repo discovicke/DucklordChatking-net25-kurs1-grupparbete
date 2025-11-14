@@ -19,6 +19,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     private readonly MessageHandler? messageHandler = new(ServerConfig.CreateHttpClient());
     private List<MessageDTO> messages = new();
+    private List<ChatMessage> chatMessageBubbles = new();
     private double lastUpdateTime = 0;
 
     public ChatScreen()
@@ -54,24 +55,31 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             lastUpdateTime = t;
             var list = messageHandler?.ReceiveHistory();
             messageHandler.SendHeartbeat();
-            if (list != null && list.Any()) messages = list.ToList();
+            if (list != null && list.Any())
+            {
+                messages = list.ToList();
+            chatMessageBubbles = messages
+                .Select(m => new ChatMessage(m, layout.ChatRect.Width - 20))
+                .ToList();
+            }
         }
 
         // TODO: Add scrollbar
         // TODO: Add Message Wrapping
         // Draw messages
         float startX = layout.ChatRect.X + 10;
-        float startY = layout.ChatRect.Y + 10;
-        const float lineH = 20;
+        float currentY = layout.ChatRect.Y + 10;
+        const float messagePadding = 8f; 
 
-        foreach (var m in messages)
+        foreach (var chatMsg in chatMessageBubbles)
         {
-            string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown Duck" : m.Sender;
-            string startText = $"{m.Timestamp} - {sender}:";
-            string text = $"{startText}\n{m.Content}";
-            Raylib.DrawTextEx(ResourceLoader.RegularFont, text, 
-                new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
-            startY += lineH;
+            // Check if we can draw the message
+            // TODO - add scrollbar here
+            if (currentY + chatMsg.Height > layout.ChatRect.Y + layout.ChatRect.Height)
+                break; // Stop drawing if we can't draw insinde of rectangle
+
+            chatMsg.Draw(startX, currentY);
+            currentY += chatMsg.Height + messagePadding;
         }
         
         // User list panel
