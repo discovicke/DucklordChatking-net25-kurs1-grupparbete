@@ -2,10 +2,8 @@ using Raylib_cs;
 
 namespace ChatClient.Core;
 
-/// <summary>
-/// Centralized resource loader for fonts, textures, and other assets.
-/// Ensures resources are loaded once and properly unloaded on exit.
-/// </summary>
+// Centralized resource loader for fonts, textures, and other assets.
+// Ensures resources are loaded once and properly unloaded on exit.
 public static class ResourceLoader
 {
     // --- Fonts ---
@@ -20,9 +18,7 @@ public static class ResourceLoader
 
     private static bool isLoaded = false;
 
-    /// <summary>
-    /// Load all resources. Call this once at application startup after Raylib.InitWindow().
-    /// </summary>
+    // Load all resources. Call this once at application startup after Raylib.InitWindow().
     public static void LoadAll()
     {
         if (isLoaded)
@@ -40,9 +36,7 @@ public static class ResourceLoader
         Log.Success("[ResourceLoader] All resources loaded successfully");
     }
 
-    /// <summary>
-    /// Unload all resources. Call this before Raylib.CloseWindow().
-    /// </summary>
+    // Unload all resources. Call this before Raylib.CloseWindow().
     public static void UnloadAll()
     {
         if (!isLoaded)
