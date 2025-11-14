@@ -27,20 +27,22 @@ public class UserStore
   /// <returns>
   /// True when creation succeeds. False when a user with the same username already exists.
   /// </returns>
-  #endregion
-  public bool Add(string username, string password, bool isAdmin = false)
+  public bool Add(string username, string password, bool isAdmin = false, string? sessionAuthToken = null)
   {
+    sessionAuthToken ??= Guid.NewGuid().ToString();
+
     if (usersByUsername.ContainsKey(username))
     {
       return false;
     }
 
-    User newUser = new(username, password, isAdmin)
+    User newUser = new(username, password, isAdmin, sessionAuthToken)
     {
       Id = nextId++
     };
 
-    usersByUsername.Add(username, newUser);
+    usersBySessionAuthToken[newUser.SessionAuthToken] = newUser;
+    usersByUsername.Add(newUser.Username, newUser);
     usersById.Add(newUser.Id, newUser);
     return true;
   }
