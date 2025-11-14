@@ -7,9 +7,6 @@ namespace ChatClient.UI.Screens;
 
 public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 {
-    private readonly TextField idField = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
-        false, false, "RegisterScreen_ID", "Enter registration ID...");
     private readonly TextField userField = new(new Rectangle(), 
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
         false, false, "RegisterScreen_Username", "Choose username...");
@@ -26,14 +23,13 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
 
     public RegisterScreen()
     {
-        logic = new RegisterScreenLogic(idField, userField, passField, passConfirmField, registerButton, backButton);
+        logic = new RegisterScreenLogic(userField, passField, passConfirmField, registerButton, backButton);
     }
 
     protected override RegisterScreenLayout.LayoutData CalculateLayout() => RegisterScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
 
     protected override void ApplyLayout(RegisterScreenLayout.LayoutData layout)
     {
-        idField.SetRect(layout.IdRect);
         userField.SetRect(layout.UserRect);
         passField.SetRect(layout.PassRect);
         passConfirmField.SetRect(layout.PassConfirmRect);
@@ -45,9 +41,6 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
     {
         const float labelFont = 15;
         
-        Raylib.DrawTextEx(ResourceLoader.RegularFont, "Register ID:", 
-            new Vector2(layout.IdRect.X - 145, layout.IdRect.Y + 5), 
-            labelFont, 0.5f, Colors.TextColor);
         Raylib.DrawTextEx(ResourceLoader.RegularFont, "New username:", 
             new Vector2(layout.UserRect.X - 145, layout.UserRect.Y + 5), 
             labelFont, 0.5f, Colors.TextColor);
@@ -58,7 +51,6 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
             new Vector2(layout.PassConfirmRect.X - 165, layout.PassConfirmRect.Y + 5), 
             labelFont, 0.5f, Colors.TextColor);
 
-        idField.Draw();
         userField.Draw();
         passField.Draw();
         passConfirmField.Draw();
@@ -69,5 +61,20 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
         Raylib.DrawTextureEx(ResourceLoader.LogoTexture, 
             new Vector2(layout.LogoX, layout.LogoY), 
             0f, layout.LogoScale, Color.White);
+
+        // Display feedback message if present
+        var registerLogic = logic as RegisterScreenLogic;
+        if (registerLogic != null && !string.IsNullOrEmpty(registerLogic.FeedbackMessage))
+        {
+            Color feedbackColor = registerLogic.IsFeedbackSuccess ? new Color(46, 204, 113, 255) : new Color(231, 76, 60, 255);
+            float feedbackY = layout.RegisterRect.Y + layout.RegisterRect.Height + 20;
+            
+            // Measure text to center it
+            Vector2 textSize = Raylib.MeasureTextEx(ResourceLoader.MediumFont, registerLogic.FeedbackMessage, 16, 0.5f);
+            float feedbackX = (Raylib.GetScreenWidth() - textSize.X) / 2;
+            
+            Raylib.DrawTextEx(ResourceLoader.MediumFont, registerLogic.FeedbackMessage, 
+                new Vector2(feedbackX, feedbackY), 16, 0.5f, feedbackColor);
+        }
     }
 }

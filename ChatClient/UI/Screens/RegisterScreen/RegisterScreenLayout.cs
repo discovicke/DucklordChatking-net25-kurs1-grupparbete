@@ -7,7 +7,7 @@ public static class RegisterScreenLayout
 {
     public struct LayoutData
     {
-        public Rectangle IdRect, UserRect, PassRect, PassConfirmRect, RegisterRect, BackRect;
+        public Rectangle UserRect, PassRect, PassConfirmRect, RegisterRect, BackRect;
         public float LogoX, LogoY, LogoScale;
     }
 
@@ -21,21 +21,20 @@ public static class RegisterScreenLayout
 
         float fieldW = w * 0.30f;
         float fieldH = h * 0.05f;
-        float btnW = w * 0.16f;
+        float btnW = w * 0.25f;
         float btnH = h * 0.05f;
         float gap = h * 0.02f;
-        float colTop = h * 0.40f;
+        float colTop = h * 0.45f;
 
         float logoTargetW = w * 0.15f;
         float logoScale = logoWidth > 0 ? logoTargetW / logoWidth : 0.15f;
 
         return new LayoutData
         {
-            IdRect = wrap.CenterHoriz(fieldW, fieldH, colTop),
-            UserRect = wrap.CenterHoriz(fieldW, fieldH, colTop + (fieldH + gap)),
-            PassRect = wrap.CenterHoriz(fieldW, fieldH, colTop + 2 * (fieldH + gap)),
-            PassConfirmRect = wrap.CenterHoriz(fieldW, fieldH, colTop + 3 * (fieldH + gap)),
-            RegisterRect = wrap.CenterHoriz(btnW, btnH, colTop + 4 * (fieldH + gap)),
+            UserRect = wrap.CenterHoriz(fieldW, fieldH, colTop),
+            PassRect = wrap.CenterHoriz(fieldW, fieldH, colTop + (fieldH + gap)),
+            PassConfirmRect = wrap.CenterHoriz(fieldW, fieldH, colTop + 2 * (fieldH + gap)),
+            RegisterRect = wrap.CenterHoriz(btnW, btnH, colTop + 3 * (fieldH + gap)),
             BackRect = new Rectangle(10, 10, 100, 30),
             LogoScale = logoScale,
             LogoX = (w - logoWidth * logoScale) / 2f,

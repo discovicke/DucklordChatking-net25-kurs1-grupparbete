@@ -39,6 +39,21 @@ public class UserAuth
         }
     }
 
+    public bool Register(string username, string password)
+    {
+        var userDto = new UserDTO { Username = username, Password = password };
+
+        try
+        {
+            var response = httpClient.PostAsJsonAsync("/auth/register", userDto).Result;
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     // New overload to allow tests to pass a DTO instance directly
     public bool Login(UserDTO user)
     {
