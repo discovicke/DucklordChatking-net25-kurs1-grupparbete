@@ -59,9 +59,9 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             if (list != null && list.Any())
             {
                 messages = list.ToList();
-            chatMessageBubbles = messages
-                .Select(m => new ChatMessage(m, layout.ChatRect.Width - 20))
-                .ToList();
+                chatMessageBubbles = messages
+                    .Select(m => new ChatMessage(m, layout.ChatRect.Width - 20))
+                    .ToList();
             }
         }
 
@@ -74,12 +74,21 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
         foreach (var chatMsg in chatMessageBubbles)
         {
-            string sender = string.IsNullOrWhiteSpace(m.Sender) ? "Unknown Duck" : m.Sender;
-            string text = $"{m.Timestamp}  -  {sender} :  {m.Content}";
-            Raylib.DrawTextEx(ResourceLoader.RegularFont, text,
-                new Vector2(startX, startY), 15, 0.5f, Colors.TextColor);
-            startY += lineH;
+            // Check if we can draw the message
+            // TODO - add scrollbar here
+            if (currentY + chatMsg.Height > layout.ChatRect.Y + layout.ChatRect.Height)
+                break; // Stop drawing if we can't draw insinde of rectangle
+
+            chatMsg.Draw(startX, currentY);
+            currentY += chatMsg.Height + messagePadding;
         }
+
+        // User list panel
+        Raylib.DrawRectangleRounded(layout.UserListRect, 0.08f, 10, Colors.PanelColor);
+        Raylib.DrawRectangleRoundedLinesEx(layout.UserListRect, 0.08f, 10, 1, Colors.OutlineColor);
+
+        // Placeholder user lists
+        DrawUserList();
 
         // Input + send
         inputField.Draw();
