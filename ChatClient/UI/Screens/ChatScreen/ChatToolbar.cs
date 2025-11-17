@@ -1,0 +1,62 @@
+using System;
+using ChatClient.Core;
+using ChatClient.UI.Components;
+using Raylib_cs;
+
+namespace ChatClient.UI.Screens;
+
+/// <summary>
+/// Responsible for: rendering and handling input for the message input field + send button.
+/// Raises SendPressed event when user submits a message.
+/// </summary>
+public class ChatToolbar
+{
+    private readonly TextField inputField;
+    private readonly Button sendButton;
+
+    public event Action<string>? SendPressed;
+
+    public ChatToolbar(TextField inputField, Button sendButton)
+    {
+        this.inputField = inputField;
+        this.sendButton = sendButton;
+    }
+
+    public void SetBounds(Rectangle inputRect, Rectangle sendRect)
+    {
+        inputField.SetRect(inputRect);
+        sendButton.SetRect(sendRect);
+    }
+
+    public void Update()
+    {
+        inputField.Update();
+
+        // Send on button click or Enter (without Shift for multiline)
+        bool sendTriggered = sendButton.IsClicked() ||
+                             (Raylib.IsKeyPressed(KeyboardKey.Enter) &&
+                              !Raylib.IsKeyDown(KeyboardKey.LeftShift));
+
+        if (sendTriggered)
+        {
+            string text = inputField.Text;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                Log.Info($"[ChatToolbar] Message submitted: '{text.Replace("\n", "\\n")}'");
+                SendPressed?.Invoke(text);
+                inputField.Clear();
+            }
+            else
+            {
+                Log.Info("[ChatToolbar] Send attempted with empty message");
+            }
+        }
+    }
+
+    public void Draw()
+    {
+        inputField.Draw();
+        sendButton.Draw();
+    }
+}
+
