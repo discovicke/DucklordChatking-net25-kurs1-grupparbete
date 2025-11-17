@@ -76,7 +76,18 @@ public static class MessageEndpoints
         var updates = messageStore.GetMessagesAfter(lastId);
 
         if (updates.Count > 0)
-          return Results.Ok(updates); // 200: new messages available
+        {
+          // Map ChatMessage -> MessageDTO, including the ID
+          var dtoUpdates = updates.Select(m => new MessageDTO
+          {
+            Id = m.Id,                     // copy the ID
+            Sender = m.Sender,    // map sender username
+            Content = m.Content,
+            Timestamp = m.Timestamp
+          }).ToList();
+
+          return Results.Ok(dtoUpdates); // 200: new messages available
+        }
 
         await Task.Delay(sleepMs);
         waited += sleepMs;

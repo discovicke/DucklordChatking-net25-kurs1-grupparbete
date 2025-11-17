@@ -6,6 +6,7 @@ public class MessageDTO
     // if any fields are null the message is invalid (not sent)
 
     // Message ID is generated server-side
+    public int? Id { get; set; }
     public string? Sender { get; set; }
     public string? Content { get; set; }
 
