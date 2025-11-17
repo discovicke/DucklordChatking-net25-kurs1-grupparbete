@@ -9,9 +9,13 @@ namespace ChatClient;
 
 public class Program
 {
-    // TODO: Add relative spacing to window size
-    // TODO: What happens when connection to server is lost?
-    // TODO: Tab & Ctrl + Tab for switching between fields
+    // TODO:
+    //      - Add relative spacing to window size
+    //      - Tab & Ctrl + Tab for switching between fields
+    //      - Quack login = DuckLord acc
+    //      - Add chat bubble for own user message
+    //      - Add feedback box / message when other users change status
+    
     public static void Main()
     {
         string appVersion = "2 girls, 1 duck v.0.2.4";

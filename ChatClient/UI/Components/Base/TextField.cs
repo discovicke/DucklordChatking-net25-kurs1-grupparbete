@@ -13,15 +13,8 @@ namespace ChatClient.UI.Components.Base
     /// </summary>
     public class TextField : UIComponent
     {
-        // TODO Bugg FIX!!! ctrl + z should return to last text state
-
         // TODO:
-        // - Add scroll logic
-        // - Add copy/paste support (Ctrl + C / Ctrl + V)
-        // - Add cut support (Ctrl + X)
-        // - Add undo/redo support (Ctrl + Z / Ctrl + Y)
         // - Add text selection support (Mouse drag || shift key)
-        // - Add font support
 
         public string Text { get; private set; } = string.Empty;
         private string FieldName { get; set; } = "TextField";
@@ -101,7 +94,6 @@ namespace ChatClient.UI.Components.Base
             Log.Info($"[{FieldName}] Undo state saved - Stack size: {undoStack.Count} - State: '{currentState.Replace("\n", "\\n")}'");
         }
 
-        // TODO: Manage corner roundness
         public override void Draw()
         {
             // Determine fill color based on state
@@ -325,6 +317,5 @@ namespace ChatClient.UI.Components.Base
         }
         // TODO: Mouse click to get position in text
         // TODO: Crtl backspace to  delete one word
-        // TODO: Font?
     }
 }

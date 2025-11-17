@@ -32,6 +32,13 @@ namespace ChatClient.UI.Theme
         public static Color Success = new Color(120, 255, 200, 255); 
         public static Color Fail = new Color(255, 130, 120, 255);
         
+        // Chat bubbles
+        public static Color ChatBubbleOther = new Color(152, 160, 166, 255); // Ljusgrå
+        public static Color ChatBubbleSelf = new Color(24, 120, 156, 255);   // Teal-blå (egen)
+
+        // Online/offline indicators
+        public static Color Online = new Color(75, 211, 123, 255);           // Klar grön
+        public static Color Offline = new Color(125, 138, 146, 255);         // Neutral mellangrå
         
         // Text colors
         public static Color TextColor = new Color(20, 40, 50, 255);

@@ -10,13 +10,13 @@ namespace ChatClient.UI.Screens.Chat.Components;
 /// </summary>
 public class ChatMessagesView
 {
-    private readonly ScrollablePanel _panel;
-    private Rectangle _bounds;
+    private readonly ScrollablePanel panel;
+    private Rectangle bounds;
 
-    private readonly List<ChatMessage> _bubbles = new();
-    private int _lastMessageCount;
-    private float _lastContentHeight;
-    private bool _firstLoad = true;
+    private readonly List<ChatMessage> bubbles = new();
+    private int lastMessageCount;
+    private float lastContentHeight;
+    private bool firstLoad = true;
 
     // layout constants
     private const float PaddingTop = 10f;
@@ -27,31 +27,31 @@ public class ChatMessagesView
 
     public ChatMessagesView(ScrollablePanel panel)
     {
-        _panel = panel;
+        this.panel = panel;
     }
 
     public void SetBounds(Rectangle bounds)
     {
-        _bounds = bounds;
-        _panel.SetBounds(bounds);
+        this.bounds = bounds;
+        panel.SetBounds(bounds);
     }
 
     public void UpdateMessages(IReadOnlyList<MessageDTO> messages, float contentWidth)
     {
         if (messages.Count == 0)
         {
-            _bubbles.Clear();
-            _lastMessageCount = 0;
+            bubbles.Clear();
+            lastMessageCount = 0;
             return;
         }
 
         // Only rebuild bubbles if count changed or width changed significantly
-        if (_bubbles.Count != messages.Count || Math.Abs(contentWidth - GetCurrentContentWidth()) > 0.5f)
+        if (bubbles.Count != messages.Count || Math.Abs(contentWidth - GetCurrentContentWidth()) > 0.5f)
         {
-            _bubbles.Clear();
+            bubbles.Clear();
             foreach (var m in messages)
             {
-                _bubbles.Add(new ChatMessage(m, contentWidth));
+                bubbles.Add(new ChatMessage(m, contentWidth));
             }
         }
     }
@@ -61,49 +61,51 @@ public class ChatMessagesView
     {
         // Compute total content height using same spacing as draw
         float totalHeight = PaddingTop + PaddingBottom;
-        foreach (var b in _bubbles)
+        foreach (var b in bubbles)
+        {
             totalHeight += b.Height + Spacing;
+        }
 
         // Determine if user was at bottom based on previous content height
-        float prevMaxScroll = MathF.Max(0, _lastContentHeight - _bounds.Height);
-        bool wasAtBottom = _panel.ScrollOffset >= (prevMaxScroll - BottomTolerancePx);
+        float prevMaxScroll = MathF.Max(0, lastContentHeight - bounds.Height);
+        bool wasAtBottom = panel.ScrollOffset >= (prevMaxScroll - BottomTolerancePx);
 
         // Begin scroll region with current height (also sets scissor)
-        _panel.BeginScroll(totalHeight);
+        panel.BeginScroll(totalHeight);
 
         // Auto-scroll on first load or if new messages arrived while user was at bottom
-        bool hasMessages = _bubbles.Count > 0;
-        bool hasNewMessages = _bubbles.Count > _lastMessageCount;
-        if ((_firstLoad && hasMessages) || (hasNewMessages && wasAtBottom))
+        bool hasMessages = bubbles.Count > 0;
+        bool hasNewMessages = bubbles.Count > lastMessageCount;
+        if ((firstLoad && hasMessages) || (hasNewMessages && wasAtBottom))
         {
-            _panel.ScrollToBottom();
-            _firstLoad = false;
+            panel.ScrollToBottom();
+            firstLoad = false;
         }
 
         // Draw bubbles
-        float currentY = _bounds.Y + PaddingTop;
-        foreach (var b in _bubbles)
+        float currentY = bounds.Y + PaddingTop;
+        foreach (var b in bubbles)
         {
-            float scrolledY = _panel.GetScrolledY(currentY);
-            if (_panel.IsVisible(scrolledY, b.Height))
+            float scrolledY = panel.GetScrolledY(currentY);
+            if (panel.IsVisible(scrolledY, b.Height))
             {
-                b.Draw(_bounds.X + LeftInset, scrolledY);
+                b.Draw(bounds.X + LeftInset, scrolledY);
             }
             currentY += b.Height + Spacing;
         }
 
-        _panel.EndScroll();
+        panel.EndScroll();
 
         // Track for next frame
-        _lastMessageCount = _bubbles.Count;
-        _lastContentHeight = totalHeight;
+        lastMessageCount = bubbles.Count;
+        lastContentHeight = totalHeight;
     }
 
-    public void ScrollToBottom() => _panel.ScrollToBottom();
+    public void ScrollToBottom() => panel.ScrollToBottom();
 
     private float GetCurrentContentWidth()
     {
-        return MathF.Max(0, _bounds.Width - LeftInset * 2);
+        return MathF.Max(0, bounds.Width - LeftInset * 2);
     }
 }
 

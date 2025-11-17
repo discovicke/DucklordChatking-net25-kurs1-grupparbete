@@ -52,7 +52,7 @@ public class UserListView(ScrollablePanel panel)
 
         // Offline header
         scrolledY = panel.GetScrolledY(y);
-        Raylib.DrawTextEx(ResourceLoader.BoldFont, "OFFLINE", new Vector2(x, scrolledY), fontSize, 0.5f, Colors.SubtleText);
+        Raylib.DrawTextEx(ResourceLoader.BoldFont, "OFFLINE", new Vector2(x, scrolledY), fontSize, 0.5f, Colors.Offline);
         y += lineH;
 
         // Offline users
@@ -61,8 +61,8 @@ public class UserListView(ScrollablePanel panel)
             scrolledY = panel.GetScrolledY(y);
             if (panel.IsVisible(scrolledY, lineH))
             {
-                Raylib.DrawCircle((int)x + 5, (int)scrolledY + 7, 4f, Colors.SubtleText);
-                Raylib.DrawTextEx(ResourceLoader.RegularFont, user, new Vector2(x + 15, scrolledY), fontSize, 0.5f, Colors.SubtleText);
+                Raylib.DrawCircle((int)x + 5, (int)scrolledY + 7, 4f, Colors.Offline);
+                Raylib.DrawTextEx(ResourceLoader.RegularFont, user, new Vector2(x + 15, scrolledY), fontSize, 0.5f, Colors.Offline);
             }
             y += lineH;
         }

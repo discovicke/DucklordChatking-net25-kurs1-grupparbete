@@ -88,7 +88,7 @@ public class ChatMessage
     {
         // Draw bubble bakgrund
         var bubbleRect = new Rectangle(x, y, Width, Height);
-        Raylib.DrawRectangleRounded(bubbleRect, 0.15f, 8, Colors.PanelColor);
+        Raylib.DrawRectangleRounded(bubbleRect, 0.15f, 8, Colors.ChatBubbleOther);
         Raylib.DrawRectangleRoundedLinesEx(bubbleRect, 0.15f, 8, 1, Colors.OutlineColor);
 
         // Draw text
@@ -102,7 +102,7 @@ public class ChatMessage
         for (int i = 0; i < wrappedLines.Count; i++)
         {
             var font = i < headerLineCount ? ResourceLoader.BoldFont : ResourceLoader.RegularFont;
-            var color = i < headerLineCount ? Colors.AccentColor : Colors.UiText;
+            var color = i < headerLineCount ? Colors.UiText : Colors.InputText;
 
             Raylib.DrawTextEx(font, wrappedLines[i],
                 new Vector2(x + Padding, textY), FontSize, 0.5f, color);
