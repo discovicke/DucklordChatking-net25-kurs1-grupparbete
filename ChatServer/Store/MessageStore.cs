@@ -67,6 +67,7 @@ public class MessageStore(UserStore userStore)
 
         result.Add(new MessageDTO
         {
+          Id = m.Id,
           Sender = user.Username,
           Content = m.Content,
           Timestamp = m.Timestamp // timestamp automatically set when message was created
@@ -100,6 +101,7 @@ public class MessageStore(UserStore userStore)
         );
       result.Add(new MessageDTO
       {
+        Id = m.Id,
         Sender = user.Username,
         Content = m.Content,
         Timestamp = m.Timestamp
@@ -140,6 +142,7 @@ public class MessageStore(UserStore userStore)
 
       result.Add(new MessageDTO
       {
+        Id = m.Id,
         Sender = user.Username,
         Content = m.Content,
         Timestamp = m.Timestamp
