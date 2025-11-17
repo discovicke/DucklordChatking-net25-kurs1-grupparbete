@@ -31,7 +31,11 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private readonly ScrollablePanel inputPanel;
     private List<MessageDTO> messages = new();
     private List<ChatMessage> chatMessageBubbles = new();
-    private double lastUpdateTime = 0;
+    private int lastMessageId = 1;
+    private readonly ConcurrentQueue<MessageDTO> incomingMessages = new();
+    private bool pollingStarted = false;
+    private CancellationTokenSource cts = new();
+
 
     public ChatScreen()
     {
