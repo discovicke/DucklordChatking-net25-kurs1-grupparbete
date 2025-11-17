@@ -60,30 +60,21 @@ namespace ChatClient.UI.Components
                 ResetCursorToStart = () => cursor.Position = 0,
                 ResetCursorToEnd = pos => cursor.Position = pos,
                 ResetCursorBlink = () => cursor.ResetBlink(),
+                SetMovedThisFrame = () => movedThisFrame = true,
                 FieldName = FieldName
             };
             clipboardActions = new ClipboardActions(ctx);
+            
+            undoStack.Push(string.Empty);
             SaveStateForUndo();
+            
         }
 
         private void SaveStateForUndo()
         {
-            // snapshot current text
-            string snapshot = Text ?? string.Empty;
-
-            // avoid pushing duplicate consecutive states
-            if (undoStack.Count > 0 && undoStack.Peek() == snapshot) return;
-
-            // if at capacity, remove the oldest entry (bottom of the stack)
-            if (undoStack.Count >= MaxUndoEntries)
-            {
-                var keep = undoStack.Reverse().Skip(1).Reverse().ToArray();
-                undoStack.Clear();
-                foreach (var item in keep) undoStack.Push(item);
-            }
-
-            undoStack.Push(snapshot);
-            Log.Info($"[{FieldName}] Saved state for undo - Stack size: {undoStack.Count}");
+            string currentState = Text ?? string.Empty;
+            undoStack.Push(currentState);
+            Log.Info($"[{FieldName}] Undo state saved - Stack size: {undoStack.Count} - State: '{currentState.Replace("\n", "\\n")}'");
         }
 
         // TODO: Manage corner roundness
@@ -131,6 +122,7 @@ namespace ChatClient.UI.Components
 
         public override void Update()
         {
+            movedThisFrame = false;
 
             if (MouseInput.IsLeftClick(Rect))
             {
@@ -158,8 +150,6 @@ namespace ChatClient.UI.Components
 
             HandleTextInput();
             HandleNavigation();
-
-
         }
 
         private void HandleTextInput()
