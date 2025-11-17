@@ -135,7 +135,7 @@ namespace ChatClient.UI.Components
         
                     if (ctx.UndoStack.Count >= 0)
                     {
-                        string previousState = ctx.UndoStack.Pop();
+                        string previousState =  ctx.UndoStack.Pop();
                         ctx.SetText(previousState);
                         ctx.ResetCursorToEnd(previousState.Length);
                         ctx.ResetCursorBlink();

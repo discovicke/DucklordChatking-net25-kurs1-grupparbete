@@ -16,7 +16,7 @@ namespace ChatClient.UI.Components
         // - Add undo/redo support (Ctrl + Z / Ctrl + Y)
         // - Add text selection support (Mouse drag || shift key)
         // - Add font support
-        
+
         public string Text { get; private set; } = string.Empty;
         private string FieldName { get; set; } = "TextField";
         private string PlaceholderText { get; set; } = "";
@@ -220,15 +220,8 @@ namespace ChatClient.UI.Components
         //  Navigation for arrow keys
         private bool TryPress(KeyboardKey key, Action action)
         {
-            if (movedThisFrame) // to block out dubble left frame action
-            bool navigated = false;
-            
-            if (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left))
-            {
+            if (movedThisFrame) // block duplicate action within same press/frame
                 return false;
-                cursor.MoveLeft(Text.Length);
-                navigated = true;
-            }
 
             if (Raylib.IsKeyPressed(key))
             {
@@ -245,20 +238,21 @@ namespace ChatClient.UI.Components
             TryPress(KeyboardKey.Right, () => cursor.MoveRight(Text.Length));
             TryPress(KeyboardKey.Home, () => cursor.MoveToStart());
             TryPress(KeyboardKey.End, () => cursor.MoveToEnd(Text.Length));
-            
+           // bool navigated = false;
             if (!Raylib.IsKeyDown(KeyboardKey.Left) &&
                 !Raylib.IsKeyDown(KeyboardKey.Right) &&
                 !Raylib.IsKeyDown(KeyboardKey.Home) &&
                 !Raylib.IsKeyDown(KeyboardKey.End))
             {
-                cursor.MoveToEnd(Text.Length);
-                navigated = true;
+                movedThisFrame = false;
+                //cursor.MoveToEnd(Text.Length);
+             //   navigated = true;
             }
-            if (navigated && isTypingWord)
-            {
-                SaveUndoIfChanged();
-                isTypingWord = false;
-            }
+            //if (navigated && isTypingWord)
+            //{
+            //    SaveUndoIfChanged();
+            //    isTypingWord = false;
+            //}
         }
 
 
@@ -280,18 +274,18 @@ namespace ChatClient.UI.Components
             {
                 return;
             }
-            
+
             if (!isTypingWord)
             {
                 SaveUndoIfChanged();
             }
-        
+
             int removeIndex = Math.Clamp(cursor.Position - 1, 0, Text.Length - 1);
             char deletedChar = Text[removeIndex];
             Text = Text.Remove(removeIndex, 1);
             cursor.Position = removeIndex;
             cursor.ResetBlink();
-        
+
             isTypingWord = true;
             Log.Info($"[{FieldName}] Deleted: '{deletedChar}' at position {removeIndex}");
 
