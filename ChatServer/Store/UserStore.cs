@@ -223,11 +223,31 @@ public class UserStore : ConcurrentStoreBase
   /// </returns>
   public IEnumerable<string> GetAllUsernames()
   {
+    return WithRead(() => usersByUsername.Keys.ToArray());
+  }
+  #endregion
+
+  #region GET ALL USER STATUSES
+  /// <summary>
+  /// Returns every user together with a isOnline bool that indicates whether they are currently online.
+  /// </summary>
+  /// <remarks>
+  /// A user is considered online if their <c>LastActivityUtc</c>
+  /// is within <c>OnlineWindow</c> (see <see cref="OnlineWindow"/>).
+  /// </remarks>
+  /// <returns>
+  /// A sequence of (Username, Online) pairs.
+  /// </returns>
+  public IEnumerable<(string Username, bool Online)> GetAllUserStatuses()
+  {
     return WithRead(() =>
     {
-      return usersByUsername.Keys.ToArray();
+      return usersByUsername.Values
+          .Select(u => (u.Username, IsOnline(u)))
+          .ToArray();
     });
   }
+
   #endregion
 
   #region ASSIGN NEW SESSION AUTH TOKEN
