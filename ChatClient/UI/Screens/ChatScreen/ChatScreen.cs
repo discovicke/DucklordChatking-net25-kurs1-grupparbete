@@ -33,6 +33,9 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private List<MessageDTO> messages = new();
     private List<ChatMessage> chatMessageBubbles = new();
 
+    // Amount of messages (from most recent) to fetch from the server at once during initial load.
+    private int amountOfRecentMessagesToFetch = 30;
+
     // Background polling + message sync state stuff.
     // These fields track synchronization with the server, background polling,
     // and incoming message flow. The chat screen uses them to manage
@@ -301,8 +304,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         if (hasLoadedInitialMessageHistory) return;
         hasLoadedInitialMessageHistory = true;
 
-        // Load recent history (or full history if you prefer)
-        var history = await messageHandler.ReceiveHistoryAsync(30);
+        // Load recent history (or full history if parameter is left blank)
+        var history = await messageHandler.ReceiveHistoryAsync(amountOfRecentMessagesToFetch);
         messages = history ?? [];
 
         // Convert to bubbles
