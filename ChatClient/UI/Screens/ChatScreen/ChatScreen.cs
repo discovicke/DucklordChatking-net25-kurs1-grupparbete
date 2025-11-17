@@ -216,4 +216,43 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         // inputPanel.EndScroll();
         // Count text's height and use inputPanel.BeginScroll/EndScroll
     }
+
+    /// <summary>
+    /// Continuously polls the server for new chat messages and enqueues them for rendering.
+    /// Runs in the background while the chat screen is active. UI rendering pulls messages
+    /// from the <c>incomingMessages</c> queue.
+    /// </summary>
+    private async Task PollMessagesAsync(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            try
+            {
+                Log.Info($"[Poll] Requesting updates after ID {lastMessageId}");
+                var updates = await messageHandler.ReceiveUpdatesAsync(lastMessageId);
+
+                if (updates != null && updates.Any())
+                {
+                    Log.Info($"[Poll] Received {updates.Count} messages");
+                    foreach (var msg in updates)
+                    {
+                        Log.Info($"[Poll] Message ID {msg.Id}: {msg.Content ?? "<no content>"}");
+                        if (msg.Id > lastMessageId)
+                            incomingMessages.Enqueue(msg);
+                    }
+                }
+                else
+                {
+                    Log.Info("[Poll] No new messages");
+                }
+
+                await Task.Delay(200, token); // Add delay between polls
+            }
+            catch (Exception ex)
+            {
+                Log.Error("[ChatScreen] Polling error: " + ex.Message);
+                await Task.Delay(200, token);
+            }
+        }
+    }
 }
