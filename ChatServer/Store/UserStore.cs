@@ -10,6 +10,11 @@ public class UserStore : ConcurrentStoreBase
   private readonly Dictionary<int, User> usersById = [];
   private readonly Dictionary<string, User> usersBySessionAuthToken = [];
 
+  // Adjust this value to define how long a user remains "online" after their last recorded activity.
+  // Any user whose LastSeenUtc (property) is older than this window is treated as offline.
+  public static readonly TimeSpan OnlineWindow = TimeSpan.FromSeconds(30);
+
+
   // User ID counter
   private int nextId = 1;
 
@@ -256,5 +261,10 @@ public class UserStore : ConcurrentStoreBase
     });
   }
   #endregion
+
+  public bool IsOnline(User user)
+  {
+    return (DateTime.UtcNow - user.LastSeenUtc) < OnlineWindow;
+  }
 
 }

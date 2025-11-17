@@ -7,4 +7,7 @@ public class User(string username, string password, bool isAdmin, string session
   public string Password { get; set; } = password;
   public bool IsAdmin { get; set; } = isAdmin;
   public string SessionAuthToken { get; set; } = sessionAuthToken;
+  
+  public DateTime LastSeenUtc { get; set; } = DateTime.UtcNow;
+
 }
