@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Concurrent;
+using System.Numerics;
 using ChatClient.Core;
 using ChatClient.Data;
 using ChatClient.UI.Components;
@@ -31,11 +32,15 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private readonly ScrollablePanel inputPanel;
     private List<MessageDTO> messages = new();
     private List<ChatMessage> chatMessageBubbles = new();
-    private double lastUpdateTime = 0;
+    private int lastMessageId = 1;
+    private readonly ConcurrentQueue<MessageDTO> incomingMessages = new();
+    private bool pollingStarted = false;
+    private CancellationTokenSource cts = new();
+
 
     public ChatScreen()
     {
-        logic = new ChatScreenLogic(inputField, sendButton, backButton, SendMessage);
+        logic = new ChatScreenLogic(inputField, sendButton, backButton, SendMessageAsync);
         chatPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 30f);
         userListPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 20f);
         inputPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 20f);
@@ -57,6 +62,21 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
+        // Start polling only once layout is valid
+        if (!pollingStarted && layout.ChatRect.Width > 0)
+        {
+            pollingStarted = true;
+            cts = new CancellationTokenSource();
+            _ = Task.Run(() => PollMessagesAsync(cts.Token));
+        }
+
+        // Pull messages from queue and create chat bubbles
+        while (incomingMessages.TryDequeue(out var msg))
+        {
+            messages.Add(msg);
+            lastMessageId = Math.Max(lastMessageId, msg.Id);
+            chatMessageBubbles.Add(new ChatMessage(msg, layout.ChatRect.Width - 20));
+        }
 
         // Logo
         Raylib.DrawTextureEx(ResourceLoader.LogoTexture,
@@ -67,22 +87,6 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         Raylib.DrawRectangleRounded(layout.ChatRect, 0.01f, 10, Colors.TextFieldUnselected);
         Raylib.DrawRectangleRoundedLinesEx(layout.ChatRect, 0.01f, 10, 1, Colors.OutlineColor);
 
-        // Pull history ~1/s
-        double t = Raylib.GetTime();
-        if (t - lastUpdateTime >= 1.0)
-        {
-            lastUpdateTime = t;
-            var list = messageHandler?.ReceiveHistory();
-            messageHandler.SendHeartbeat();
-            if (list != null && list.Any())
-            {
-                messages = list.ToList();
-                chatMessageBubbles = messages
-                    .Select(m => new ChatMessage(m, layout.ChatRect.Width - 20))
-                    .ToList();
-            }
-        }
-        
         // Draw messages
         float totalChatHeight = chatMessageBubbles.Sum(m => m.Height + 8f);
         chatPanel.BeginScroll(totalChatHeight);
@@ -115,42 +119,36 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         backButton.Draw();
     }
 
-    private void SendMessage(string text)
+    private async void SendMessageAsync(string text)
     {
         if (messageHandler == null) return;
 
-        // Use logged in username or default to "Anonymous Duck"
         string sender = !string.IsNullOrEmpty(AppState.LoggedInUsername)
             ? AppState.LoggedInUsername
             : "Anonymous Duck";
 
-        Log.Info($"[ChatScreen] Sending message as '{sender}': {text}");
+        bool ok = await messageHandler.SendMessageAsync(text);
 
-        bool ok = messageHandler.SendMessage(text);
-        var list = messageHandler.ReceiveHistory();
-        if (ok && list != null && list.Any())
-        {
-            messages = list.ToList();
-        }
+        // Don't assign ID locally — the polling loop will fetch it
     }
 
     private void DrawUserList()
     {
         // Placeholder data
-        var onlineUsers = new[] { 
-            "Ducklord", 
-            "QuackyMcQuack", 
+        var onlineUsers = new[] {
+            "Ducklord",
+            "QuackyMcQuack",
             "DaffyDev",
             "DuckyDuck",
             "Goobert",
             "DuckyDuck"
         };
-        var offlineUsers = new[] { 
-            "SleepyDuck", 
-            "LazyFeathers", 
-            "Bunny", 
-            "DuckyDuck", 
-            "DuckyDuck", 
+        var offlineUsers = new[] {
+            "SleepyDuck",
+            "LazyFeathers",
+            "Bunny",
+            "DuckyDuck",
+            "DuckyDuck",
             "DuckyDuck",
             "Felhantering",
             "Varför",
@@ -158,10 +156,10 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             "inte",
             "detta?"
         };
-        
+
         const float lineH = 22;
         const float fontSize = 14;
-        
+
         float totalHeight = lineH + // "ONLINE" header
                             (onlineUsers.Length * lineH) +
                             10 + // spacing
@@ -178,7 +176,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         Raylib.DrawTextEx(ResourceLoader.BoldFont, "ONLINE",
             new Vector2(x, scrolledY), fontSize, 0.5f, Colors.AccentColor);
         y += lineH;
-        
+
         // Online users
         foreach (var user in onlineUsers)
         {
@@ -215,17 +213,56 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
         userListPanel.EndScroll();
     }
-    
+
     private void DrawInputWithScroll()
     {
         // TextField handles it's own rendering, but we can wrap it in scroll
         // if the text gets too long (multiline)
-    
+
         // For now: draw TextField as normal
         // You can add scroll later if the content grows
         // inputPanel.BeginScroll(inputField.Height);
         inputField.Draw();
         // inputPanel.EndScroll();
         // Count text's height and use inputPanel.BeginScroll/EndScroll
+    }
+
+    /// <summary>
+    /// Continuously polls the server for new chat messages and enqueues them for rendering.
+    /// Runs in the background while the chat screen is active. UI rendering pulls messages
+    /// from the <c>incomingMessages</c> queue.
+    /// </summary>
+    private async Task PollMessagesAsync(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            try
+            {
+                Log.Info($"[Poll] Requesting updates after ID {lastMessageId}");
+                var updates = await messageHandler.ReceiveUpdatesAsync(lastMessageId);
+
+                if (updates != null && updates.Any())
+                {
+                    Log.Info($"[Poll] Received {updates.Count} messages");
+                    foreach (var msg in updates)
+                    {
+                        Log.Info($"[Poll] Message ID {msg.Id}: {msg.Content ?? "<no content>"}");
+                        if (msg.Id > lastMessageId)
+                            incomingMessages.Enqueue(msg);
+                    }
+                }
+                else
+                {
+                    Log.Info("[Poll] No new messages");
+                }
+
+                await Task.Delay(200, token); // Add delay between polls
+            }
+            catch (Exception ex)
+            {
+                Log.Error("[ChatScreen] Polling error: " + ex.Message);
+                await Task.Delay(200, token);
+            }
+        }
     }
 }
