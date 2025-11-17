@@ -5,7 +5,7 @@ using Raylib_cs;
 
 namespace ChatClient.UI.Screens;
 
-public class ChatScreenLogic(
+public class ChatScreenLogic(ChatScreen screen,
     TextField inputField,
     Button sendButton,
     BackButton backButton,
@@ -20,6 +20,7 @@ public class ChatScreenLogic(
         if (backButton.IsClicked())
         {
             inputField.Clear();
+            screen.StopPolling();
             AppState.CurrentScreen = Screen.Start;
             return;
         }

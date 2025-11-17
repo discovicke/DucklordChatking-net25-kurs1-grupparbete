@@ -32,16 +32,34 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private readonly ScrollablePanel inputPanel;
     private List<MessageDTO> messages = new();
     private List<ChatMessage> chatMessageBubbles = new();
-    private int lastMessageId = 0;
+
+    // Amount of messages (from most recent) to fetch from the server at once during initial load.
+    private int amountOfRecentMessagesToFetch = 30;
+
+    // Background polling + message sync state stuff.
+    // These fields track synchronization with the server, background polling,
+    // and incoming message flow. The chat screen uses them to manage
+    // message history loading, real-time updates, and safe UI rendering.
+    //
+    // - latestReceivedMessageId:    Highest message ID the client has processed.
+    // - incomingMessages:           Queue of messages received from polling thread
+    //                               but not yet rendered on screen.
+    // - hasLoadedInitialMessageHistory: Ensures chat history is loaded once before
+    //                                   starting polling or accepting UI input.
+    // - isPolling:                  Tracks whether the background polling loop is active.
+    // - pollingCts:                 Allows the polling loop to be cancelled when
+    //                               leaving the chat screen.
+    private int latestReceivedMessageId = 0;
     private readonly ConcurrentQueue<MessageDTO> incomingMessages = new();
-    private bool pollingStarted = false;
-    private CancellationTokenSource cts = new();
     private bool hasLoadedInitialMessageHistory = false;
+    private bool isPolling = false;
+    private CancellationTokenSource pollingCts = new();
 
 
     public ChatScreen()
     {
-        logic = new ChatScreenLogic(inputField, sendButton, backButton, SendMessageAsync);
+        // The "this" reference is required because ChatScreenLogic needs to call methods on ChatScreen (like StopPolling)
+        logic = new ChatScreenLogic(this, inputField, sendButton, backButton, SendMessageAsync);
         chatPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 30f);
         userListPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 20f);
         inputPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 20f);
@@ -63,6 +81,16 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
+        // SAFETY GUARD:
+        // The ChatScreen can still receive a final RenderContent() call during or
+        // immediately after a screen transition. Without this guard, that extra render
+        // frame would re-trigger polling logic even after the user has left the chat,
+        // causing a new polling task to start in the background.
+        // Checking that the current screen is still Chat ensures that no rendering or
+        // background tasks continue after navigating away.
+        if (AppState.CurrentScreen != Screen.Chat)
+            return;
+
         // 1. Make sure chat is initialized
         if (!hasLoadedInitialMessageHistory)
         {
@@ -71,18 +99,18 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         }
 
         // 2. Start polling only after initialization
-        if (!pollingStarted && layout.ChatRect.Width > 0)
+        if (!isPolling && layout.ChatRect.Width > 0)
         {
-            pollingStarted = true;
-            cts = new CancellationTokenSource();
-            _ = Task.Run(() => PollMessagesAsync(cts.Token));
+            isPolling = true;
+            pollingCts = new CancellationTokenSource();
+            _ = Task.Run(() => PollMessagesAsync(pollingCts.Token));
         }
 
         // 3. Handle incoming queued messages (unchanged)
         while (incomingMessages.TryDequeue(out var msg))
         {
             messages.Add(msg);
-            lastMessageId = Math.Max(lastMessageId, msg.Id);
+            latestReceivedMessageId = Math.Max(latestReceivedMessageId, msg.Id);
             chatMessageBubbles.Add(new ChatMessage(msg, layout.ChatRect.Width - 20));
         }
 
@@ -235,27 +263,25 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         // Count text's height and use inputPanel.BeginScroll/EndScroll
     }
 
-    /// <summary>
-    /// Continuously polls the server for new chat messages and enqueues them for rendering.
-    /// Runs in the background while the chat screen is active. UI rendering pulls messages
-    /// from the <c>incomingMessages</c> queue.
-    /// </summary>
+    // Continuously polls the server for new chat messages and enqueues them for rendering.
+    // Runs in the background while the chat screen is active. UI rendering pulls messages
+    // from the <c>incomingMessages</c> queue.
     private async Task PollMessagesAsync(CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {
             try
             {
-                Log.Info($"[Poll] Requesting updates after ID {lastMessageId}");
-                var updates = await messageHandler.ReceiveUpdatesAsync(lastMessageId);
+                Log.Info($"[Poll] Requesting updates after ID {latestReceivedMessageId}");
+                var updates = await messageHandler.ReceiveUpdatesAsync(latestReceivedMessageId);
 
-                if (updates != null && updates.Any())
+                if (updates != null && updates.Count != 0)
                 {
                     Log.Info($"[Poll] Received {updates.Count} messages");
                     foreach (var msg in updates)
                     {
                         Log.Info($"[Poll] Message ID {msg.Id}: {msg.Content ?? "<no content>"}");
-                        if (msg.Id > lastMessageId)
+                        if (msg.Id > latestReceivedMessageId)
                             incomingMessages.Enqueue(msg);
                     }
                 }
@@ -278,16 +304,26 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         if (hasLoadedInitialMessageHistory) return;
         hasLoadedInitialMessageHistory = true;
 
-        // Load recent history (or full history if you prefer)
-        var history = await messageHandler.ReceiveHistoryAsync(30);
-        messages = history ?? new List<MessageDTO>();
+        // Load recent history (or full history if parameter is left blank)
+        var history = await messageHandler.ReceiveHistoryAsync(amountOfRecentMessagesToFetch);
+        messages = history ?? [];
 
         // Convert to bubbles
         chatMessageBubbles = messages
             .Select(m => new ChatMessage(m, layout.ChatRect.Width - 20))
             .ToList();
 
-        // Set lastMessageId correctly
-        lastMessageId = messages.Any() ? messages.Max(m => m.Id) : 0;
+        // Set latestReceivedMessageId correctly
+        latestReceivedMessageId = messages.Count != 0 ? messages.Max(m => m.Id) : 0;
+    }
+
+    public void StopPolling()
+    {
+        if (isPolling)
+        {
+            pollingCts.Cancel();
+            isPolling = false;
+            Log.Info("[ChatScreen] Polling stopped");
+        }
     }
 }
