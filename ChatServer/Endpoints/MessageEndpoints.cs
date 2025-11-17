@@ -1,6 +1,5 @@
 using ChatServer.Store;
 using ChatServer.Auth;
-using Microsoft.AspNetCore.SignalR;
 using Shared;
 using Scalar.AspNetCore;
 
