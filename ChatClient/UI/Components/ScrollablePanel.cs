@@ -1,4 +1,4 @@
-using ChatClient.Core;
+﻿using ChatClient.Core;
 using Raylib_cs;
 
 namespace ChatClient.UI.Components;
@@ -55,6 +55,7 @@ public class ScrollablePanel
 
     private void DrawScrollbar()
     {
+        float padding = 10f;
         float scrollbarWidth = 6f;
         float scrollbarX = bounds.X + bounds.Width - scrollbarWidth - 4f;
         
@@ -64,12 +65,16 @@ public class ScrollablePanel
         float maxScrollOffset = contentHeight - bounds.Height;
         float scrollbarY = bounds.Y + (scrollOffset / maxScrollOffset) * 
             (bounds.Height - scrollbarHeight);
+        
+        scrollbarY += padding;
+        scrollbarHeight -= padding * 2;
+
 
         var scrollbarRect = new Rectangle(scrollbarX, scrollbarY, 
             scrollbarWidth, scrollbarHeight);
 
         Raylib.DrawRectangleRounded(scrollbarRect, 0.5f, 4, 
-            new Color(255, 255, 255, 100));
+            Colors.BackgroundColor);
     }
 
     public float GetScrolledY(float originalY) => originalY - scrollOffset;

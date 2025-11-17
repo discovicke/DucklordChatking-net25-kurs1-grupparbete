@@ -9,10 +9,10 @@ namespace ChatClient.UI.Screens
         public struct LayoutData
         {
             public Rectangle UserRect, PassRect, LoginRect, RegisterRect, OptionsRect;
-            public float LogoX, LogoY, LogoScale, ScreenHeight;
+            public float LogoX, LogoY, LogoWidth, LogoHeight, LogoScale, ScreenHeight;
         }
 
-        public static LayoutData Calculate(int logoWidth)
+        public static LayoutData Calculate(int logoWidth, int logoHeight)
         {
             // Create UI wrapper for layout
             // Covers full window - must be called each time to get current window size
@@ -20,20 +20,27 @@ namespace ChatClient.UI.Screens
             wrapper.SetToFullWindow(); // This updates Width/Height based on current window size
             
             // Use wrapper dimensions for all calculations
-            float screenWidth = wrapper.Width;
-            float screenHeight = wrapper.Height;
+            float w = wrapper.Width;
+            float h = wrapper.Height;
+            
+            float colTop = h * 0.45f;
+            
+            // Logo
+            float logoTargetW = w * 0.15f;
+            float logoScale = logoWidth > 0 ? logoTargetW / logoWidth : 0.15f;
+            float scaledLogoHeight = logoHeight * logoScale;
+            float scaledLogoWidth = logoWidth * logoScale;
+            float logoX = (w - scaledLogoWidth) / 2f;
+            float logoY = h * 0.10f;
             
             // Dynamic sizing based on screen dimensions
-            float fieldWidth = screenWidth * 0.3f;
-            float fieldHeight = screenHeight * 0.05f;
-            float buttonWidth = screenWidth * 0.25f;
-            float buttonHeight = screenHeight * 0.05f;
-            float gap = screenHeight * 0.02f;
+            float fieldWidth = w * 0.3f;
+            float fieldHeight = h * 0.05f;
+            float buttonWidth = w * 0.25f;
+            float buttonHeight = h * 0.05f;
+            float gap = h * 0.02f;
             // Starting top position (Y axis) for first column
-            float colTop = screenHeight * 0.45f;
 
-            float logoTargetWidth = screenWidth * 0.15f;
-            float logoScale = logoWidth > 0 ? logoTargetWidth / logoWidth : 0.15f;
 
             return new LayoutData
             {
@@ -45,9 +52,11 @@ namespace ChatClient.UI.Screens
                 RegisterRect = wrapper.CenterHoriz(buttonWidth, buttonHeight, colTop + 3 * (fieldHeight + gap)),
                 OptionsRect = wrapper.CenterHoriz(buttonWidth, buttonHeight, colTop + 4 * (fieldHeight + gap)),
                 LogoScale = logoScale,
-                LogoX = (screenWidth - logoWidth * logoScale) / 2f,
-                LogoY = screenHeight * 0.10f,
-                ScreenHeight = screenHeight
+                LogoX = logoX,
+                LogoY = logoY,
+                LogoWidth = scaledLogoWidth,
+                LogoHeight = scaledLogoHeight,
+                ScreenHeight = h
             };
         }
     }

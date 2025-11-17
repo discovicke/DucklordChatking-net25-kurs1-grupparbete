@@ -8,7 +8,6 @@ namespace ChatClient.UI.Components
     public class TextField : UIComponent
     {
         // TODO Bugg FIX!!! ctrl + z should return to last text state
-        // TODO Ctrl+c and Ctrl+ v write text and adds the copyed text. it should only paste the current text.
 
         // TODO:
         // - Add scroll logic
@@ -17,7 +16,7 @@ namespace ChatClient.UI.Components
         // - Add undo/redo support (Ctrl + Z / Ctrl + Y)
         // - Add text selection support (Mouse drag || shift key)
         // - Add font support
-        
+
         public string Text { get; private set; } = string.Empty;
         private string FieldName { get; set; } = "TextField";
         private string PlaceholderText { get; set; } = "";
@@ -34,6 +33,8 @@ namespace ChatClient.UI.Components
         private readonly Stack<string> undoStack = new();
         private const int MaxUndoEntries = 100;
         private readonly ClipboardActions clipboardActions;
+
+        private bool movedThisFrame = false;
 
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
             bool allowMultiline = false, bool isPassword = false, string fieldName = "TextField", string placeholderText = "")
@@ -59,30 +60,21 @@ namespace ChatClient.UI.Components
                 ResetCursorToStart = () => cursor.Position = 0,
                 ResetCursorToEnd = pos => cursor.Position = pos,
                 ResetCursorBlink = () => cursor.ResetBlink(),
+                SetMovedThisFrame = () => movedThisFrame = true,
                 FieldName = FieldName
             };
             clipboardActions = new ClipboardActions(ctx);
+            
+            undoStack.Push(string.Empty);
             SaveStateForUndo();
+            
         }
 
         private void SaveStateForUndo()
         {
-            // snapshot current text
-            string snapshot = Text ?? string.Empty;
-
-            // avoid pushing duplicate consecutive states
-            if (undoStack.Count > 0 && undoStack.Peek() == snapshot) return;
-
-            // if at capacity, remove the oldest entry (bottom of the stack)
-            if (undoStack.Count >= MaxUndoEntries)
-            {
-                var keep = undoStack.Reverse().Skip(1).Reverse().ToArray();
-                undoStack.Clear();
-                foreach (var item in keep) undoStack.Push(item);
-            }
-
-            undoStack.Push(snapshot);
-            Log.Info($"[{FieldName}] Saved state for undo - Stack size: {undoStack.Count}");
+            string currentState = Text ?? string.Empty;
+            undoStack.Push(currentState);
+            Log.Info($"[{FieldName}] Undo state saved - Stack size: {undoStack.Count} - State: '{currentState.Replace("\n", "\\n")}'");
         }
 
         // TODO: Manage corner roundness
@@ -130,6 +122,8 @@ namespace ChatClient.UI.Components
 
         public override void Update()
         {
+            movedThisFrame = false;
+
             if (MouseInput.IsLeftClick(Rect))
             {
                 if (!IsSelected)
@@ -156,7 +150,6 @@ namespace ChatClient.UI.Components
 
             HandleTextInput();
             HandleNavigation();
-
         }
 
         private void HandleTextInput()
@@ -214,40 +207,45 @@ namespace ChatClient.UI.Components
             return char.IsWhiteSpace(Text[idx]);
         }
 
-        // TODO Double jump on singleline text, dont know why... Bool as backspace maybe?
+        //  Navigation for arrow keys
+        private bool TryPress(KeyboardKey key, Action action)
+        {
+            if (movedThisFrame) // block duplicate action within same press/frame
+                return false;
+
+            if (Raylib.IsKeyPressed(key))
+            {
+                action();
+                movedThisFrame = true;
+                return true;
+            }
+            return false;
+        }
+        // Method for arrow Navigation with Lamda
         private void HandleNavigation()
         {
-            bool navigated = false;
-            
-            if (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left))
+            TryPress(KeyboardKey.Left, () => cursor.MoveLeft(Text.Length));
+            TryPress(KeyboardKey.Right, () => cursor.MoveRight(Text.Length));
+            TryPress(KeyboardKey.Home, () => cursor.MoveToStart());
+            TryPress(KeyboardKey.End, () => cursor.MoveToEnd(Text.Length));
+           // bool navigated = false;
+            if (!Raylib.IsKeyDown(KeyboardKey.Left) &&
+                !Raylib.IsKeyDown(KeyboardKey.Right) &&
+                !Raylib.IsKeyDown(KeyboardKey.Home) &&
+                !Raylib.IsKeyDown(KeyboardKey.End))
             {
-                cursor.MoveLeft(Text.Length);
-                navigated = true;
+                movedThisFrame = false;
+                //cursor.MoveToEnd(Text.Length);
+             //   navigated = true;
             }
-
-            if (Raylib.IsKeyPressed(KeyboardKey.Right) || Raylib.IsKeyPressedRepeat(KeyboardKey.Right))
-            {
-                cursor.MoveRight(Text.Length);
-                navigated = true;
-            }
-
-            if (Raylib.IsKeyPressed(KeyboardKey.Home))
-            {
-                cursor.MoveToStart();
-                navigated = true;
-            }
-
-            if (Raylib.IsKeyPressed(KeyboardKey.End))
-            {
-                cursor.MoveToEnd(Text.Length);
-                navigated = true;
-            }
-            if (navigated && isTypingWord)
-            {
-                SaveUndoIfChanged();
-                isTypingWord = false;
-            }
+            //if (navigated && isTypingWord)
+            //{
+            //    SaveUndoIfChanged();
+            //    isTypingWord = false;
+            //}
         }
+
+
 
         private void InsertText(string s)
         {
@@ -266,18 +264,18 @@ namespace ChatClient.UI.Components
             {
                 return;
             }
-            
+
             if (!isTypingWord)
             {
                 SaveUndoIfChanged();
             }
-        
+
             int removeIndex = Math.Clamp(cursor.Position - 1, 0, Text.Length - 1);
             char deletedChar = Text[removeIndex];
             Text = Text.Remove(removeIndex, 1);
             cursor.Position = removeIndex;
             cursor.ResetBlink();
-        
+
             isTypingWord = true;
             Log.Info($"[{FieldName}] Deleted: '{deletedChar}' at position {removeIndex}");
 
@@ -311,7 +309,6 @@ namespace ChatClient.UI.Components
         }
         // TODO: Mouse click to get position in text
         // TODO: Crtl backspace to  delete one word
-        // TODO: Scroll logicZ
         // TODO: Font?
     }
 }

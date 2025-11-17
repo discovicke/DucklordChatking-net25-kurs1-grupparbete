@@ -43,7 +43,6 @@ namespace ChatClient.UI.Rendering
                 DrawCaret(text, textX, textY, cursor);
             }
         }
-
         private void DrawSingleLineText(string text, float textX, float textY, TextCursor cursor)
         {
             string displayText = isPassword ? new string('*', text.Length) : text;

@@ -84,8 +84,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             0f, layout.LogoScale, Color.White);
 
         // Chat window background
-        Raylib.DrawRectangleRounded(layout.ChatRect, 0.08f, 10, Colors.TextFieldUnselected);
-        Raylib.DrawRectangleRoundedLinesEx(layout.ChatRect, 0.08f, 10, 1, Colors.OutlineColor);
+        Raylib.DrawRectangleRounded(layout.ChatRect, 0.01f, 10, Colors.TextFieldUnselected);
+        Raylib.DrawRectangleRoundedLinesEx(layout.ChatRect, 0.01f, 10, 1, Colors.OutlineColor);
 
         // Draw messages
         float totalChatHeight = chatMessageBubbles.Sum(m => m.Height + 8f);

@@ -29,6 +29,8 @@ namespace ChatClient.UI.Components
         public Stack<string> UndoStack { get; init; } = default!;
         public Action ResetCursorToStart { get; init; } = default!;
         public required Action<int> ResetCursorToEnd { get; init; }
+        public required Action SetMovedThisFrame { get; init; }
+
         public Action ResetCursorBlink { get; init; } = default!;
         public string FieldName { get; init; } = "TextField";
     }
@@ -76,8 +78,8 @@ namespace ChatClient.UI.Components
                     try
                     {
                         Raylib.SetClipboardText(ctx.GetText() ?? string.Empty);
+                        ctx.SetMovedThisFrame();
                         Log.Info($"[{ctx.FieldName}] Copied to clipboard - Length: {(ctx.GetText()?.Length ?? 0)}");
-                        var currentText = ctx.SetText + ctx.GetText();
                         
                     }
                     catch (Exception ex)
@@ -94,6 +96,7 @@ namespace ChatClient.UI.Components
                         {
                             ctx.SaveStateForUndo();
                             ctx.InsertText(clipboard);
+                            ctx.SetMovedThisFrame();
                             Log.Info($"[{ctx.FieldName}] Pasted from clipboard - Text length: {clipboard.Length}");
                         }
                         else
@@ -118,6 +121,7 @@ namespace ChatClient.UI.Components
                             Log.Info($"[{ctx.FieldName}] Cut to clipboard - Previous text: '{current.Replace("\n", "\\n")}'");
                             ctx.SetText(string.Empty);
                             ctx.ResetCursorToStart();
+                            ctx.SetMovedThisFrame();
                             ctx.ResetCursorBlink();
                         }
                         else
@@ -133,23 +137,26 @@ namespace ChatClient.UI.Components
 
                 case ClipboardAction.Undo:
                     Log.Info($"[{ctx.FieldName}] Ctrl+Z detected - Stack size: {ctx.UndoStack.Count}");
-        
-                    if (ctx.UndoStack.Count >= 0)
+
+                    if (ctx.UndoStack.Count > 1) // ✅ Minst 2 states (current + previous)
                     {
-                        string previousState = ctx.UndoStack.Pop();
-                        ctx.SetText(previousState);
-                        ctx.ResetCursorToEnd(previousState.Length);
-                        ctx.ResetCursorBlink();
-                        Log.Success($"[{ctx.FieldName}] Undo successful - Restored: '{previousState.Replace("\n", "\\n")}'");
+                        // Pop current state (vi vill gå tillbaka till föregående)
+                        ctx.UndoStack.TryPop(out _);
+
+                        // Peek på föregående state (utan att ta bort den)
+                        if (ctx.UndoStack.TryPeek(out var previousState) && previousState != null)
+                        {
+                            ctx.SetText(previousState);
+                            ctx.ResetCursorToEnd(previousState.Length);
+                            ctx.ResetCursorBlink();
+                            ctx.SetMovedThisFrame();
+                            Log.Success($"[{ctx.FieldName}] Undo successful - Restored: '{previousState.Replace("\n", "\\n")}' - Stack: {ctx.UndoStack.Count}");
+                        }
                     }
                     else
                     {
-                        Log.Error($"[{ctx.FieldName}] Undo stack is empty");
+                        Log.Error($"[{ctx.FieldName}] Cannot undo - at initial state");
                     }
-                    return;
-
-                case ClipboardAction.None:
-                default:
                     return;
 
             }

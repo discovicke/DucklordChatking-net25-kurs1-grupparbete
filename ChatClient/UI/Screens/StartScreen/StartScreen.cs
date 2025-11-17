@@ -29,7 +29,7 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
     }
 
     protected override StartScreenLayout.LayoutData CalculateLayout() =>
-        StartScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
+        StartScreenLayout.Calculate(ResourceLoader.LogoTexture.Width, ResourceLoader.LogoTexture.Height);
 
     protected override void ApplyLayout(StartScreenLayout.LayoutData layout)
     {
