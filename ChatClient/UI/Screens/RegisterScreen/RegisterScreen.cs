@@ -26,7 +26,8 @@ public class RegisterScreen : ScreenBase<RegisterScreenLayout.LayoutData>
         logic = new RegisterScreenLogic(userField, passField, passConfirmField, registerButton, backButton);
     }
 
-    protected override RegisterScreenLayout.LayoutData CalculateLayout() => RegisterScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
+    protected override RegisterScreenLayout.LayoutData CalculateLayout() => 
+        RegisterScreenLayout.Calculate(ResourceLoader.LogoTexture.Width, ResourceLoader.LogoTexture.Height);
 
     protected override void ApplyLayout(RegisterScreenLayout.LayoutData layout)
     {
