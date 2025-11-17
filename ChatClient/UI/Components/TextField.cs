@@ -35,6 +35,7 @@ namespace ChatClient.UI.Components
         private readonly ClipboardActions clipboardActions;
 
         private bool movedThisFrame = false;
+
         private static readonly List<TextField> TabOrder = new();
 
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
@@ -67,10 +68,12 @@ namespace ChatClient.UI.Components
             clipboardActions = new ClipboardActions(ctx);
             
             undoStack.Push(string.Empty);
-            TabOrder.Add(this);
             SaveStateForUndo();
+
+            TabOrder.Add(this);
             
         }
+        // Tab navigation
         private void TabFocus() 
         {
             IsSelected = true;
@@ -80,6 +83,26 @@ namespace ChatClient.UI.Components
         {
             IsSelected = false;
             cursor.ResetInvisible();
+        }
+        //
+        private static void FocusNext(TextField current, bool backWards) 
+        {
+            if (TabOrder.Count == 0) 
+            {
+                return; 
+            }
+            int index = TabOrder.IndexOf(current);
+            if (index < 0 ) 
+            {
+                return; 
+            }
+            int nextIdexer = backWards ? (index - 1 + TabOrder.Count) % TabOrder.Count : (index + 1 ) % TabOrder.Count;
+            if (TabOrder[nextIdexer] == current)
+            {
+                return;
+            }
+            current.NotSelect();
+            TabOrder[nextIdexer].TabFocus();
         }
 
 
@@ -155,8 +178,18 @@ namespace ChatClient.UI.Components
                 cursor.ResetInvisible();
             }
 
-            if (!IsSelected) return;
+            if (!IsSelected)
+            { 
+                return; 
+            }
 
+            // function for Tab moves to next / privuous field
+            if (IsSelected && Raylib.IsKeyPressed(KeyboardKey.Tab))
+            {
+                bool backwards = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
+                FocusNext(this, backwards);
+                return;
+            }
             cursor.Update(Raylib.GetFrameTime());
             clipboardActions.Process();
 
