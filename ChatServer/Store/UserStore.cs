@@ -2,7 +2,7 @@
 
 namespace ChatServer.Store;
 
-public class UserStore
+public class UserStore : ConcurrentStoreBase
 {
   // Dictionaries for storing and looking up users
   private readonly Dictionary<string, User> usersByUsername =
@@ -29,22 +29,25 @@ public class UserStore
   /// </returns>
   public bool Add(string username, string password, bool isAdmin = false, string? sessionAuthToken = null)
   {
-    sessionAuthToken ??= Guid.NewGuid().ToString();
-
-    if (usersByUsername.ContainsKey(username))
+    return WithWrite(() =>
     {
-      return false;
-    }
+      sessionAuthToken ??= Guid.NewGuid().ToString();
 
-    User newUser = new(username, password, isAdmin, sessionAuthToken)
-    {
-      Id = nextId++
-    };
+      if (usersByUsername.ContainsKey(username))
+      {
+        return false;
+      }
 
-    usersBySessionAuthToken[newUser.SessionAuthToken] = newUser;
-    usersByUsername.Add(newUser.Username, newUser);
-    usersById.Add(newUser.Id, newUser);
-    return true;
+      User newUser = new(username, password, isAdmin, sessionAuthToken)
+      {
+        Id = nextId++
+      };
+
+      usersBySessionAuthToken[newUser.SessionAuthToken] = newUser;
+      usersByUsername.Add(newUser.Username, newUser);
+      usersById.Add(newUser.Id, newUser);
+      return true;
+    });
   }
   #endregion
 
@@ -67,20 +70,23 @@ public class UserStore
   /// </returns>
   public bool Update(string oldUsername, string newUsername, string? newPassword = null)
   {
-    if (!usersByUsername.TryGetValue(oldUsername, out var user)) { return false; } // If the old username does not exist, the update cannot continue.
-    if (oldUsername != newUsername && usersByUsername.ContainsKey(newUsername)) { return false; } // If the username changes, make sure the new username is not already taken.
+    return WithWrite(() =>
+    {
+      if (!usersByUsername.TryGetValue(oldUsername, out var user)) { return false; } // If the old username does not exist, the update cannot continue.
+      if (oldUsername != newUsername && usersByUsername.ContainsKey(newUsername)) { return false; } // If the username changes, make sure the new username is not already taken.
 
-    // Remove the old username key from the dictionary. (Note: the user object still exists in memory at this point)
-    usersByUsername.Remove(oldUsername);
+      // Remove the old username key from the dictionary. (Note: the user object still exists in memory at this point)
+      usersByUsername.Remove(oldUsername);
 
-    // Update the properties on the existing User instance.
-    user.Username = newUsername;
-    if (!string.IsNullOrWhiteSpace(newPassword)) { user.Password = newPassword; } // Only update the password if a new one was provided.
+      // Update the properties on the existing User instance.
+      user.Username = newUsername;
+      if (!string.IsNullOrWhiteSpace(newPassword)) { user.Password = newPassword; } // Only update the password if a new one was provided.
 
-    // Insert the updated user using the new username as key.
-    usersByUsername.Add(newUsername, user);
+      // Insert the updated user using the new username as key.
+      usersByUsername.Add(newUsername, user);
 
-    return true;
+      return true;
+    });
   }
   #endregion
 
@@ -97,16 +103,19 @@ public class UserStore
   /// </returns>
   public bool Remove(string username)
   {
-    if (!usersByUsername.TryGetValue(username, out var user))
-      return false;
+    return WithWrite(() =>
+    {
+      if (!usersByUsername.TryGetValue(username, out var user))
+        return false;
 
-    if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
-      usersBySessionAuthToken.Remove(user.SessionAuthToken);
+      if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+        usersBySessionAuthToken.Remove(user.SessionAuthToken);
 
-    usersByUsername.Remove(username);
-    usersById.Remove(user.Id);
+      usersByUsername.Remove(username);
+      usersById.Remove(user.Id);
 
-    return true;
+      return true;
+    });
   }
   #endregion
 
@@ -123,17 +132,20 @@ public class UserStore
   /// </returns>
   public bool Remove(int id)
   {
-    if (!usersById.TryGetValue(id, out var user))
+    return WithWrite(() =>
     {
-      return false;
-    }
-    if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
-      usersBySessionAuthToken.Remove(user.SessionAuthToken);
+      if (!usersById.TryGetValue(id, out var user))
+      {
+        return false;
+      }
+      if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+        usersBySessionAuthToken.Remove(user.SessionAuthToken);
 
-    usersById.Remove(id);
-    usersByUsername.Remove(user.Username);
+      usersById.Remove(id);
+      usersByUsername.Remove(user.Username);
 
-    return true;
+      return true;
+    });
   }
   #endregion
 
@@ -150,8 +162,11 @@ public class UserStore
 
   public User? GetByUsername(string username)
   {
-    usersByUsername.TryGetValue(username, out var user);
-    return user;
+    return WithRead(() =>
+    {
+      usersByUsername.TryGetValue(username, out var user);
+      return user;
+    });
   }
   #endregion
 
@@ -167,8 +182,11 @@ public class UserStore
   /// </returns>
   public User? GetById(int id)
   {
-    usersById.TryGetValue(id, out var user);
-    return user;
+    return WithRead(() =>
+    {
+      usersById.TryGetValue(id, out var user);
+      return user;
+    });
   }
   #endregion
 
@@ -182,8 +200,11 @@ public class UserStore
   /// </returns>
   public User? GetBySessionAuthToken(string token)
   {
-    usersBySessionAuthToken.TryGetValue(token, out var user);
-    return user;
+    return WithRead(() =>
+    {
+      usersBySessionAuthToken.TryGetValue(token, out var user);
+      return user;
+    });
   }
   #endregion
 
@@ -197,7 +218,10 @@ public class UserStore
   /// </returns>
   public IEnumerable<string> GetAllUsernames()
   {
-    return usersByUsername.Keys;
+    return WithRead(() =>
+    {
+      return usersByUsername.Keys.ToArray();
+    });
   }
   #endregion
 
@@ -215,20 +239,21 @@ public class UserStore
   /// </remarks>
   public string AssignNewSessionAuthToken(User user)
   {
-    // Remove old token if one exists
-    if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+    return WithWrite(() =>
     {
-      usersBySessionAuthToken.Remove(user.SessionAuthToken);
-    }
+      // Remove old token if one exists
+      if (!string.IsNullOrWhiteSpace(user.SessionAuthToken))
+        usersBySessionAuthToken.Remove(user.SessionAuthToken);
 
-    // Generate new token
-    string newToken = Guid.NewGuid().ToString();
-    user.SessionAuthToken = newToken;
+      // Generate new token
+      string newToken = Guid.NewGuid().ToString();
+      user.SessionAuthToken = newToken;
 
-    // Add mapping
-    usersBySessionAuthToken[newToken] = user;
+      // Add mapping
+      usersBySessionAuthToken[newToken] = user;
 
-    return newToken;
+      return newToken;
+    });
   }
   #endregion
 
