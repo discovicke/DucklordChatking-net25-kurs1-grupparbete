@@ -8,7 +8,6 @@ namespace ChatClient.UI.Components
     public class TextField : UIComponent
     {
         // TODO Bugg FIX!!! ctrl + z should return to last text state
-        // TODO Ctrl+c and Ctrl+ v write text and adds the copyed text. it should only paste the current text.
 
         // TODO:
         // - Add scroll logic
@@ -155,7 +154,7 @@ namespace ChatClient.UI.Components
 
             HandleTextInput();
             HandleNavigation();
-            
+
 
         }
 
@@ -197,48 +196,40 @@ namespace ChatClient.UI.Components
 
         }
 
-        private void TryPress(KeyboardKey key, Action action)
+        //  Navigation for arrow keys
+        private bool TryPress(KeyboardKey key, Action action)
         {
+            if (movedThisFrame) // to block out dubble left frame action
+            {
+                return false;
+            }
+
             if (Raylib.IsKeyPressed(key))
             {
                 action();
+                movedThisFrame = true;
+                return true;
             }
+            return false;
         }
-
+        // Method for arrow Navigation with Lamda
         private void HandleNavigation()
         {
             TryPress(KeyboardKey.Left, () => cursor.MoveLeft(Text.Length));
             TryPress(KeyboardKey.Right, () => cursor.MoveRight(Text.Length));
             TryPress(KeyboardKey.Home, () => cursor.MoveToStart());
             TryPress(KeyboardKey.End, () => cursor.MoveToEnd(Text.Length));
+            
+            if (!Raylib.IsKeyDown(KeyboardKey.Left) &&
+                !Raylib.IsKeyDown(KeyboardKey.Right) &&
+                !Raylib.IsKeyDown(KeyboardKey.Home) &&
+                !Raylib.IsKeyDown(KeyboardKey.End))
+            {
+                movedThisFrame = false;
+            }
         }
-        
 
 
-        // TODO Double jump on singleline text, dont know why... Bool as backspace maybe?
-       
-        //private void HandleNavigation()
-        //{
-        //    if (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left))
-        //    {
-        //        cursor.MoveLeft(Text.Length);
-        //    }
-        //
-        //    if (Raylib.IsKeyPressed(KeyboardKey.Right) || Raylib.IsKeyPressedRepeat(KeyboardKey.Right))
-        //    {
-        //        cursor.MoveRight(Text.Length);
-        //    }
-        //
-        //    if (Raylib.IsKeyPressed(KeyboardKey.Home))
-        //    {
-        //        cursor.MoveToStart();
-        //    }
-        //
-        //    if (Raylib.IsKeyPressed(KeyboardKey.End))
-        //    {
-        //        cursor.MoveToEnd(Text.Length);
-        //    }
-        //}
 
         private void InsertText(string s)
         {

@@ -72,7 +72,6 @@ namespace ChatClient.UI.Components
                     {
                         Raylib.SetClipboardText(ctx.GetText() ?? string.Empty);
                         Log.Info($"[{ctx.FieldName}] Copied to clipboard - Length: {(ctx.GetText()?.Length ?? 0)}");
-                        var currentText = ctx.SetText + ctx.GetText();
                         
                     }
                     catch (Exception ex)
