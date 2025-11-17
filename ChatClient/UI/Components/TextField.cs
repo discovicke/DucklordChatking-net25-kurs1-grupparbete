@@ -187,76 +187,9 @@ namespace ChatClient.UI.Components
                 backspaceHandledThisFrame = false;
             }
 
+
             clipboardActions.Process();
-
-            // TODO: Kolla under den här kommentaren, Markus... Dubbel klistra in etc? 
-            // Clipboard / copy-paste / cut handling
-            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
-
-
-            // Copy: Ctrl + C
-            if (ctrlDown && Raylib.IsKeyPressed(KeyboardKey.C))
-            {
-                try
-                {
-                    Raylib.SetClipboardText(Text ?? string.Empty);
-                    Log.Info($"[{FieldName}] Copied to clipboard - Length: {(Text?.Length ?? 0)}");
-                }
-                catch (Exception ex)
-                {
-                    Log.Info($"[{FieldName}] Copy failed: {ex.Message}");
-                }
-            }
-
-            // Paste: Ctrl + V
-
-
-            if (ctrlDown && Raylib.IsKeyPressed(KeyboardKey.V))
-            {
-                try
-                {
-                    string clipboard = Raylib.GetClipboardText_();
-                    if (!string.IsNullOrEmpty(clipboard))
-                    {
-                        InsertText(clipboard);
-                        Log.Info($"[{FieldName}] Pasted from clipboard - Text length: {clipboard.Length}");
-                    }
-                    else
-                    {
-                        Log.Info($"[{FieldName}] Clipboard empty on paste");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Info($"[{FieldName}] Paste failed: {ex.Message}");
-                }
-            }
-
-
-            // Cut: Ctrl + X
-
-            if (ctrlDown && Raylib.IsKeyPressed(KeyboardKey.X))
-            {
-                try
-                {
-                    if (!string.IsNullOrEmpty(Text))
-                    {
-                        Raylib.SetClipboardText(Text);
-                        Log.Info($"[{FieldName}] Cut to clipboard - Previous text: '{Text.Replace("\n", "\\n")}'");
-                        Text = string.Empty;
-                        cursor.Position = 0;
-                        cursor.ResetBlink();
-                    }
-                    else
-                    {
-                        Log.Info($"[{FieldName}] Cut requested but field is empty");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Info($"[{FieldName}] Cut failed: {ex.Message}");
-                }
-            }
+            
 
         }
 

@@ -54,7 +54,7 @@ namespace ChatClient.UI.Components
 
 
         }
-        public void Process()
+        public  void Process()
         {
             bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
             if (!ctrlDown) return;
@@ -72,6 +72,8 @@ namespace ChatClient.UI.Components
                     {
                         Raylib.SetClipboardText(ctx.GetText() ?? string.Empty);
                         Log.Info($"[{ctx.FieldName}] Copied to clipboard - Length: {(ctx.GetText()?.Length ?? 0)}");
+                        var currentText = ctx.SetText + ctx.GetText();
+                        
                     }
                     catch (Exception ex)
                     {
