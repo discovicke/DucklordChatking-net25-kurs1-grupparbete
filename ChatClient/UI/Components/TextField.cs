@@ -36,6 +36,19 @@ namespace ChatClient.UI.Components
 
         private bool movedThisFrame = false;
 
+        //tab logics 
+        public bool IsFocused => IsSelected;
+        public void Focus() 
+        {
+            IsSelected = true;
+            cursor.ResetBlink();
+        }
+        public void Blur() 
+        {
+            IsSelected = false;
+            cursor.ResetInvisible();
+        }
+        
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
             bool allowMultiline = false, bool isPassword = false, string fieldName = "TextField", string placeholderText = "")
         {
@@ -67,8 +80,13 @@ namespace ChatClient.UI.Components
             
             undoStack.Push(string.Empty);
             SaveStateForUndo();
+
             
         }
+       
+        
+       
+
 
         private void SaveStateForUndo()
         {
@@ -122,7 +140,6 @@ namespace ChatClient.UI.Components
 
         public override void Update()
         {
-
             if (MouseInput.IsLeftClick(Rect))
             {
                 if (!IsSelected)
@@ -142,8 +159,12 @@ namespace ChatClient.UI.Components
                 cursor.ResetInvisible();
             }
 
-            if (!IsSelected) return;
+            if (!IsSelected)
+            { 
+                return; 
+            }
 
+            
             cursor.Update(Raylib.GetFrameTime());
             clipboardActions.Process();
 

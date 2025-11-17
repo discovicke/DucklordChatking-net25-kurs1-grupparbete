@@ -18,8 +18,18 @@ namespace ChatClient.UI.Screens
         private readonly UserAuth userAuth = new UserAuth(ServerConfig.CreateHttpClient());
         public readonly FeedbackBox FeedbackBox = new();
 
+        private readonly TabLogics tabs = new();
+        private bool tabsInitialized;
         public void HandleInput()
         {
+            // Register fields once in desired tab order (username -> password)
+            if (!tabsInitialized)
+            {
+                tabs.Register(userField);
+                tabs.Register(passwordField);
+                tabsInitialized = true;
+            }
+
             FeedbackBox.Update();
 
             // DEV MODE: Ctrl+Shift+D for instant dev login
@@ -31,6 +41,7 @@ namespace ChatClient.UI.Screens
                 DevLogin();
                 return;
             }
+            tabs.Update();
 
             userField.Update();
             passwordField.Update();

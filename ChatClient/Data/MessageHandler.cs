@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using ChatClient.Core;
 using Shared;
 
@@ -14,10 +12,7 @@ namespace ChatClient.Data
         // Sends message to server. Returns true if message was sent, false otherwise.
         public bool SendMessage(string content)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            ArgumentNullException.ThrowIfNull(content);
 
             //Converts current user and added content to a DTO for sending to server
             var messageDto = new MessageDTO
@@ -125,8 +120,7 @@ namespace ChatClient.Data
 
         public async Task<bool> SendMessageAsync(string content)
         {
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
+            ArgumentNullException.ThrowIfNull(content);
 
             if (string.IsNullOrWhiteSpace(AppState.LoggedInUsername))
                 throw new InvalidOperationException("Ingen duck inloggad!");
@@ -174,7 +168,7 @@ namespace ChatClient.Data
                     return null;
 
                 var messages = await response.Content.ReadFromJsonAsync<List<MessageDTO>>();
-                return messages ?? new List<MessageDTO>();
+                return messages ?? [];
             }
             catch (Exception ex)
             {
@@ -189,18 +183,17 @@ namespace ChatClient.Data
             {
                 var response = await httpClient.GetAsync($"/messages/updates?lastId={lastSeenId}");
                 if (!response.IsSuccessStatusCode)
-                    return new List<MessageDTO>();
+                    return [];
 
                 var messages = await response.Content.ReadFromJsonAsync<List<MessageDTO>>();
-                return messages ?? new List<MessageDTO>();
+                return messages ?? [];
             }
             catch (Exception ex)
             {
                 Log.Error($"ReceiveUpdatesAsync failed: {ex.Message}");
-                return new List<MessageDTO>();
+                return [];
             }
         }
-
 
     }
 }

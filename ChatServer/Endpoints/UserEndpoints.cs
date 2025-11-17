@@ -136,6 +136,40 @@ public static class UserEndpoints
     .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
+    #region GET ALL USER STATUSES
+    app.MapGet("/users/status", (HttpContext context) =>
+    {
+      // 401: authentication required
+      if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller))
+        return Results.Unauthorized();
+
+      var statuses = userStore.GetAllUserStatuses();
+
+      // 204: empty store
+      if (!statuses.Any())
+        return Results.NoContent();
+
+      // Convert from tuple -> DTO
+      var result = statuses.Select(s => new UserStatusDTO
+      {
+        Username = s.Username,
+        Online = s.Online
+      });
+
+      return Results.Ok(result);
+    })
+    .Produces<IEnumerable<UserStatusDTO>>(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status204NoContent)
+    .Produces(StatusCodes.Status401Unauthorized)
+    .WithSummary("List All Users With Online/Offline Status")
+    .WithDescription(
+    "Returns all registered users along with their current online status. " +
+    "Each entry includes the `Username` and a boolean `Online` value. " +
+    "A user is considered online when their `LastActivityUtc` timestamp is within the configured `OnlineWindow`."
+    )
+    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+    #endregion
+
 
     return users;
   }

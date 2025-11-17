@@ -3,12 +3,13 @@ using Shared;
 
 namespace ChatServer.Store;
 
-public class MessageStore(UserStore userStore)
+public class MessageStore(UserStore userStore) : ConcurrentStoreBase
 {
   private readonly UserStore userStore = userStore;
   private readonly List<ChatMessage> messages = [];
   private readonly Dictionary<int, ChatMessage> messagesById = [];
 
+  // Message ID counter
   private int nextMessageId = 1;
 
   #region ADD MESSAGE
@@ -22,6 +23,8 @@ public class MessageStore(UserStore userStore)
   /// False if <paramref name="user"/> is null or <paramref name="messageContent"/> is invalid.
   /// </returns>
   public bool Add(string username, string messageContent)
+  {
+    return WithWrite(() =>
   {
     if (string.IsNullOrEmpty(username) || string.IsNullOrWhiteSpace(messageContent)) // Validate message sender and content
     { return false; }
@@ -41,41 +44,7 @@ public class MessageStore(UserStore userStore)
     messages.Add(newMessage);
     messagesById.Add(newMessage.Id, newMessage);
     return true;
-  }
-  #endregion
-
-  #region GET MESSAGES AFTER ID
-  /// <summary>
-  /// Returns all messages with Id greater than the specified lastMessageId.
-  /// </summary>
-  /// <param name="lastMessageId">The last message ID that the client has seen.</param>
-  /// <returns>
-  /// A read-only list of MessageDTO representing all messages newer than lastMessageId.
-  /// </returns>
-  public IReadOnlyList<MessageDTO> GetMessagesAfter(int lastMessageId)
-  {
-    var result = new List<MessageDTO>();
-
-    // Messages are stored in chronological order, so we can scan forward.
-    foreach (var m in messages)
-    {
-      if (m.Id > lastMessageId)
-      {
-        var user = userStore.GetById(m.SenderId)
-                   ?? throw new InvalidOperationException(
-                      $"Message with ID {m.Id} references a missing user");
-
-        result.Add(new MessageDTO
-        {
-          Id = m.Id,
-          Sender = user.Username,
-          Content = m.Content,
-          Timestamp = m.Timestamp // timestamp automatically set when message was created
-        });
-      }
-    }
-
-    return result;
+  });
   }
   #endregion
 
@@ -92,6 +61,8 @@ public class MessageStore(UserStore userStore)
   /// </returns>
   public IReadOnlyList<MessageDTO> GetAll()
   {
+    return WithRead(() =>
+  {
     var result = new List<MessageDTO>();
 
     foreach (var m in messages)
@@ -107,12 +78,12 @@ public class MessageStore(UserStore userStore)
         Timestamp = m.Timestamp
       });
     }
-
     return result;
+  });
   }
   #endregion
 
-  #region GET LAST MESSAGES
+  #region GET LAST (n) MESSAGES
   /// <summary>
   /// Returns the most recently stored chat messages in chronological order up to the amount specified.
   /// </summary>
@@ -126,30 +97,70 @@ public class MessageStore(UserStore userStore)
   /// </returns>
   public IReadOnlyList<MessageDTO> GetLast(int count)
   {
-    if (count <= 0)
-      return [];
-
-    // Determine starting index
-    int startIndex = Math.Max(0, messages.Count - count);
-
-    var result = new List<MessageDTO>(count);
-
-    for (int i = startIndex; i < messages.Count; i++)
+    return WithRead(() =>
     {
-      var m = messages[i];
-      var user = userStore.GetById(m.SenderId)
-                 ?? throw new InvalidOperationException($"Message with ID {m.Id} references a missing user");
+      if (count <= 0)
+        return [];
 
-      result.Add(new MessageDTO
+      // Determine starting index
+      int startIndex = Math.Max(0, messages.Count - count);
+
+      var result = new List<MessageDTO>(count);
+
+      for (int i = startIndex; i < messages.Count; i++)
       {
-        Id = m.Id,
-        Sender = user.Username,
-        Content = m.Content,
-        Timestamp = m.Timestamp
-      });
-    }
+        var m = messages[i];
+        var user = userStore.GetById(m.SenderId)
+                   ?? throw new InvalidOperationException($"Message with ID {m.Id} references a missing user");
 
-    return result;
+        result.Add(new MessageDTO
+        {
+          Id = m.Id,
+          Sender = user.Username,
+          Content = m.Content,
+          Timestamp = m.Timestamp
+        });
+      }
+
+      return result;
+    });
+  }
+  #endregion
+
+  #region GET MESSAGES AFTER ID
+  /// <summary>
+  /// Returns all messages with Id greater than the specified lastMessageId.
+  /// </summary>
+  /// <param name="lastMessageId">The last message ID that the client has seen.</param>
+  /// <returns>
+  /// A read-only list of MessageDTO representing all messages newer than lastMessageId.
+  /// </returns>
+  public IReadOnlyList<MessageDTO> GetMessagesAfter(int lastMessageId)
+  {
+    return WithRead(() =>
+    {
+      var result = new List<MessageDTO>();
+
+      // Messages are stored in chronological order, so we can scan forward.
+      foreach (var m in messages)
+      {
+        if (m.Id > lastMessageId)
+        {
+          var user = userStore.GetById(m.SenderId)
+                     ?? throw new InvalidOperationException(
+                        $"Message with ID {m.Id} references a missing user");
+
+          result.Add(new MessageDTO
+          {
+            Id = m.Id,
+            Sender = user.Username,
+            Content = m.Content,
+            Timestamp = m.Timestamp // timestamp automatically set when message was created
+          });
+        }
+      }
+      return result;
+    });
   }
   #endregion
 
@@ -164,14 +175,17 @@ public class MessageStore(UserStore userStore)
   /// </returns>
   public bool RemoveById(int messageId)
   {
-    if (messagesById.TryGetValue(messageId, out var message))
-    {
-      messages.Remove(message);
-      messagesById.Remove(messageId);
-      return true;
-    }
+    return WithWrite(() =>
+ {
+   if (messagesById.TryGetValue(messageId, out var message))
+   {
+     messages.Remove(message);
+     messagesById.Remove(messageId);
+     return true;
+   }
 
-    return false;
+   return false;
+ });
   }
   #endregion
 
@@ -185,14 +199,12 @@ public class MessageStore(UserStore userStore)
   /// </returns>
   public bool ClearAll()
   {
-    if (messages == null || messagesById == null)
-    {
-      return false;
-    }
-
-    messages.Clear();
-    messagesById.Clear();
-    return true;
+    return WithWrite(() =>
+ {
+   messages.Clear();
+   messagesById.Clear();
+   return true;
+ });
   }
   #endregion
 

@@ -17,7 +17,13 @@ public static class AuthUtils
       return false;
 
     user = userStore.GetBySessionAuthToken(token);
-    return user != null;
+    if (user is null)
+      return false;
+
+    // Update last seen timestamp on every authenticated request
+    user.LastSeenUtc = DateTime.UtcNow;
+
+    return true;
   }
 
 }

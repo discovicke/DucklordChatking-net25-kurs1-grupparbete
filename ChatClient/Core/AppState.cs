@@ -20,6 +20,10 @@
         // Session auth token
         public static string SessionAuthToken { get; set; } = string.Empty;
 
+        // Amount of recent messages to fetch on inital chat load
+        public static int HistoryFetchCount { get; set; } = 30;
+
+
 
         public static Screen CurrentScreen
         {
