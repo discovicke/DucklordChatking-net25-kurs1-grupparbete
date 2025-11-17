@@ -83,17 +83,7 @@ namespace ChatClient.UI.Components
 
             
         }
-        // Tab navigation
-        private void TabFocus() 
-        {
-            IsSelected = true;
-            cursor.ResetBlink();
-        }
-        private void NotSelect()
-        {
-            IsSelected = false;
-            cursor.ResetInvisible();
-        }
+       
         
        
 
@@ -150,7 +140,6 @@ namespace ChatClient.UI.Components
 
         public override void Update()
         {
-
             if (MouseInput.IsLeftClick(Rect))
             {
                 if (!IsSelected)

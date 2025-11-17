@@ -1,18 +1,14 @@
-﻿using Raylib_cs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Raylib_cs;
 
 namespace ChatClient.UI.Components
 {
+    // Simple Tab navigation between registered TextFields
     public class TabLogics
     {
         private readonly List<TextField> fields = new();
 
-
-        // Register a field in tab order (first registered gets initial focus)
+        // Register fields in tab order
         public void Register(TextField field)
         {
             if (field == null) return;
@@ -20,6 +16,7 @@ namespace ChatClient.UI.Components
 
             fields.Add(field);
 
+            // Auto-focus the first field if none focused yet
             if (fields.Count == 1 && !field.IsFocused)
             {
                 field.Focus();
@@ -28,13 +25,17 @@ namespace ChatClient.UI.Components
         // clears all fields
         public void Clear() => fields.Clear();
 
-        public void Update() 
+        public void Update()
         {
             if (!Raylib.IsKeyPressed(KeyboardKey.Tab))
+            {
                 return;
+            }
 
             if (fields.Count == 0)
+            {
                 return;
+            }
 
             bool backwards = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
 
@@ -46,18 +47,16 @@ namespace ChatClient.UI.Components
                 return;
             }
 
-            int nextIndex = backwards
+            int next = backwards
                 ? (currentIndex - 1 + fields.Count) % fields.Count
                 : (currentIndex + 1) % fields.Count;
 
-            if (nextIndex == currentIndex && fields.Count == 1)
-                return; // Only one field, nothing to switch
-
-            var current = fields[currentIndex];
-            var next = fields[nextIndex];
-
-            current.Blur();
-            next.Focus();
+            if (next == currentIndex && fields.Count == 1)
+            {
+                return;
+            }
+            fields[currentIndex].Blur();
+            fields[next].Focus();
         }
     }
 }
