@@ -200,5 +200,22 @@ namespace ChatClient.Data.Services
             }
         }
 
+        public async Task<List<UserStatusDTO>> GetUserStatusesAsync()
+        {
+            try
+            {
+                var response = await httpClient.GetAsync("/users/status");
+                if (!response.IsSuccessStatusCode)
+                    return [];
+
+                var statuses = await response.Content.ReadFromJsonAsync<List<UserStatusDTO>>();
+                return statuses ?? [];
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"GetUserStatusesAsync failed: {ex.Message}");
+                return [];
+            }
+        }
     }
 }
