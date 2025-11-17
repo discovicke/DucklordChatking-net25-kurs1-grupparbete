@@ -28,6 +28,7 @@ namespace ChatClient.UI.Components
         public Action SaveStateForUndo { get; init; } = default!;
         public Stack<string> UndoStack { get; init; } = default!;
         public Action ResetCursorToStart { get; init; } = default!;
+        public required Action<int> ResetCursorToEnd { get; init; }
         public Action ResetCursorBlink { get; init; } = default!;
         public string FieldName { get; init; } = "TextField";
     }
@@ -56,7 +57,11 @@ namespace ChatClient.UI.Components
         }
         public  void Process()
         {
-            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
+            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || 
+                            Raylib.IsKeyDown(KeyboardKey.RightControl) || 
+                            Raylib.IsKeyDown(KeyboardKey.LeftSuper) ||  // Cmd on macOS
+                            Raylib.IsKeyDown(KeyboardKey.RightSuper);
+                            ;
             if (!ctrlDown) return;
 
             ClipboardAction action = ClipboardAction.None;
@@ -78,7 +83,7 @@ namespace ChatClient.UI.Components
                     {
                         Log.Info($"[{ctx.FieldName}] Copy failed: {ex.Message}");
                     }
-                    break;
+                    return;
 
                 case ClipboardAction.Paste:
                     try
@@ -99,7 +104,7 @@ namespace ChatClient.UI.Components
                     {
                         Log.Info($"[{ctx.FieldName}] Paste failed: {ex.Message}");
                     }
-                    break;
+                    return;
 
                 case ClipboardAction.Cut:
                     try
@@ -123,25 +128,28 @@ namespace ChatClient.UI.Components
                     {
                         Log.Info($"[{ctx.FieldName}] Cut failed: {ex.Message}");
                     }
-                    break;
+                    return;
 
                 case ClipboardAction.Undo:
-                    if (ctx.UndoStack!.Count > 0)
+                    Log.Info($"[{ctx.FieldName}] Ctrl+Z detected - Stack size: {ctx.UndoStack.Count}");
+        
+                    if (ctx.UndoStack.Count >= 0)
                     {
-                        string previous = ctx.UndoStack.Pop();
-                        ctx.SetText(previous ?? string.Empty);
+                        string previousState = ctx.UndoStack.Pop();
+                        ctx.SetText(previousState);
+                        ctx.ResetCursorToEnd(previousState.Length);
                         ctx.ResetCursorBlink();
-                        Log.Info($"[{ctx.FieldName}] Undo performed - Current text: '{(previous ?? string.Empty).Replace("\n", "\\n")}'");
+                        Log.Success($"[{ctx.FieldName}] Undo successful - Restored: '{previousState.Replace("\n", "\\n")}'");
                     }
                     else
                     {
-                        Log.Info($"[{ctx.FieldName}] Undo requested but no history");
+                        Log.Error($"[{ctx.FieldName}] Undo stack is empty");
                     }
-                    break;
+                    return;
 
                 case ClipboardAction.None:
                 default:
-                    break;
+                    return;
 
             }
         }

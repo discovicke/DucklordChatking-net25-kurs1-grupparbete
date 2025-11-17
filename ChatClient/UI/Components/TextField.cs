@@ -16,10 +16,13 @@ namespace ChatClient.UI.Components
         // - Add undo/redo support (Ctrl + Z / Ctrl + Y)
         // - Add text selection support (Mouse drag || shift key)
         // - Add font support
+        
         public string Text { get; private set; } = string.Empty;
         private string FieldName { get; set; } = "TextField";
         private string PlaceholderText { get; set; } = "";
 
+        private string lastSavedState = string.Empty;
+        private bool isTypingWord = false;
         private bool IsSelected { get; set; }
         private readonly bool AllowMultiline;
         private readonly TextCursor cursor;
@@ -55,12 +58,12 @@ namespace ChatClient.UI.Components
                 SaveStateForUndo = SaveStateForUndo,
                 UndoStack = undoStack,
                 ResetCursorToStart = () => cursor.Position = 0,
+                ResetCursorToEnd = pos => cursor.Position = pos,
                 ResetCursorBlink = () => cursor.ResetBlink(),
                 FieldName = FieldName
             };
             clipboardActions = new ClipboardActions(ctx);
-
-
+            SaveStateForUndo();
         }
 
         private void SaveStateForUndo()
@@ -151,6 +154,7 @@ namespace ChatClient.UI.Components
             if (!IsSelected) return;
 
             cursor.Update(Raylib.GetFrameTime());
+            clipboardActions.Process();
 
             HandleTextInput();
             HandleNavigation();
@@ -162,7 +166,9 @@ namespace ChatClient.UI.Components
         {
             if (AllowMultiline && IsShiftEnterPressed())
             {
+                SaveUndoIfChanged();
                 InsertText("\n");
+                isTypingWord = false;
                 return;
             }
 
@@ -171,7 +177,17 @@ namespace ChatClient.UI.Components
             while (key > 0)
             {
                 if (key >= 32)
-                    InsertText(char.ConvertFromUtf32(key));
+                {
+                    char c = char.ConvertFromUtf32(key)[0];
+                    bool isWhitespace = char.IsWhiteSpace(c);
+                    if (!isTypingWord || (isWhitespace != WasLastCharWhitespace()))
+                    {
+                        SaveUndoIfChanged();
+                        isTypingWord = !isWhitespace;
+                    }
+
+                    InsertText(c.ToString());
+                }
 
                 key = Raylib.GetCharPressed();
             }
@@ -190,18 +206,28 @@ namespace ChatClient.UI.Components
                 backspaceHandledThisFrame = false;
             }
 
-
-            clipboardActions.Process();
-
-
+        }
+        private bool WasLastCharWhitespace()
+        {
+            if (string.IsNullOrEmpty(Text) || cursor.Position <= 0)
+            {
+                return false;
+            }
+            int idx = Math.Min(cursor.Position - 1, Text.Length - 1);
+            return char.IsWhiteSpace(Text[idx]);
         }
 
         //  Navigation for arrow keys
         private bool TryPress(KeyboardKey key, Action action)
         {
             if (movedThisFrame) // to block out dubble left frame action
+            bool navigated = false;
+            
+            if (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left))
             {
                 return false;
+                cursor.MoveLeft(Text.Length);
+                navigated = true;
             }
 
             if (Raylib.IsKeyPressed(key))
@@ -225,7 +251,13 @@ namespace ChatClient.UI.Components
                 !Raylib.IsKeyDown(KeyboardKey.Home) &&
                 !Raylib.IsKeyDown(KeyboardKey.End))
             {
-                movedThisFrame = false;
+                cursor.MoveToEnd(Text.Length);
+                navigated = true;
+            }
+            if (navigated && isTypingWord)
+            {
+                SaveUndoIfChanged();
+                isTypingWord = false;
             }
         }
 
@@ -244,16 +276,32 @@ namespace ChatClient.UI.Components
 
         private void DeleteCharacter()
         {
-            if (cursor.Position > 0 && Text.Length > 0)
+            if (cursor.Position <= 0 || Text.Length == 0)
             {
-                int removeIndex = Math.Clamp(cursor.Position - 1, 0, Text.Length - 1);
-                char deletedChar = Text[removeIndex];
-                Text = Text.Remove(removeIndex, 1);
-                cursor.Position = removeIndex;
-                cursor.ResetBlink();
+                return;
+            }
+            
+            if (!isTypingWord)
+            {
+                SaveUndoIfChanged();
+            }
+        
+            int removeIndex = Math.Clamp(cursor.Position - 1, 0, Text.Length - 1);
+            char deletedChar = Text[removeIndex];
+            Text = Text.Remove(removeIndex, 1);
+            cursor.Position = removeIndex;
+            cursor.ResetBlink();
+        
+            isTypingWord = true;
+            Log.Info($"[{FieldName}] Deleted: '{deletedChar}' at position {removeIndex}");
 
-                string displayChar = deletedChar == '\n' ? "\\n" : deletedChar.ToString();
-                Log.Info($"[{FieldName}] Character deleted: '{displayChar}' - Current text: '{Text.Replace("\n", "\\n")}'");
+        }
+        private void SaveUndoIfChanged()
+        {
+            if (Text != lastSavedState)
+            {
+                SaveStateForUndo();
+                lastSavedState = Text;
             }
         }
 

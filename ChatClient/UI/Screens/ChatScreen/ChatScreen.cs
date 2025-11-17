@@ -82,9 +82,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
                     .ToList();
             }
         }
-
-        // TODO: Add scrollbar
-        // TODO: Add Message Wrapping
+        
         // Draw messages
         float totalChatHeight = chatMessageBubbles.Sum(m => m.Height + 8f);
         chatPanel.BeginScroll(totalChatHeight);
