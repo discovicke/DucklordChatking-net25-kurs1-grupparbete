@@ -34,11 +34,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     #region Fields: Data & Services
     private readonly ChatDataService dataService;
     private List<MessageDTO> currentMessages = new();
-    #endregion
-
-    #region Fields: Placeholder Data (TODO: replace with real online/offline tracking)
-    private readonly string[] onlineUsers = { "Ducklord", "QuackyMcQuack", "DaffyDev" };
-    private readonly string[] offlineUsers = { "SleepyDuck", "LazyFeathers" };
+    private List<string> online = new();
+    private List<string> offline = new();
     #endregion
 
     public ChatScreen()
@@ -68,6 +65,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
         // Wire up events
         dataService.MessagesChanged += OnMessagesChanged;
+        dataService.UsersStatusChanged += OnUsersStatusChanged;
         toolbar.SendPressed += OnSendPressed;
 
         // Logic (simplified - now just handles back button)
@@ -115,7 +113,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         Raylib.DrawRectangleRoundedLinesEx(layout.UserListRect, 0.08f, 10, 1, Colors.OutlineColor);
 
         // Render user list
-        userListView.Render(onlineUsers, offlineUsers);
+        userListView.Render(online, offline);
 
         // Toolbar (input + send button)
         toolbar.Update();
@@ -131,6 +129,13 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         currentMessages = messages.ToList();
         float usableWidth = layout.ChatRect.Width - 20; // 10px insets on both sides
         messagesView.UpdateMessages(currentMessages, usableWidth);
+    }
+
+    private void OnUsersStatusChanged(IReadOnlyList<UserStatusDTO> statuses)
+    {
+        // Split into online/offline and sort alphabetically
+        online = statuses.Where(s => s.Online).Select(s => s.Username).OrderBy(n => n).ToList();
+        offline = statuses.Where(s => !s.Online).Select(s => s.Username).OrderBy(n => n).ToList();
     }
 
     private void OnSendPressed(string text)
@@ -181,4 +186,3 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     }
     #endregion
 }
-

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Linq;
 using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
 using ChatClient.Data.Services;
@@ -19,8 +20,10 @@ public class ChatDataService
     private bool isPolling;
     private CancellationTokenSource? pollingCts;
     private readonly ConcurrentQueue<MessageDTO> incomingMessages = new();
+    private List<UserStatusDTO> lastStatuses = new();
 
     public event Action<IReadOnlyList<MessageDTO>>? MessagesChanged;
+    public event Action<IReadOnlyList<UserStatusDTO>>? UsersStatusChanged;
 
     public ChatDataService(MessageHandler handler)
     {
@@ -43,6 +46,21 @@ public class ChatDataService
         
         MessagesChanged?.Invoke(messages);
         Log.Info($"[ChatDataService] Loaded {messages.Count} messages, latest ID: {latestReceivedMessageId}");
+
+        // Fetch initial user statuses so UI has data before polling loop kicks in
+        try
+        {
+            var statuses = await handler.GetUserStatusesAsync();
+            if (statuses.Count > 0)
+            {
+                lastStatuses = statuses;
+                UsersStatusChanged?.Invoke(lastStatuses);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[ChatDataService] Initial status fetch failed: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -135,6 +153,20 @@ public class ChatDataService
                     Log.Info("[Poll] No new messages");
                 }
 
+                // Also fetch user statuses periodically
+                var statuses = await handler.GetUserStatusesAsync();
+                if (statuses.Count > 0)
+                {
+                    // Only raise if changed (simple count or sequence diff)
+                    bool changed = statuses.Count != lastStatuses.Count ||
+                                   statuses.Any(s => !lastStatuses.Any(p => p.Username == s.Username && p.Online == s.Online));
+                    if (changed)
+                    {
+                        lastStatuses = statuses;
+                        UsersStatusChanged?.Invoke(lastStatuses);
+                    }
+                }
+
                 await Task.Delay(150, token);
             }
             catch (OperationCanceledException)
@@ -151,6 +183,6 @@ public class ChatDataService
     }
 
     public IReadOnlyList<MessageDTO> GetCachedMessages() => messages;
+    public IReadOnlyList<UserStatusDTO> GetCachedStatuses() => lastStatuses;
     public bool HasLoadedHistory => hasLoadedInitialHistory;
 }
-
