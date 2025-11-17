@@ -16,7 +16,7 @@ public static class MessageEndpoints
     var messages = app.MapGroup("/messages").WithTags("Messages");
 
     #region SEND MESSAGE
-    messages.MapPost("/send", async (HttpContext context, MessageDTO dto) =>
+    messages.MapPost("/send", (HttpContext context, MessageDTO dto) =>
     {
       // 401: authentication required
       if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
@@ -106,7 +106,6 @@ public static class MessageEndpoints
     )
     .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
-
 
     #region GET MESSAGE HISTORY (WITH OPTIONAL TAKE PARAMETER)
     messages.MapGet("/history", (HttpContext context, int? take) =>
