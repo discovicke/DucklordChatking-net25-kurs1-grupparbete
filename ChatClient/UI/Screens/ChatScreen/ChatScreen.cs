@@ -32,10 +32,11 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private readonly ScrollablePanel inputPanel;
     private List<MessageDTO> messages = new();
     private List<ChatMessage> chatMessageBubbles = new();
-    private int lastMessageId = 1;
+    private int lastMessageId = 0;
     private readonly ConcurrentQueue<MessageDTO> incomingMessages = new();
     private bool pollingStarted = false;
     private CancellationTokenSource cts = new();
+    private bool hasLoadedInitialMessageHistory = false;
 
 
     public ChatScreen()
@@ -62,7 +63,14 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
 
     public override void RenderContent()
     {
-        // Start polling only once layout is valid
+        // 1. Make sure chat is initialized
+        if (!hasLoadedInitialMessageHistory)
+        {
+            _ = LoadChatHistoryAsync();
+            return;
+        }
+
+        // 2. Start polling only after initialization
         if (!pollingStarted && layout.ChatRect.Width > 0)
         {
             pollingStarted = true;
@@ -70,7 +78,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             _ = Task.Run(() => PollMessagesAsync(cts.Token));
         }
 
-        // Pull messages from queue and create chat bubbles
+        // 3. Handle incoming queued messages (unchanged)
         while (incomingMessages.TryDequeue(out var msg))
         {
             messages.Add(msg);
@@ -264,5 +272,22 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
                 await Task.Delay(200, token);
             }
         }
+    }
+    private async Task LoadChatHistoryAsync()
+    {
+        if (hasLoadedInitialMessageHistory) return;
+        hasLoadedInitialMessageHistory = true;
+
+        // Load recent history (or full history if you prefer)
+        var history = await messageHandler.ReceiveHistoryAsync(30);
+        messages = history ?? new List<MessageDTO>();
+
+        // Convert to bubbles
+        chatMessageBubbles = messages
+            .Select(m => new ChatMessage(m, layout.ChatRect.Width - 20))
+            .ToList();
+
+        // Set lastMessageId correctly
+        lastMessageId = messages.Any() ? messages.Max(m => m.Id) : 0;
     }
 }
