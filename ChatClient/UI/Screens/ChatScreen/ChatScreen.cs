@@ -19,41 +19,35 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     //      - User bubble / received bubble difference
     //      - Visible scrollbar in chatwindow
     //      - Visible scrollbar IF input height exceeds chat height
+    #region Fields: UI Controls
     private readonly TextField inputField = new(new Rectangle(),
         Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         true, false, "ChatScreen_MessageInput", "Quack a message... (Shift+Enter for new line)");
+
     private readonly Button sendButton = new(new Rectangle(), "Send",
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
+
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
-    private readonly MessageHandler messageHandler = new(ServerConfig.CreateHttpClient());
     private readonly ScrollablePanel chatPanel;
     private readonly ScrollablePanel userListPanel;
     private readonly ScrollablePanel inputPanel;
-    private List<MessageDTO> messages = new();
+
     private List<ChatMessage> chatMessageBubbles = new();
+    #endregion
 
-    // Amount of messages (from most recent) to fetch from the server at once during initial load.
-    private int amountOfRecentMessagesToFetch = 30;
+    #region Fields: Data & Services - Fields
+    private readonly MessageHandler messageHandler = new(ServerConfig.CreateHttpClient());
+    private List<MessageDTO> messages = [];
+    #endregion
 
-    // Background polling + message sync state stuff.
-    // These fields track synchronization with the server, background polling,
-    // and incoming message flow. The chat screen uses them to manage
-    // message history loading, real-time updates, and safe UI rendering.
-    //
-    // - latestReceivedMessageId:    Highest message ID the client has processed.
-    // - incomingMessages:           Queue of messages received from polling thread
-    //                               but not yet rendered on screen.
-    // - hasLoadedInitialMessageHistory: Ensures chat history is loaded once before
-    //                                   starting polling or accepting UI input.
-    // - isPolling:                  Tracks whether the background polling loop is active.
-    // - pollingCts:                 Allows the polling loop to be cancelled when
-    //                               leaving the chat screen.
+    #region Fields: Polling State - Fields
     private int latestReceivedMessageId = 0;
     private readonly ConcurrentQueue<MessageDTO> incomingMessages = new();
     private bool hasLoadedInitialMessageHistory = false;
     private bool isPolling = false;
     private CancellationTokenSource pollingCts = new();
+    #endregion
 
 
     public ChatScreen()
@@ -305,7 +299,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         hasLoadedInitialMessageHistory = true;
 
         // Load recent history (or full history if parameter is left blank)
-        var history = await messageHandler.ReceiveHistoryAsync(amountOfRecentMessagesToFetch);
+        var history = await messageHandler.ReceiveHistoryAsync(AppState.HistoryFetchCount);
         messages = history ?? [];
 
         // Convert to bubbles
