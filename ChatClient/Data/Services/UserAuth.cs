@@ -11,9 +11,9 @@ namespace ChatClient.Data.Services;
 /// Responsible for: user authentication and registration via HTTP/REST API.
 /// Handles login validation, new user registration, and password change requests with the server.
 /// </summary>
-public class UserAuth
+public class UserAuth(HttpClient httpClient)
 {
-    private readonly HttpClient httpClient;
+    private readonly HttpClient httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     // Production constructor - uses global server config
     public UserAuth() : this(ServerConfig.CreateHttpClient())
@@ -21,10 +21,6 @@ public class UserAuth
     }
 
     // Test constructor - allows custom HttpClient for testing
-    public UserAuth(HttpClient httpClient)
-    {
-        this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-    }
 
     public bool Login(string username, string password)
     {
@@ -43,6 +39,7 @@ public class UserAuth
 
             // Store identity
             UserAccount.SetUser(username, password);
+            // TODO: username -> ServerUserName
             AppState.LoggedInUsername = username;
             AppState.SessionAuthToken = token;
 
