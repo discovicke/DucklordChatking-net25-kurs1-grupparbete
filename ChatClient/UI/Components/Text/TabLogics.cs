@@ -10,6 +10,7 @@ namespace ChatClient.UI.Components.Text
     // Simple Tab navigation between registered TextFields
     public class TabLogics
     {
+
         private readonly List<TextField> fields = new();
 
         // Register fields in tab order

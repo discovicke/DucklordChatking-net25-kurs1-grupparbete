@@ -1,4 +1,4 @@
-using ChatClient.Core;
+﻿using ChatClient.Core;
 using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
 using ChatClient.Core.Input;
@@ -7,8 +7,10 @@ using ChatClient.Data.Services;
 using ChatClient.UI.Components;
 using ChatClient.UI.Components.Base;
 using ChatClient.UI.Components.Specialized;
+using ChatClient.UI.Components.Text;
 using ChatClient.UI.Screens.Common;
 using Raylib_cs;
+using System.Security.AccessControl;
 
 namespace ChatClient.UI.Screens.Register;
 
@@ -26,9 +28,21 @@ public class RegisterScreenLogic(
 {
     private readonly UserAuth userAuth = new UserAuth(ServerConfig.CreateHttpClient());
     public readonly FeedbackBox FeedbackBox = new();
+    private readonly TabLogics tabs = new();
+    private bool tabsInitialized;
 
     public void HandleInput()
     {
+        tabs.Update();
+
+        // Register fields once in desired tab order (username -> password)
+        if (!tabsInitialized)
+        {
+            tabs.Register(userField);
+            tabs.Register(passField);
+            tabs.Register(passConfirmField);
+            tabsInitialized = true;
+        }
         FeedbackBox.Update();
         
         userField.Update();
