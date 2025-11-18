@@ -2,6 +2,7 @@ using ChatServer.Store;
 using ChatServer.Auth;
 using Shared;
 using Scalar.AspNetCore;
+using ChatServer.Logger;
 
 namespace ChatServer.Endpoints;
 
@@ -19,24 +20,40 @@ public static class MessageEndpoints
     {
       // 401: authentication required
       if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+      {
+        ServerLog.Warning("Unauthorized attempt to send a message"); // TODO: could be improved to add more details, like token and IP address
         return Results.Unauthorized();
+      }
 
       // 400: missing sender or content
       if (string.IsNullOrWhiteSpace(dto.Content) || string.IsNullOrWhiteSpace(dto.Sender))
+      {
+        ServerLog.Warning($"User '{caller.Username}' sent invalid message data (empty sender or content)");
         return Results.BadRequest();
+      }
 
       // 403: sender must match authenticated user
       if (!AuthRules.IsSelf(caller, dto.Sender))
+      {
+        ServerLog.Warning($"User '{caller.Username}' attempted to send a message as '{dto.Sender}'");
         return Results.StatusCode(StatusCodes.Status403Forbidden);
+      }
 
       // Attempt to store the message
       var added = messageStore.Add(dto.Sender, dto.Content);
 
-      // 500: something unexpected went wrong storing the message
+      // 500: unexpected store failure
       if (!added)
+      {
+        ServerLog.Error(
+            $"Message storage failed for user '{dto.Sender}'"
+        );
         return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      }
 
-      // 204: message stored successfully, no response body needed
+      ServerLog.Info($"Message stored from '{dto.Sender}'");
+
+      // 204: success
       return Results.NoContent();
     })
     .Produces(StatusCodes.Status204NoContent)
@@ -59,11 +76,17 @@ public static class MessageEndpoints
     {
       // 401: authentication required
       if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+      {
+        ServerLog.Warning("Unauthorized attempt to poll message updates");
         return Results.Unauthorized();
+      }
 
       // 400: invalid lastId
       if (lastId < 0)
+      {
+        ServerLog.Warning($"User '{caller.Username}' sent invalid lastId value '{lastId}' in update request");
         return Results.BadRequest();
+      }
 
       const int timeoutMs = 25000;     // total wait before returning empty
       const int sleepMs = 200;         // minimum wait between checks ( to avoid heavy load if server is busy )
@@ -84,6 +107,9 @@ public static class MessageEndpoints
             Content = m.Content,
             Timestamp = m.Timestamp
           }).ToList();
+
+          // Optional lightweight info log:
+          // ServerLog.Info($"Delivered {dtoUpdates.Count} updates to '{caller.Username}'");
 
           return Results.Ok(dtoUpdates); // 200: new messages available
         }
@@ -111,17 +137,24 @@ public static class MessageEndpoints
     {
       // 401: authentication required
       if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+      {
+        ServerLog.Warning("Unauthorized attempt to fetch message history");
         return Results.Unauthorized();
+      }
 
       // 400: invalid query parameter
       if (take.HasValue && take.Value <= 0)
+      {
+        ServerLog.Warning($"User '{caller.Username}' provided invalid take value '{take}'");
         return Results.BadRequest();
+      }
 
       var messages = take.HasValue
           ? messageStore.GetLast(take.Value)
           : messageStore.GetAll();
 
       // 200: always OK, returns empty list if no messages exist
+      ServerLog.Info($"Message history requested by '{caller.Username}' with {messages.Count} messages returned");
       return Results.Ok(messages);
     })
     .Produces<IEnumerable<MessageDTO>>(StatusCodes.Status200OK)
@@ -141,20 +174,30 @@ public static class MessageEndpoints
     {
       // 401: authentication required
       if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+      {
+        ServerLog.Warning("Unauthorized attempt to clear message history");
         return Results.Unauthorized();
+      }
 
       // 403: authorization, admin-only operation
       if (!caller.IsAdmin)
+      {
+        ServerLog.Warning($"User '{caller.Username}' attempted to clear message history without admin privileges");
         return Results.StatusCode(StatusCodes.Status403Forbidden);
+      }
 
       // Attempt to clear all stored messages
       var cleared = messageStore.ClearAll();
 
       // 500: unexpected failure
       if (!cleared)
+      {
+        ServerLog.Error("Message history clear operation failed unexpectedly");
         return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      }
 
       // 204: success, no content
+      ServerLog.Success($"Message history cleared by admin '{caller.Username}'");
       return Results.NoContent();
     })
     .WithBadge("Danger Zone 💣", BadgePosition.Before, "#ff3b30")
