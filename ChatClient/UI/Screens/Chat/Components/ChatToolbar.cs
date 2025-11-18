@@ -48,5 +48,9 @@ public class ChatToolbar(TextField inputField, Button sendButton)
         inputField.Draw();
         sendButton.Draw();
     }
+    public void ClearInput()
+    {
+        inputField.Clear();
+    }
 }
 

@@ -126,7 +126,7 @@ public class ChatMessage
                 : ResourceLoader.RegularFont;
             var color = i < headerLineCount 
                 ? Colors.UiText 
-                : Colors.InputText;
+                : Colors.ChatBubbleOtherText;
 
             Raylib.DrawTextEx(font, wrappedLines[i],
                 new Vector2(bubbleX + Padding, textY), FontSize, 0.5f, color);

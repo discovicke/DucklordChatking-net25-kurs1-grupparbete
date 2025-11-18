@@ -27,8 +27,14 @@ public static class AuthEndpoints
       // Update the auth token
       var token = userStore.AssignNewSessionAuthToken(user);
 
+      var response = new LoginResponseDTO
+      {
+        Username = user.Username,
+        Token = token
+      };
+
       // 200: success
-      return Results.Ok(new { user.Username, token });
+      return Results.Ok(response);
     })
     .Produces(StatusCodes.Status200OK)
     .Produces(StatusCodes.Status400BadRequest)

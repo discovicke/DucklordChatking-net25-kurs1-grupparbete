@@ -21,6 +21,7 @@ namespace ChatClient.UI.Theme
         public static Color TextFieldSelected = new Color(235, 245, 247, 255);
         public static Color TextFieldHovered = new Color(245, 250, 252, 255);
         public static Color TextFieldUnselected = new Color(210, 235, 240, 255);
+        public static Color ChatBubbleOtherText = new Color(240, 245, 247, 255); // Soft white-blue
         
         // Button colors
         public static Color ButtonDefault = new Color(210, 150, 40, 255);
@@ -33,11 +34,11 @@ namespace ChatClient.UI.Theme
         public static Color Fail = new Color(255, 130, 120, 255);
         
         // Chat bubbles
-        public static Color ChatBubbleOther = new Color(152, 160, 166, 255); // Ljusgrå
-        public static Color ChatBubbleSelf = new Color(24, 120, 156, 255);   // Teal-blå (egen)
+        public static Color ChatBubbleOther = new Color(110, 125, 135, 255); // Ljusgrå
+        public static Color ChatBubbleSelf = new Color(30, 135, 170, 255);   // Teal-blå (egen)
 
         // Online/offline indicators
-        public static Color Online = new Color(75, 211, 123, 255);           // Klar grön
+        public static Color Online = Color.Gold;
         public static Color Offline = new Color(125, 138, 146, 255);         // Neutral mellangrå
         
         // Text colors
