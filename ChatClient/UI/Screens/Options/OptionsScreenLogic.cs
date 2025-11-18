@@ -1,9 +1,10 @@
-using ChatClient.Core;
+﻿using ChatClient.Core;
 using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
 using ChatClient.UI.Components;
 using ChatClient.UI.Components.Base;
 using ChatClient.UI.Components.Specialized;
+using ChatClient.UI.Components.Text;
 using ChatClient.UI.Screens.Common;
 
 namespace ChatClient.UI.Screens.Options;
@@ -22,8 +23,21 @@ public class OptionsScreenLogic(
     Button btnFullscreen
 ) : IScreenLogic
 {
+    private readonly TabLogics tabs = new();
+    private bool tabsIniti;
     public void HandleInput()
     {
+        tabs.Update();
+
+        // Register fields once in desired tab order (username -> password)
+        if (!tabsIniti)
+        {
+            tabs.Register(userField);
+            tabs.Register(passField);
+            tabs.Register(passConfirmField);
+            tabsIniti = true;
+        }
+
         userField.Update();
         passField.Update();
         passConfirmField.Update();
