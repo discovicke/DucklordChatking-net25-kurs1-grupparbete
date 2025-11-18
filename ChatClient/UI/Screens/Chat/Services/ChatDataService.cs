@@ -161,19 +161,7 @@ public class ChatDataService(MessageHandler handler)
                     Log.Info("[Poll] No new messages");
                 }
 
-                // Also fetch user statuses periodically
-                var statuses = await handler.GetUserStatusesAsync();
-                if (statuses.Count > 0)
-                {
-                    // Only raise if changed (simple count or sequence diff)
-                    bool changed = statuses.Count != lastStatuses.Count ||
-                                   statuses.Any(s => !lastStatuses.Any(p => p.Username == s.Username && p.Online == s.Online));
-                    if (changed)
-                    {
-                        lastStatuses = statuses;
-                        UsersStatusChanged?.Invoke(lastStatuses);
-                    }
-                }
+
 
                 await Task.Delay(150, token);
             }
@@ -196,14 +184,32 @@ public class ChatDataService(MessageHandler handler)
         {
             try
             {
+                // send heartbeat
                 await handler.SendHeartbeatAsync();
+
+                // fetch statuses
+                var statuses = await handler.GetUserStatusesAsync();
+
+                if (statuses.Count > 0)
+                {
+                    bool changed =
+                        statuses.Count != lastStatuses.Count ||
+                        statuses.Any(s => !lastStatuses.Any(p =>
+                            p.Username == s.Username && p.Online == s.Online));
+
+                    if (changed)
+                    {
+                        lastStatuses = statuses;
+                        UsersStatusChanged?.Invoke(lastStatuses);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Log.Error($"[Heartbeat] Failed: {ex.Message}");
             }
 
-            await Task.Delay(3000, token); // heartbeat every 3 seconds
+            await Task.Delay(3000, token); // every 3 seconds
         }
     }
 
