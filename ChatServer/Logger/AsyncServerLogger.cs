@@ -48,7 +48,14 @@ namespace ChatServer.Logger
     public static void Success(string message) => Write(ServerLogLevel.Success, message);
     public static void Error(string message) => Write(ServerLogLevel.Error, message);
     public static void Critical(string message) => Write(ServerLogLevel.Critical, message);
+    private static void Write(ServerLogLevel level, string message)
+    {
+      if (level < minimumLevel)
+        return;
 
-
+      string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+      string line = $"[{timestamp}] [{level}] {message}";
+      queue.Add(line);
+    }
   }
 }
