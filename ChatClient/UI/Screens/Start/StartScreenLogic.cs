@@ -21,8 +21,7 @@ namespace ChatClient.UI.Screens.Start
         TextField userField,
         TextField passwordField,
         Button loginButton,
-        Button registerButton/*,
-        OptionsButton optionsButton*/) : IScreenLogic
+        Button registerButton) : IScreenLogic
     {
         // DEV MODE: Set to false before production release
         private const bool DEV_MODE_ENABLED = true;
@@ -68,12 +67,6 @@ namespace ChatClient.UI.Screens.Start
                 NavigateToRegister();
             }
 
-            /*
-            if (MouseInput.IsLeftClick(optionsButton.Rect))
-            {
-                NavigateToOptions();
-            }
-            */
         }
 
         private void Login()
@@ -143,15 +136,6 @@ namespace ChatClient.UI.Screens.Start
             AppState.CurrentScreen = Screen.Register;
             ClearFields();
         }
-
-        /*
-        private void NavigateToOptions()
-        {
-            Log.Info("[StartScreenLogic] Navigating to options screen");
-            AppState.CurrentScreen = Screen.Options;
-            ClearFields();
-        }
-        */
 
         private void ClearFields()
         {
