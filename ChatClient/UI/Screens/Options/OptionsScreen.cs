@@ -41,7 +41,7 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
         logic = new OptionsScreenLogic(newUsername, newPassword, confirmPassword, confirmButton, backButton, btnWindowed, btnFullscreen);
     }
 
-    protected override OptionsScreenLayout.LayoutData CalculateLayout() => OptionsScreenLayout.Calculate(ResourceLoader.LogoTexture.Width);
+    protected override OptionsScreenLayout.LayoutData CalculateLayout() => OptionsScreenLayout.Calculate(ResourceLoader.LogoTexture.Width, ResourceLoader.LogoTexture.Height);
 
     protected override void ApplyLayout(OptionsScreenLayout.LayoutData layout)
     {
