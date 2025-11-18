@@ -29,6 +29,7 @@ public class ChatToolbar(TextField inputField, Button sendButton)
 
         if (sendTriggered)
         {
+            Raylib.PlaySound(ResourceLoader.ButtonSound);
             string text = inputField.Text;
             if (!string.IsNullOrWhiteSpace(text))
             {

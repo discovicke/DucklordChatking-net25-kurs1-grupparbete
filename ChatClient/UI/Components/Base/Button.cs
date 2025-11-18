@@ -110,9 +110,6 @@ namespace ChatClient.UI.Components.Base
             if (clicked)
             {
                 Log.Info($"[Button] '{Text}' clicked");
-
-                // Duck sound
-                Raylib.PlaySound(ResourceLoader.ButtonSound);
             }
 
             return clicked;

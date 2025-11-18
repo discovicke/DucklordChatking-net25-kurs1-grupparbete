@@ -57,7 +57,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
         var inputField = new TextField(new Rectangle(),
             Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
             true, false, "ChatScreen_MessageInput", "Quack a message... (Shift+Enter for new line)");
-        var sendButton = new Button(new Rectangle(), "Send",
+        var sendButton = new Button(new Rectangle(), "Quack",
             Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
         toolbar = new ChatToolbar(inputField, sendButton);
 
