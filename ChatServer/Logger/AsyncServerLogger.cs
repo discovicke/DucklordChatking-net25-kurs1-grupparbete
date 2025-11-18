@@ -109,5 +109,31 @@ namespace ChatServer.Logger
       }
     }
 
+    private static string CreateLogFilePath()
+    {
+      string date = DateTime.Now.ToString("yyyy-MM-dd");
+      return Path.Combine(logDirectory, $"server-{date}.log");
+    }
+
+    // ---------------------------------------------------------------
+    // Shutdown handling
+    // ---------------------------------------------------------------
+
+    public static void Shutdown()
+    {
+      try
+      {
+        queue.CompleteAdding();
+        cts.CancelAfter(3000);
+        writerTask.Wait(3000);
+      }
+      catch
+      {
+      }
+      finally
+      {
+        cts.Dispose();
+      }
+    }
   }
 }
