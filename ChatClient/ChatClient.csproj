@@ -15,6 +15,7 @@
     <None Remove="Resources\CascadiaCode-Regular.ttf" />
     <None Remove="Resources\DuckLord1.2.png" />
     <None Remove="Resources\DuckLord1.2slim.png" />
+    <None Remove="Resources\NewLogo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +41,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Duckquack.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\NewLogo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -14,9 +14,10 @@ namespace ChatClient.UI.Theme
         public static Color BrandBeige = new Color(242, 230, 191, 255); // #F2E6BF
         public static Color BrandGreen = new Color(0, 146, 51, 255); // #009233
         public static Color BrandBrown = new Color(175, 86, 14, 255); // #AF560E
+        public static Color NewBlue = new Color(33, 109, 148); // #216D94
 
         // App layout
-        public static Color BackgroundColor = BrandBlue; // använd loggans blå som bakgrund
+        public static Color BackgroundColor = NewBlue; // använd loggans blå som bakgrund
         public static Color OutlineColor = new Color(8, 60, 80, 255); // mörkare teal för ramar
         public static Color PanelColor = new Color(20, 90, 120, 255); // befintlig (fungerar med brandblue)
 

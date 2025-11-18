@@ -87,7 +87,7 @@ public static class ResourceLoader
 
     private static void LoadTextures()
     {
-        LogoTexture = Raylib.LoadTexture("Resources/DuckLord1.2slim.png");
+        LogoTexture = Raylib.LoadTexture("Resources/NewLogo.png");
         Log.Info("[ResourceLoader] Textures loaded");
     }
 
