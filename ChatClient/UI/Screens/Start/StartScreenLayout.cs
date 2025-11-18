@@ -12,7 +12,7 @@ namespace ChatClient.UI.Screens.Start
     {
         public struct LayoutData
         {
-            public Rectangle UserRect, PassRect, LoginRect, RegisterRect/*, OptionsRect*/;
+            public Rectangle UserRect, PassRect, LoginRect, RegisterRect;
             public float LogoX, LogoY, LogoWidth, LogoHeight, LogoScale, ScreenHeight;
         }
 

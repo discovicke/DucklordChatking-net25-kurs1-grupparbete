@@ -1,21 +1,13 @@
 ﻿using ChatClient.Core.Infrastructure;
 using ChatClient.Core.Input;
 using ChatClient.UI.Components.Text;
-using ChatClient.UI.Rendering;
 using ChatClient.UI.Theme;
 using Raylib_cs;
 
 namespace ChatClient.UI.Components.Base
 {
-    /// <summary>
-    /// Responsible for: rendering and managing text input fields with support for multiline, password masking, clipboard, and undo/redo.
-    /// Handles cursor positioning, text selection, placeholder text, and keyboard input with proper DPI scaling.
-    /// </summary>
     public class TextField : UIComponent
     {
-        // TODO:
-        // - Add text selection support (Mouse drag || shift key)
-
         public string Text { get; private set; } = string.Empty;
         private string FieldName { get; set; } = "TextField";
         private string PlaceholderText { get; set; } = "";
@@ -28,26 +20,15 @@ namespace ChatClient.UI.Components.Base
         private readonly TextRenderer renderer;
         private bool backspaceHandledThisFrame;
 
-        // Undo stack + clipboard helper
         private readonly Stack<string> undoStack = new();
         private const int MaxUndoEntries = 100;
         private readonly ClipboardActions clipboardActions;
-
         private bool movedThisFrame = false;
 
-        //tab logics 
         public bool IsFocused => IsSelected;
-        public void Focus() 
-        {
-            IsSelected = true;
-            cursor.ResetBlink();
-        }
-        public void Blur() 
-        {
-            IsSelected = false;
-            cursor.ResetInvisible();
-        }
-        
+        public void Focus() { IsSelected = true; cursor.ResetBlink(); }
+        public void Blur() { IsSelected = false; cursor.ResetInvisible(); }
+
         public TextField(Rectangle rect, Color backgroundColor, Color hoverColor, Color textColor,
             bool allowMultiline = false, bool isPassword = false, string fieldName = "TextField", string placeholderText = "")
         {
@@ -57,11 +38,9 @@ namespace ChatClient.UI.Components.Base
             AllowMultiline = allowMultiline;
             FieldName = fieldName;
             PlaceholderText = placeholderText;
-
             cursor = new TextCursor();
             renderer = new TextRenderer(rect, textColor, isPassword, allowMultiline);
 
-            // Clipboard helper to inject delegates
             var ctx = new ClipboardContext
             {
                 GetText = () => Text,
@@ -76,16 +55,10 @@ namespace ChatClient.UI.Components.Base
                 FieldName = FieldName
             };
             clipboardActions = new ClipboardActions(ctx);
-            
+
             undoStack.Push(string.Empty);
             SaveStateForUndo();
-
-            
         }
-       
-        
-       
-
 
         private void SaveStateForUndo()
         {
@@ -96,43 +69,38 @@ namespace ChatClient.UI.Components.Base
 
         public override void Draw()
         {
-            // Determine fill color based on state
-            Color fill;
-            if (IsSelected)
-                fill = Colors.TextFieldSelected;
-            else if (MouseInput.IsHovered(Rect))
-                fill = Colors.TextFieldHovered;
-            else
-                fill = Colors.TextFieldUnselected;
+            Color fill = IsSelected
+                ? Colors.TextFieldSelected
+                : (MouseInput.IsHovered(Rect) ? Colors.TextFieldHovered : Colors.TextFieldUnselected);
 
-            // Draw background
             Raylib.DrawRectangleRounded(Rect, 0.1f, 10, fill);
+            Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, IsSelected || MouseInput.IsHovered(Rect) ? 2 : 1, Colors.OutlineColor);
 
-            // Draw border/outline
-            if (IsSelected || MouseInput.IsHovered(Rect))
-            {
-                Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, 2, Colors.OutlineColor);
-            }
-            else
-            {
-                // Subtle outline when not selected/hovered
-                Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, 1, Colors.OutlineColor);
-            }
-
-            // Draw text or placeholder
             if (string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(PlaceholderText))
             {
-                // Draw placeholder text (always shown when text is empty) - smaller font size
-                float textX = Rect.X + 4;
-                float textY = Rect.Y + 4;
-                Raylib.DrawTextEx(ResourceLoader.RegularFont, PlaceholderText,
-                    new System.Numerics.Vector2(textX, textY), 18, 0.5f, Colors.PlaceholderText);
+                const float PlaceholderFontSize = 14f;
+                const float Padding = 8f;
+
+                float x = Rect.X + Padding;
+                float y = Rect.Y + (Rect.Height - PlaceholderFontSize) / 2f;
+                float maxWidth = Rect.Width - (Padding * 2);
+
+                string display = PlaceholderText;
+                var size = Raylib.MeasureTextEx(ResourceLoader.RegularFont, display, PlaceholderFontSize, 0.5f);
+                while (display.Length > 0 && size.X > maxWidth)
+                {
+                    display = display[..^1];
+                    size = Raylib.MeasureTextEx(ResourceLoader.RegularFont, display, PlaceholderFontSize, 0.5f);
+                }
+
+                Raylib.DrawTextEx(ResourceLoader.RegularFont, display, new System.Numerics.Vector2(x, y),
+                    PlaceholderFontSize, 0.5f, Colors.PlaceholderText);
             }
 
-            // Always draw actual text and cursor if there is text or field is selected
             if (!string.IsNullOrEmpty(Text) || IsSelected)
             {
-                renderer.Draw(Text, cursor, IsSelected);
+                // Pass showCursor = IsSelected
+                renderer.Draw(Text, cursor, IsSelected, IsSelected);
             }
         }
 
@@ -141,29 +109,19 @@ namespace ChatClient.UI.Components.Base
             movedThisFrame = false;
             if (MouseInput.IsLeftClick(Rect))
             {
-                if (!IsSelected)
-                {
-                    Log.Info($"[{FieldName}] Field selected");
-                }
+                if (!IsSelected) Log.Info($"[{FieldName}] Field selected");
                 IsSelected = true;
                 cursor.ResetBlink();
             }
             else if (Raylib.IsMouseButtonPressed(MouseButton.Left) && !MouseInput.IsHovered(Rect))
             {
-                if (IsSelected)
-                {
-                    Log.Info($"[{FieldName}] Field deselected - Final text: '{Text}'");
-                }
+                if (IsSelected) Log.Info($"[{FieldName}] Field deselected - Final text: '{Text}'");
                 IsSelected = false;
                 cursor.ResetInvisible();
             }
 
-            if (!IsSelected)
-            { 
-                return; 
-            }
+            if (!IsSelected) return;
 
-            
             cursor.Update(Raylib.GetFrameTime());
             clipboardActions.Process();
 
@@ -181,7 +139,6 @@ namespace ChatClient.UI.Components.Base
                 return;
             }
 
-            // Normal character input
             int key = Raylib.GetCharPressed();
             while (key > 0)
             {
@@ -194,14 +151,11 @@ namespace ChatClient.UI.Components.Base
                         SaveUndoIfChanged();
                         isTypingWord = !isWhitespace;
                     }
-
                     InsertText(c.ToString());
                 }
-
                 key = Raylib.GetCharPressed();
             }
 
-            // Backspace handling (single press / repeat)
             bool backspacePressed = (Raylib.IsKeyPressed(KeyboardKey.Backspace) && !backspaceHandledThisFrame)
                                     || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace);
 
@@ -210,28 +164,22 @@ namespace ChatClient.UI.Components.Base
                 DeleteCharacter();
                 backspaceHandledThisFrame = true;
             }
-            else if (!backspacePressed)
+            else
             {
                 backspaceHandledThisFrame = false;
             }
-
         }
+
         private bool WasLastCharWhitespace()
         {
-            if (string.IsNullOrEmpty(Text) || cursor.Position <= 0)
-            {
-                return false;
-            }
+            if (string.IsNullOrEmpty(Text) || cursor.Position <= 0) return false;
             int idx = Math.Min(cursor.Position - 1, Text.Length - 1);
             return char.IsWhiteSpace(Text[idx]);
         }
 
-        //  Navigation for arrow keys
         private bool TryPress(KeyboardKey key, Action action)
         {
-            if (movedThisFrame) // block duplicate action within same press/frame
-                return false;
-
+            if (movedThisFrame) return false;
             if (Raylib.IsKeyPressed(key))
             {
                 action();
@@ -240,21 +188,16 @@ namespace ChatClient.UI.Components.Base
             }
             return false;
         }
-        // Method for arrow Navigation with Lamda
+
         private void HandleNavigation()
         {
-            if (movedThisFrame)
-            {
-                return;
-            }
-            Log.Error($"HandleNavigation called");
+            if (movedThisFrame) return;
+
             TryPress(KeyboardKey.Left, () => cursor.MoveLeft(Text.Length));
             TryPress(KeyboardKey.Right, () => cursor.MoveRight(Text.Length));
             TryPress(KeyboardKey.Home, () => cursor.MoveToStart());
             TryPress(KeyboardKey.End, () => cursor.MoveToEnd(Text.Length));
         }
-
-
 
         private void InsertText(string s)
         {
@@ -269,15 +212,9 @@ namespace ChatClient.UI.Components.Base
 
         private void DeleteCharacter()
         {
-            if (cursor.Position <= 0 || Text.Length == 0)
-            {
-                return;
-            }
+            if (cursor.Position <= 0 || Text.Length == 0) return;
 
-            if (!isTypingWord)
-            {
-                SaveUndoIfChanged();
-            }
+            if (!isTypingWord) SaveUndoIfChanged();
 
             int removeIndex = Math.Clamp(cursor.Position - 1, 0, Text.Length - 1);
             char deletedChar = Text[removeIndex];
@@ -287,8 +224,8 @@ namespace ChatClient.UI.Components.Base
 
             isTypingWord = true;
             Log.Info($"[{FieldName}] Deleted: '{deletedChar}' at position {removeIndex}");
-
         }
+
         private void SaveUndoIfChanged()
         {
             if (Text != lastSavedState)
@@ -316,7 +253,5 @@ namespace ChatClient.UI.Components.Base
             Text = string.Empty;
             cursor.Reset();
         }
-        // TODO: Mouse click to get position in text
-        // TODO: Crtl backspace to  delete one word
     }
 }

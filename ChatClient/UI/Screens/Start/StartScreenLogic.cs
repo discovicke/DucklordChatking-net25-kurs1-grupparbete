@@ -21,8 +21,8 @@ namespace ChatClient.UI.Screens.Start
         TextField userField,
         TextField passwordField,
         Button loginButton,
-        Button registerButton/*,
-        OptionsButton optionsButton*/) : IScreenLogic
+        Button registerButton) 
+        : IScreenLogic
     {
         // DEV MODE: Set to false before production release
         private const bool DEV_MODE_ENABLED = true;
@@ -67,13 +67,6 @@ namespace ChatClient.UI.Screens.Start
             {
                 NavigateToRegister();
             }
-
-            /*
-            if (MouseInput.IsLeftClick(optionsButton.Rect))
-            {
-                NavigateToOptions();
-            }
-            */
         }
 
         private void Login()
@@ -96,7 +89,7 @@ namespace ChatClient.UI.Screens.Start
             {
                 Log.Success($"[StartScreenLogic] Login successful for user '{username}'");
                 AppState.LoggedInUsername = username;
-                FeedbackBox.Show($"Welcome back, {username}!", true);
+                FeedbackBox.Show($"Welcome duck, {username}!", true);
 
                 Task.Delay(1000).ContinueWith(_ =>
                 {
