@@ -46,7 +46,7 @@ public class ChatDataService
         messages = history ?? new List<MessageDTO>();
 
         latestReceivedMessageId = messages.Count != 0 ? messages.Max(m => m.Id) : 0;
-        
+
         MessagesChanged?.Invoke(messages);
         Log.Info($"[ChatDataService] Loaded {messages.Count} messages, latest ID: {latestReceivedMessageId}");
 
@@ -78,8 +78,16 @@ public class ChatDataService
 
         isPolling = true;
         pollingCts = new CancellationTokenSource();
-        _ = Task.Run(() => PollMessagesAsync(pollingCts.Token));
-        Log.Info("[ChatDataService] Polling started");
+
+        var token = pollingCts.Token;
+
+        // Start message long polling
+        _ = Task.Run(() => PollMessagesAsync(token));
+
+        // Start heartbeat loop
+        _ = Task.Run(() => HeartbeatLoopAsync(token));
+
+        Log.Info("[ChatDataService] Polling + Heartbeat started");
     }
 
     /// <summary>
@@ -107,7 +115,7 @@ public class ChatDataService
 
         Log.Info($"[ChatDataService] Sending message as '{sender}': {text}");
         await handler.SendMessageAsync(text);
-        
+
         // Message will be fetched by polling loop
     }
 
@@ -185,6 +193,23 @@ public class ChatDataService
                 Log.Error($"[Poll] Error: {ex.Message}");
                 await Task.Delay(150, token);
             }
+        }
+    }
+
+    private async Task HeartbeatLoopAsync(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            try
+            {
+                await handler.SendHeartbeatAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[Heartbeat] Failed: {ex.Message}");
+            }
+
+            await Task.Delay(3000, token); // heartbeat every 3 seconds
         }
     }
 

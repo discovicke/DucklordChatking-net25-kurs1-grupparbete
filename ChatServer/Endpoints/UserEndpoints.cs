@@ -170,7 +170,16 @@ public static class UserEndpoints
     .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
+    #region USER HEARTBEAT Check
+    users.MapPost("/heartbeat", (HttpContext context) =>
+    {
+      if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller) || caller == null)
+        return Results.Unauthorized();
 
+      caller.LastSeenUtc = DateTime.UtcNow;
+      return Results.Ok();
+    });
     return users;
   }
+  #endregion
 }

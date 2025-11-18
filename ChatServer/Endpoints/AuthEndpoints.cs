@@ -24,9 +24,6 @@ public static class AuthEndpoints
       if (user == null || user.Password != dto.Password)
         return Results.Unauthorized();
 
-      // Mark the login as activity
-      user.LastSeenUtc = DateTime.UtcNow;
-
       // Update the auth token
       var token = userStore.AssignNewSessionAuthToken(user);
 

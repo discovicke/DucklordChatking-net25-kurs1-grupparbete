@@ -12,7 +12,7 @@ public class UserStore : ConcurrentStoreBase
 
   // Adjust this value to define how long a user remains "online" after their last recorded activity.
   // Any user whose LastSeenUtc (property) is older than this window is treated as offline.
-  public static readonly TimeSpan OnlineWindow = TimeSpan.FromSeconds(30);
+  public static readonly TimeSpan OnlineWindow = TimeSpan.FromSeconds(5);
 
 
   // User ID counter
