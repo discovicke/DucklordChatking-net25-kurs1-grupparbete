@@ -6,7 +6,10 @@ using ChatClient.UI.Components.Text;
 using ChatClient.UI.Screens.Common;
 
 namespace ChatClient.UI.Screens.Options;
-
+/// <summary>
+/// Responsible for: calculating layout positions for all UI elements on the options/settings screen.
+/// Determines field sizes for account updates and window mode toggle buttons (windowed/fullscreen).
+/// </summary>
 // TODO Save settings
 public class OptionsScreenLogic(
     TextField userField,

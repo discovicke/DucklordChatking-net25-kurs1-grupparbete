@@ -7,6 +7,10 @@ using Raylib_cs;
 
 namespace ChatClient.UI.Components.Base;
 
+/// <summary>
+/// Responsible for: rendering a checkbox with label and handling toggle state.
+/// Provides visual feedback through hover effects and checked/unchecked states.
+/// </summary>
 public class ToggleBox : UIComponent
 {
     private string label;
@@ -32,7 +36,7 @@ public class ToggleBox : UIComponent
         // Wrapper background
         Raylib.DrawRectangleRounded(Rect, 0.15f, 8, Colors.TextFieldUnselected);
         Color border = hovered ? Colors.BrandGold : Colors.OutlineColor;
-        Raylib.DrawRectangleRoundedLinesEx(Rect, 0.15f, 8, BorderThickness, border);
+        Raylib.DrawRectangleRoundedLinesEx(Rect, 0.15f, 8, BorderThickness, Colors.OutlineColor);
 
         // Compute checkbox size (square) relative to wrapper
         float boxSize = Rect.Width * 0.5f;
@@ -47,8 +51,8 @@ public class ToggleBox : UIComponent
 
         // Checkbox fill
         Color boxFill = isChecked ? Colors.BrandGold : Colors.TextFieldUnselected;
-        Raylib.DrawRectangleRounded(boxRect, 0.2f, 4, boxFill);
-        Raylib.DrawRectangleRoundedLinesEx(boxRect, 0.2f, 4, 2, border);
+        Raylib.DrawRectangleRounded(boxRect, 60f, 4, boxFill);
+        Raylib.DrawRectangleRoundedLinesEx(boxRect, 60f, 4, 2, border);
 
         // Check indicator
         if (isChecked)
@@ -60,7 +64,7 @@ public class ToggleBox : UIComponent
         }
 
         // Label below checkbox
-        int fontSize = (int)(boxSize * 0.8f);
+        int fontSize = 14;
         Vector2 measure = Raylib.MeasureTextEx(ResourceLoader.RegularFont, label, fontSize, 0.5f);
         float textX = Rect.X + (Rect.Width - measure.X) / 2f;
         float textY = boxY + boxSize + LabelGap;
@@ -72,7 +76,6 @@ public class ToggleBox : UIComponent
         if (MouseInput.IsLeftClick(Rect))
         {
             isChecked = !isChecked;
-            Raylib.PlaySound(ResourceLoader.ButtonSound);
         }
     }
 

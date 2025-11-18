@@ -57,7 +57,7 @@ public static class OptionsScreenLayout
         // Toggle wrappers below confirm
         float toggleBoxSize = h * 0.025f; // intended checkbox size
         float labelHeightApprox = toggleBoxSize * 0.8f;
-        float wrapperW = toggleBoxSize * 2f;
+        float wrapperW = toggleBoxSize * 5f;
         float wrapperH = toggleBoxSize + 5f + labelHeightApprox + 8f; // 8px internal padding
         float toggleY = confirmY + btnH + (GapBetweenItems * 3);
 
