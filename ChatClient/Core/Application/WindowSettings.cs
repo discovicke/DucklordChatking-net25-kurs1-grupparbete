@@ -1,4 +1,4 @@
-using ChatClient.Core.Infrastructure;
+﻿using ChatClient.Core.Infrastructure;
 using Raylib_cs;
 
 namespace ChatClient.Core.Application;

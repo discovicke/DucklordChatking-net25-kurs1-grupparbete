@@ -11,7 +11,7 @@ namespace ChatClient.UI.Components.Specialized
     public class OptionsButton : Button
     {
         public OptionsButton(Rectangle rect)
-            : base(rect, "Ducktions", Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor)
+            : base(rect, "Options", Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor)
         {
         }
 

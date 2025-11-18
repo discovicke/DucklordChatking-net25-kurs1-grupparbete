@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using ChatClient.Core.Application;
 
 namespace ChatClient.Core.Infrastructure;

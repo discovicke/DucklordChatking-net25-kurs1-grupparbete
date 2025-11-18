@@ -11,7 +11,7 @@ public static class ChatScreenLayout
 {
     public struct LayoutData
     {
-        public Rectangle ChatRect, InputRect, SendRect, BackRect, UserListRect;
+        public Rectangle ChatRect, InputRect, SendRect, BackRect, UserListRect, OptionsRect;
         public float LogoX, LogoY, LogoScale, LogoWidth, LogoHeight;
     }
 
@@ -53,6 +53,9 @@ public static class ChatScreenLayout
         var inputRect = new Rectangle(chatX, inputY, inputW, inputH);
         var sendRect = new Rectangle(chatX + inputW + 10f, inputY, btnW, inputH);
         var backRect = new Rectangle(10, 10, 100, 30);
+        // --- Options ---
+        var optionsRect = new Rectangle(800, 10, 70, 30);
+        // --- ---
         var userListRect = new Rectangle(userListX, userListY, userListW, userListH);
 
         return new LayoutData
@@ -66,7 +69,10 @@ public static class ChatScreenLayout
             LogoX = logoX,
             LogoY = logoY,
             LogoWidth = scaledLogoWidth,
-            LogoHeight = scaledLogoHeight
+            LogoHeight = scaledLogoHeight,
+            // --- Options ---
+            OptionsRect = optionsRect
+            // --- ---
         };
     }
 }

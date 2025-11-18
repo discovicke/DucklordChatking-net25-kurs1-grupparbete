@@ -30,11 +30,11 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
     private readonly Button loginButton = new(new Rectangle(0, 0, 0, 0), "Login",
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
 
-    private readonly OptionsButton optionsButton = new(new Rectangle(0, 0, 0, 0));
+    //private readonly OptionsButton optionsButton = new(new Rectangle(0, 0, 0, 0));
 
     public StartScreen()
     {
-        logic = new StartScreenLogic(userField, passwordField, loginButton, registerButton, optionsButton);
+        logic = new StartScreenLogic(userField, passwordField, loginButton, registerButton/*, optionsButton*/);
     }
 
     protected override StartScreenLayout.LayoutData CalculateLayout() =>
@@ -46,7 +46,7 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
         passwordField.SetRect(layout.PassRect);
         loginButton.SetRect(layout.LoginRect);
         registerButton.SetRect(layout.RegisterRect);
-        optionsButton.SetRect(layout.OptionsRect);
+        //optionsButton.SetRect(layout.OptionsRect);
     }
 
     public override void RenderContent()
@@ -58,7 +58,7 @@ public class StartScreen : ScreenBase<StartScreenLayout.LayoutData>
 
         registerButton.Draw();
         loginButton.Draw();
-        optionsButton.Draw();
+        //optionsButton.Draw();
 
         Raylib.DrawTextureEx(ResourceLoader.LogoTexture,
             new Vector2(layout.LogoX, layout.LogoY),

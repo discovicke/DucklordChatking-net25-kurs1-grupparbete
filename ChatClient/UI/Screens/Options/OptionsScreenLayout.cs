@@ -1,4 +1,4 @@
-using Raylib_cs;
+﻿using Raylib_cs;
 using ChatClient.UI.Components;
 using ChatClient.UI.Components.Layout;
 
@@ -12,7 +12,7 @@ public static class OptionsScreenLayout
 {
     public struct LayoutData
     {
-        public Rectangle UserRect, PassRect, PassConfirmRect, ConfirmRect, BackRect;
+        public Rectangle UserRect, PassRect, PassConfirmRect, ConfirmRect, BackRect, OptionsRect;
         public Rectangle BtnWindowedRect, BtnFullscreenRect;
         public float LogoX, LogoY, LogoScale, LogoWidth, LogoHeight;
     }
@@ -47,9 +47,12 @@ public static class OptionsScreenLayout
             PassConfirmRect = wrap.CenterHoriz(fieldW, fieldH, colTop + 2 * (fieldH + gap)),
             ConfirmRect = wrap.CenterHoriz(btnW, btnH, colTop + 3 * (fieldH + gap)),
             BackRect = new Rectangle(10, 10, 100, 30),
+            // --- Options ---
+            OptionsRect = new Rectangle(10, 100, 100, 30),
+            // --- ---
             LogoScale = logoScale,
-            BtnWindowedRect = new Rectangle(w/2 - windowBtnW - windowBtnGap/2, btnTop, windowBtnW, windowBtnH),
-            BtnFullscreenRect = new Rectangle(w/2 + windowBtnGap/2, btnTop, windowBtnW, windowBtnH),
+            BtnWindowedRect = new Rectangle(w / 2 - windowBtnW - windowBtnGap / 2, btnTop, windowBtnW, windowBtnH),
+            BtnFullscreenRect = new Rectangle(w / 2 + windowBtnGap / 2, btnTop, windowBtnW, windowBtnH),
             LogoX = (w - logoWidth * logoScale) / 2f,
             LogoY = h * 0.10f,
             LogoWidth = logoWidth * logoScale,

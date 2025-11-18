@@ -12,7 +12,7 @@ namespace ChatClient.UI.Screens.Start
     {
         public struct LayoutData
         {
-            public Rectangle UserRect, PassRect, LoginRect, RegisterRect, OptionsRect;
+            public Rectangle UserRect, PassRect, LoginRect, RegisterRect/*, OptionsRect*/;
             public float LogoX, LogoY, LogoWidth, LogoHeight, LogoScale, ScreenHeight;
         }
 
@@ -54,7 +54,7 @@ namespace ChatClient.UI.Screens.Start
                 PassRect = wrapper.CenterHoriz(fieldWidth, fieldHeight, colTop + fieldHeight + gap),
                 LoginRect = wrapper.CenterHoriz(buttonWidth, buttonHeight, colTop + 2 * (fieldHeight + gap)),
                 RegisterRect = wrapper.CenterHoriz(buttonWidth, buttonHeight, colTop + 3 * (fieldHeight + gap)),
-                OptionsRect = wrapper.CenterHoriz(buttonWidth, buttonHeight, colTop + 4 * (fieldHeight + gap)),
+                //OptionsRect = wrapper.CenterHoriz(buttonWidth, buttonHeight, colTop + 4 * (fieldHeight + gap)),
                 LogoScale = logoScale,
                 LogoX = logoX,
                 LogoY = logoY,

@@ -1,9 +1,10 @@
-﻿using Raylib_cs;
-using System.Numerics;
-using ChatClient.Core.Infrastructure;
+﻿using ChatClient.Core.Infrastructure;
 using ChatClient.Core.Input;
 using ChatClient.UI.Screens.Common;
 using ChatClient.UI.Theme;
+using Raylib_cs;
+using System.Numerics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatClient;
 
@@ -46,6 +47,7 @@ public class Program
             // --- UI ---
             // Tracks current screen and runs it.
             ScreenRouter.RunCurrent();
+
 
             // Version text in bottom-left corner (always on top, updates position on window resize)
             int screenHeight = Raylib.GetScreenHeight();
