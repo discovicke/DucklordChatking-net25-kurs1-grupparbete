@@ -137,7 +137,7 @@ public static class UserEndpoints
     #endregion
 
     #region GET ALL USER STATUSES
-    users.MapGet("/users/status", (HttpContext context) =>
+    users.MapGet("/status", (HttpContext context) =>
     {
       // 401: authentication required
       if (!AuthUtils.TryAuthenticate(context.Request, userStore, out var caller))
