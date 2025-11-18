@@ -111,8 +111,9 @@ namespace ChatClient.UI.Screens.Start
 
         private void DevLogin()
         {
+            // TODO DEV LOGIN
             Log.Info("[StartScreenLogic] DEV MODE: Quack login activated (Ctrl+Shift+D)");
-            AppState.LoggedInUsername = "DevUser";
+            AppState.LoggedInUsername = "Ducklord";
             AppState.CurrentScreen = Screen.Chat;
             ClearFields();
         }
