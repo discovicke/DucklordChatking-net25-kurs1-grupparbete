@@ -28,14 +28,23 @@ namespace ChatClient.UI.Screens.Start
             float h = wrapper.Height;
             
             float colTop = h * 0.45f;
-            
+
             // Logo
-            float logoTargetW = w * 0.15f;
+            float logoTargetW;
+            if (h < 800)
+            {
+                logoTargetW = w * 0.40f; // Larger logo in small window
+            }
+            else
+            {
+                logoTargetW = w * 0.15f; // Smaller logo in fullscreen
+            }
+
             float logoScale = logoWidth > 0 ? logoTargetW / logoWidth : 0.15f;
             float scaledLogoHeight = logoHeight * logoScale;
             float scaledLogoWidth = logoWidth * logoScale;
             float logoX = (w - scaledLogoWidth) / 2f;
-            float logoY = h * 0.10f;
+            float logoY = 10f; 
             
             // Dynamic sizing based on screen dimensions
             float fieldWidth = w * 0.3f;
