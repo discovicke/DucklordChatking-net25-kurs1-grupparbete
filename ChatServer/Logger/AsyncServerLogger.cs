@@ -12,6 +12,43 @@ namespace ChatServer.Logger
     Error,
     Critical
   }
+  /// <summary>
+  /// Global asynchronous server logger with a background write queue, file rotation,
+  /// graceful shutdown, severity filtering, and structured log formatting.
+  /// Safe to call from anywhere in the server.
+  /// </summary>
+  public static class ServerLog
+  {
+    private static readonly BlockingCollection<string> queue = new();
+    private static readonly CancellationTokenSource cts = new();
+
+    private static readonly string logDirectory = "logs";
+    private static readonly long maxFileSizeBytes = 10 * 1024 * 1024; // 10 MB rotation
+    private static readonly ServerLogLevel minimumLevel = ServerLogLevel.Info;
+
+    private static readonly Task writerTask;
+    private static string currentLogFile;
+
+    // Static constructor initializes the logger once for the entire app
+    static ServerLog()
+    {
+      Directory.CreateDirectory(logDirectory);
+      currentLogFile = CreateLogFilePath();
+
+      writerTask = Task.Run(() => WriterLoop(cts.Token));
+    }
+
+    // ---------------------------------------------------------------
+    // Public logging API
+    // ---------------------------------------------------------------
+
+    public static void Trace(string message) => Write(ServerLogLevel.Trace, message);
+    public static void Info(string message) => Write(ServerLogLevel.Info, message);
+    public static void Warning(string message) => Write(ServerLogLevel.Warning, message);
+    public static void Success(string message) => Write(ServerLogLevel.Success, message);
+    public static void Error(string message) => Write(ServerLogLevel.Error, message);
+    public static void Critical(string message) => Write(ServerLogLevel.Critical, message);
 
 
+  }
 }
