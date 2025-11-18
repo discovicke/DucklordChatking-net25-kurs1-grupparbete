@@ -1,4 +1,4 @@
-using ChatClient.UI.Components;
+using ChatClient.Core.Application;
 using ChatClient.UI.Components.Base;
 using Raylib_cs;
 using Shared;
@@ -8,9 +8,8 @@ namespace ChatClient.UI.Screens.Chat.Components;
 /// <summary>
 /// Responsible for: wrapping MessageDTO into ChatMessage bubbles, measuring, scrolling and rendering.
 /// </summary>
-public class ChatMessagesView
+public class ChatMessagesView(ScrollablePanel panel)
 {
-    private readonly ScrollablePanel panel;
     private Rectangle bounds;
 
     private readonly List<ChatMessage> bubbles = new();
@@ -24,11 +23,6 @@ public class ChatMessagesView
     private const float PaddingBottom = 10f;
     private const float LeftInset = 10f;
     private const float BottomTolerancePx = 24f;
-
-    public ChatMessagesView(ScrollablePanel panel)
-    {
-        this.panel = panel;
-    }
 
     public void SetBounds(Rectangle bounds)
     {
@@ -49,9 +43,13 @@ public class ChatMessagesView
         if (bubbles.Count != messages.Count || Math.Abs(contentWidth - GetCurrentContentWidth()) > 0.5f)
         {
             bubbles.Clear();
+            string loggedInUser = AppState.LoggedInUsername ?? string.Empty;
+            
             foreach (var m in messages)
             {
-                bubbles.Add(new ChatMessage(m, contentWidth));
+                bool isOwnMessage = !string.IsNullOrWhiteSpace(m.Sender) && 
+                                   m.Sender.Equals(loggedInUser, StringComparison.OrdinalIgnoreCase);
+                bubbles.Add(new ChatMessage(m, contentWidth, isOwnMessage));
             }
         }
     }
@@ -82,14 +80,16 @@ public class ChatMessagesView
             firstLoad = false;
         }
 
-        // Draw bubbles
+        // Draw bubbles with container width for alignment
         float currentY = bounds.Y + PaddingTop;
+        float contentWidth = bounds.Width - (LeftInset * 2); // Left + right inset
+        
         foreach (var b in bubbles)
         {
             float scrolledY = panel.GetScrolledY(currentY);
             if (panel.IsVisible(scrolledY, b.Height))
             {
-                b.Draw(bounds.X + LeftInset, scrolledY);
+                b.Draw(bounds.X + LeftInset, scrolledY, contentWidth);
             }
             currentY += b.Height + Spacing;
         }
@@ -105,7 +105,6 @@ public class ChatMessagesView
 
     private float GetCurrentContentWidth()
     {
-        return MathF.Max(0, bounds.Width - LeftInset * 2);
+        return bubbles.Count > 0 ? bubbles[0].Width : 0f;
     }
 }
-

@@ -11,9 +11,8 @@ namespace ChatClient.UI.Screens.Chat.Services;
 /// Responsible for: async polling of message updates, sending messages, and managing background polling loop.
 /// Uses async/await pattern with CancellationToken for proper lifecycle management.
 /// </summary>
-public class ChatDataService
+public class ChatDataService(MessageHandler handler)
 {
-    private readonly MessageHandler handler;
     private List<MessageDTO> messages = new();
     private int latestReceivedMessageId;
     private bool hasLoadedInitialHistory;
@@ -24,11 +23,6 @@ public class ChatDataService
 
     public event Action<IReadOnlyList<MessageDTO>>? MessagesChanged;
     public event Action<IReadOnlyList<UserStatusDTO>>? UsersStatusChanged;
-
-    public ChatDataService(MessageHandler handler)
-    {
-        this.handler = handler;
-    }
 
     /// <summary>
     /// Loads initial chat history. Should be called once before starting polling.

@@ -13,6 +13,7 @@ namespace ChatClient.UI.Screens.Chat.Components;
 public class ChatMessage
 {
     private readonly MessageDTO message;
+    private readonly bool isOwnMessage;
     private readonly string displayText;
     private readonly float maxWidth;
     private readonly List<string> wrappedLines;
@@ -23,9 +24,10 @@ public class ChatMessage
     private const float LineSpacing = 18f;
     private const float FontSize = 14f;
 
-    public ChatMessage(MessageDTO message, float maxWidth)
+    public ChatMessage(MessageDTO message, float maxWidth, bool isOwnMessage)
     {
         this.message = message;
+        this.isOwnMessage = isOwnMessage;
         this.maxWidth = maxWidth - (Padding * 2);
 
         string sender = string.IsNullOrWhiteSpace(message.Sender) ? "Unknown Duck" : message.Sender;
@@ -84,11 +86,17 @@ public class ChatMessage
 
         return lines;
     }
-    public void Draw(float x, float y)
+
+    public void Draw(float x, float y, float containerWidth)
     {
-        // Draw bubble bakgrund
-        var bubbleRect = new Rectangle(x, y, Width, Height);
-        Raylib.DrawRectangleRounded(bubbleRect, 0.15f, 8, Colors.ChatBubbleOther);
+        // Right-align own messages
+        float bubbleX = isOwnMessage ? x + containerWidth - Width : x;
+
+        // Draw bubble background
+        var bubbleRect = new Rectangle(bubbleX, y, Width, Height);
+        var bubbleColor = isOwnMessage ? Colors.ChatBubbleSelf : Colors.ChatBubbleOther;
+        
+        Raylib.DrawRectangleRounded(bubbleRect, 0.15f, 8, bubbleColor);
         Raylib.DrawRectangleRoundedLinesEx(bubbleRect, 0.15f, 8, 1, Colors.OutlineColor);
 
         // Draw text
@@ -105,7 +113,7 @@ public class ChatMessage
             var color = i < headerLineCount ? Colors.UiText : Colors.InputText;
 
             Raylib.DrawTextEx(font, wrappedLines[i],
-                new Vector2(x + Padding, textY), FontSize, 0.5f, color);
+                new Vector2(bubbleX + Padding, textY), FontSize, 0.5f, color);
 
             textY += LineSpacing;
         }

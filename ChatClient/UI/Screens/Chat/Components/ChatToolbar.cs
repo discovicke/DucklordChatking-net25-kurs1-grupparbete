@@ -8,18 +8,9 @@ namespace ChatClient.UI.Screens.Chat.Components;
 /// Responsible for: rendering and handling input for the message input field + send button.
 /// Raises SendPressed event when user submits a message.
 /// </summary>
-public class ChatToolbar
+public class ChatToolbar(TextField inputField, Button sendButton)
 {
-    private readonly TextField inputField;
-    private readonly Button sendButton;
-
     public event Action<string>? SendPressed;
-
-    public ChatToolbar(TextField inputField, Button sendButton)
-    {
-        this.inputField = inputField;
-        this.sendButton = sendButton;
-    }
 
     public void SetBounds(Rectangle inputRect, Rectangle sendRect)
     {
