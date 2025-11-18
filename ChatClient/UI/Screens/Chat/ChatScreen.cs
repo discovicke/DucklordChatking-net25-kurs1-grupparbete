@@ -36,6 +36,9 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private List<MessageDTO> currentMessages = new();
     private List<string> online = new();
     private List<string> offline = new();
+
+    public bool startedPolling = false;
+
     #endregion
 
     public ChatScreen()
@@ -157,6 +160,8 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     public void StopPolling()
     {
         dataService.StopPolling();
+        startedPolling = false;
+        toolbar.ClearInput();
     }
     #endregion
 
@@ -195,8 +200,14 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             return;
         }
 
+        if (startedPolling)
+        {
+            return;
+        }
+
         toolbar.ClearInput();
         dataService.StartPolling();
+        startedPolling = true;
     }
     #endregion
 }
