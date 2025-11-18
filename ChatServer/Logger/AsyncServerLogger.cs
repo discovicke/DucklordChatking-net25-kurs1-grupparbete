@@ -57,5 +57,32 @@ namespace ChatServer.Logger
       string line = $"[{timestamp}] [{level}] {message}";
       queue.Add(line);
     }
-  }
-}
+
+    // ---------------------------------------------------------------
+    // Background writer loop
+    // ---------------------------------------------------------------
+
+    private static async Task WriterLoop(CancellationToken token)
+    {
+      try
+      {
+        foreach (var line in queue.GetConsumingEnumerable(token))
+        {
+          try
+          {
+            RotateIfNeeded();
+            await File.AppendAllTextAsync(currentLogFile, line + Environment.NewLine, token);
+          }
+          catch
+          {
+            Console.WriteLine(line);
+          }
+        }
+      }
+      catch (OperationCanceledException)
+      {
+      }
+    }
+
+
+}}
