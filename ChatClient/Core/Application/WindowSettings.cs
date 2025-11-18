@@ -38,7 +38,7 @@ public static class WindowSettings
             {
                 case Screen.Start:
                 case Screen.Register:
-                    Raylib.SetWindowSize(576, 1024);
+                    Raylib.SetWindowSize(500, 750);
                     break;
                     
                 case Screen.Chat:

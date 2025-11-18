@@ -22,7 +22,7 @@ public class Program
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
 
         
-        Raylib.InitWindow(1024, 1024, appVersion);
+        Raylib.InitWindow(500, 500, appVersion);
         Raylib.SetTargetFPS(60);
         
         // For ducksound
@@ -34,7 +34,7 @@ public class Program
         Console.WriteLine($"Log path: {AppDomain.CurrentDomain.BaseDirectory}log.txt");
         Log.Write("Program started.");
         
-        Raylib.SetWindowSize(1024, 1024);
+        Raylib.SetWindowSize(500, 500);
         while (!Raylib.WindowShouldClose())
         {
             // --- Mouse settings ---
