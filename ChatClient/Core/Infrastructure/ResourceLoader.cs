@@ -22,6 +22,9 @@ public static class ResourceLoader
 
     // --- Sounds ---
     public static Sound ButtonSound { get; private set; }
+    public static Sound NotificationSound { get; private set; }
+    public static Sound TypingSound { get; private set; }
+    public static Sound BackspaceSound { get; private set; }
 
     // Load all resources. Call this once at application startup after Raylib.InitWindow().
     public static void LoadAll()
@@ -93,8 +96,23 @@ public static class ResourceLoader
 
     private static void LoadSounds()
     {
+        // SendButton sound
         ButtonSound = Raylib.LoadSound("Resources/Duckquack.mp3");
         Raylib.SetSoundVolume(ResourceLoader.ButtonSound, 0.1f);
+        
+
+        // Notification sound
+        NotificationSound = Raylib.LoadSound("Resources/MessageDuck.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.NotificationSound, 0.1f);
+
+        // Typing sound
+        TypingSound = Raylib.LoadSound("Resources/MessageTyping.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.TypingSound, 0.1f);
+
+        // Backspace sound
+        BackspaceSound = Raylib.LoadSound("Resources/MessageDelete.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.BackspaceSound, 0.05f);
+
         Log.Info("[ResourceLoader] Sounds loades");
     }
 

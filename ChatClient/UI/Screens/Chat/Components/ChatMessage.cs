@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using ChatClient.Core.Infrastructure;
 using ChatClient.UI.Theme;
 using Raylib_cs;
@@ -24,7 +24,7 @@ public class ChatMessage
     private const float LineSpacing = 18f;
     private const float FontSize = 14f;
 
-    public ChatMessage(MessageDTO message, float maxWidth, bool isOwnMessage)
+    public ChatMessage(MessageDTO message, float maxWidth, bool isOwnMessage, bool playNotificationSound = false)
     {
         this.message = message;
         this.isOwnMessage = isOwnMessage;
@@ -57,6 +57,13 @@ public class ChatMessage
 
         Width = maxLineWidth + (Padding * 2);
         Height = wrappedLines.Count * LineSpacing + (Padding * 2);
+
+        // Notification sound
+        if (playNotificationSound && !isOwnMessage)
+        {
+            Raylib.PlaySound(ResourceLoader.NotificationSound);
+        }
+
     }
 
     private List<string> WrapText(string text, Font font)

@@ -1,4 +1,4 @@
-using ChatClient.Core.Application;
+﻿using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
 using ChatClient.UI.Screens.Chat;
 using ChatClient.UI.Screens.Options;

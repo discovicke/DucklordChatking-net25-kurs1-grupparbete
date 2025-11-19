@@ -208,6 +208,10 @@ namespace ChatClient.UI.Components.Base
 
             string displayChar = s == "\n" ? "\\n" : s;
             Log.Info($"[{FieldName}] Text inserted: '{displayChar}' - Current text: '{Text.Replace("\n", "\\n")}'");
+
+            // Typing Sound
+            Raylib.PlaySound(ResourceLoader.TypingSound);
+
         }
 
         private void DeleteCharacter()
@@ -221,6 +225,9 @@ namespace ChatClient.UI.Components.Base
             Text = Text.Remove(removeIndex, 1);
             cursor.Position = removeIndex;
             cursor.ResetBlink();
+
+            // Backspace sound
+            Raylib.PlaySound(ResourceLoader.BackspaceSound);
 
             isTypingWord = true;
             Log.Info($"[{FieldName}] Deleted: '{deletedChar}' at position {removeIndex}");
