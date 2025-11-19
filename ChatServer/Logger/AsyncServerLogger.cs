@@ -24,7 +24,7 @@ namespace ChatServer.Logger
 
     private static readonly string logDirectory = "logs";
     private static readonly long maxFileSizeBytes = 10 * 1024 * 1024; // 10 MB rotation
-    private static readonly ServerLogLevel minimumLevel = ServerLogLevel.Info;
+    private static readonly ServerLogLevel minimumLevel = ServerLogLevel.Trace;
 
     private static readonly Task writerTask;
     private static string currentLogFile;
