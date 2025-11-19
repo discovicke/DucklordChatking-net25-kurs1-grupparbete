@@ -87,6 +87,9 @@ namespace ChatClient.UI.Screens.Start
 
             if (success)
             {
+                // --- Login sound ---
+                Raylib.PlaySound(ResourceLoader.LoginSound);
+
                 Log.Success($"[StartScreenLogic] Login successful for user '{username}'");
                 AppState.LoggedInUsername = username;
                 FeedbackBox.Show($"Welcome duck, {username}!", true);
@@ -99,6 +102,9 @@ namespace ChatClient.UI.Screens.Start
             }
             else
             {
+                // --- Failed login sound ---
+                Raylib.PlaySound(ResourceLoader.FailedSound);
+
                 Log.Error($"[StartScreenLogic] Login failed for user '{username}' - Invalid credentials");
                 FeedbackBox.Show("DUCK! Login failed, check your credentials.", false);
             }
@@ -113,6 +119,9 @@ namespace ChatClient.UI.Screens.Start
     
             if (success)
             {
+                // --- Login sound ---
+                Raylib.PlaySound(ResourceLoader.LoginSound);
+
                 Log.Success("[StartScreenLogic] DEV MODE: Login successful for Ducklord");
                 AppState.LoggedInUsername = "Ducklord";
                 FeedbackBox.Show("DEV MODE: Welcome back, Ducklord!", true);
@@ -125,6 +134,9 @@ namespace ChatClient.UI.Screens.Start
             }
             else
             {
+                // --- Failed login sound ---
+                Raylib.PlaySound(ResourceLoader.FailedSound);
+
                 Log.Error("[StartScreenLogic] DEV MODE: Login failed for Ducklord - Invalid credentials");
                 FeedbackBox.Show("DEV MODE: Login failed!", false);
             }

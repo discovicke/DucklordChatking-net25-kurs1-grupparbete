@@ -119,7 +119,7 @@ public static class ResourceLoader
         LoginSound = Raylib.LoadSound("Resources/LoginSound.mp3");
         Raylib.SetSoundVolume(ResourceLoader.LoginSound, 0.05f);
 
-        FailedSound = Raylib.LoadSound("Resources/Failed.mp3");
+        FailedSound = Raylib.LoadSound("Resources/FailedSound.mp3");
         Raylib.SetSoundVolume(ResourceLoader.FailedSound, 0.1f);
 
 
