@@ -26,6 +26,9 @@ public static class ResourceLoader
     public static Sound TypingSound { get; private set; }
     public static Sound BackspaceSound { get; private set; }
 
+    public static Sound LoginSound { get; private set; }
+    public static Sound FailedSound { get; private set; }
+
     // Load all resources. Call this once at application startup after Raylib.InitWindow().
     public static void LoadAll()
     {
@@ -113,6 +116,13 @@ public static class ResourceLoader
         BackspaceSound = Raylib.LoadSound("Resources/MessageDelete.mp3");
         Raylib.SetSoundVolume(ResourceLoader.BackspaceSound, 0.05f);
 
+        LoginSound = Raylib.LoadSound("Resources/LoginSound.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.LoginSound, 0.05f);
+
+        FailedSound = Raylib.LoadSound("Resources/Failed.mp3");
+        Raylib.SetSoundVolume(ResourceLoader.FailedSound, 0.1f);
+
+
         Log.Info("[ResourceLoader] Sounds loades");
     }
 
@@ -136,6 +146,11 @@ public static class ResourceLoader
     private static void UnloadSounds()
     {
         Raylib.UnloadSound(ButtonSound);
+        Raylib.UnloadSound(NotificationSound);
+        Raylib.UnloadSound(TypingSound);
+        Raylib.UnloadSound(BackspaceSound);
+        Raylib.UnloadSound(LoginSound);
+        Raylib.UnloadSound(FailedSound);
         Log.Info("[ResourceLoader] Sounds unloaded");
     }
 }

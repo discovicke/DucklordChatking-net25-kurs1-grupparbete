@@ -15,6 +15,8 @@
     <None Remove="Resources\CascadiaCode-Regular.ttf" />
     <None Remove="Resources\DuckLord1.2.png" />
     <None Remove="Resources\DuckLord1.2slim.png" />
+    <None Remove="Resources\FailedSound.mp3" />
+    <None Remove="Resources\LoginSound.mp3" />
     <None Remove="Resources\MessageDelete.mp3" />
     <None Remove="Resources\MessageDuck.mp3" />
     <None Remove="Resources\MessageTyping.mp3" />
@@ -44,6 +46,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Duckquack.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\FailedSound.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\LoginSound.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\MessageDelete.mp3">
