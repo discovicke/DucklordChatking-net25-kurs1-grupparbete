@@ -17,7 +17,7 @@ public class Program
 
     public static void Main()
     {
-        string appVersion = "2 girls, 1 duck v.0.2.4";
+        string appVersion = "DuckLord v.0.5.1";
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
 
 
