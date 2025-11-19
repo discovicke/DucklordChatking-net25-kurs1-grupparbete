@@ -96,6 +96,8 @@ public static class MessageEndpoints
       var updates = messageStore.GetMessagesAfter(lastId);
       if (updates.Count > 0)
       {
+        ServerLog.Trace($"Immediate updates returned for '{caller.Username}' ({updates.Count} messages)");
+
         var dtoUpdates = updates.Select(m => new MessageDTO
         {
           Id = m.Id,
@@ -107,6 +109,9 @@ public static class MessageEndpoints
         return Results.Ok(dtoUpdates);
       }
 
+      // LOG: No immediate updates, waiting
+      ServerLog.Trace($"No immediate updates for '{caller.Username}'. Entering wait state...");
+
       // 2. Wait for notification or timeout
       var waitTask = notifier.WaitForNextMessageAsync();
       var timeoutTask = Task.Delay(25000);
@@ -114,7 +119,13 @@ public static class MessageEndpoints
       var completed = await Task.WhenAny(waitTask, timeoutTask);
 
       if (completed == timeoutTask)
+      {
+        ServerLog.Warning($"Long-poll timeout for '{caller.Username}' (25 seconds, no new messages)");
         return Results.Ok(new List<MessageDTO>());
+      }
+
+      // LOG: Notified by MessageNotifier
+      ServerLog.Trace($"Notifier woke long-poll request for '{caller.Username}'");
 
       // 3. Fetch updates again after being signaled (if timeout was not reached before signaling)
       updates = messageStore.GetMessagesAfter(lastId);
@@ -126,6 +137,9 @@ public static class MessageEndpoints
         Content = m.Content,
         Timestamp = m.Timestamp
       }).ToList();
+
+      // LOG: Returning updates after notifier signal
+      ServerLog.Info($"Long-poll response for '{caller.Username}': {dtoUpdatesAfterNotify.Count} new messages");
 
       return Results.Ok(dtoUpdatesAfterNotify);
     })

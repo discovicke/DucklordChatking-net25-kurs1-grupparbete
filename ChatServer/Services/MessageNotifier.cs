@@ -1,3 +1,5 @@
+using ChatServer.Logger;
+
 namespace ChatServer.Services
 {
   /// <summary>
@@ -30,6 +32,7 @@ namespace ChatServer.Services
       lock (waitersLock)
         waiters.Add(tcs);
 
+      ServerLog.Trace("Registered long-poll waiter");
       return tcs.Task;
     }
 
@@ -45,6 +48,8 @@ namespace ChatServer.Services
         snapshot = new List<TaskCompletionSource<bool>>(waiters);
         waiters.Clear();
       }
+
+      ServerLog.Info($"Notifier: Waking {snapshot.Count} waiting clients");
 
       foreach (var waiter in snapshot)
         waiter.TrySetResult(true);
