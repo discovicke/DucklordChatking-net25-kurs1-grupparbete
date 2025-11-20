@@ -88,6 +88,7 @@ public static class WindowSettings
         {
             return;
         }
+        Raylib.SetWindowPosition(Raylib.GetScreenWidth() / 2 - 100, Raylib.GetScreenHeight() / 2 - 150);
 
         WindowedWidth = Raylib.GetScreenWidth();
         WindowedHeight = Raylib.GetScreenHeight();
@@ -113,7 +114,6 @@ public static class WindowSettings
         }
 
         Raylib.SetWindowSize(WindowedWidth, WindowedHeight);
-        Raylib.SetWindowPosition(WindowedX, WindowedY);
     }
 
     private static void ApplyBorderlessMode()

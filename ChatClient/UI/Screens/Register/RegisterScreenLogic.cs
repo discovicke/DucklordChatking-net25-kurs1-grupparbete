@@ -16,13 +16,13 @@ namespace ChatClient.UI.Screens.Register;
 /// </summary>
 public class RegisterScreenLogic : ScreenLogicBase
 {
-    private readonly TextField userField;
-    private readonly TextField passField;
-    private readonly TextField passConfirmField;
-    private readonly Button registerButton;
-    private readonly BackButton backButton;
-    private readonly IFeedbackService feedback;
-    private readonly UserAuth userAuth;
+    private readonly TextField UserField;
+    private readonly TextField PassField;
+    private readonly TextField PassConfirmField;
+    private readonly Button RegisterButton;
+    private readonly BackButton BackButton;
+    private readonly IFeedbackService Feedback;
+    private readonly UserAuth UserAuth;
 
     public FeedbackBox FeedbackBox { get; }
 
@@ -33,15 +33,15 @@ public class RegisterScreenLogic : ScreenLogicBase
         Button registerButton,
         BackButton backButton)
     {
-        this.userField = userField;
-        this.passField = passField;
-        this.passConfirmField = passConfirmField;
-        this.registerButton = registerButton;
-        this.backButton = backButton;
+        UserField = userField;
+        PassField = passField;
+        PassConfirmField = passConfirmField;
+        RegisterButton = registerButton;
+        BackButton = backButton;
         
-        this.FeedbackBox = new FeedbackBox();
-        this.feedback = new FeedbackService(FeedbackBox);
-        this.userAuth = new UserAuth(ServerConfig.CreateHttpClient());
+        FeedbackBox = new FeedbackBox();
+        Feedback = new FeedbackService(FeedbackBox);
+        UserAuth = new UserAuth(ServerConfig.CreateHttpClient());
 
         // Register fields for automatic tab navigation
         RegisterField(userField);
@@ -52,18 +52,18 @@ public class RegisterScreenLogic : ScreenLogicBase
     protected override void UpdateComponents()
     {
         base.UpdateComponents(); // Updates all registered fields with tab navigation
-        feedback.Update();
+        Feedback.Update();
     }
 
     protected override void HandleActions()
     {
-        if (MouseInput.IsLeftClick(registerButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
+        if (MouseInput.IsLeftClick(RegisterButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
         {
             TryRegister();
         }
 
-        backButton.Update();
-        if (backButton.IsClicked())
+        BackButton.Update();
+        if (BackButton.IsClicked())
         {
             ClearFields();
             Navigation.NavigateBack();
@@ -72,16 +72,16 @@ public class RegisterScreenLogic : ScreenLogicBase
 
     private void TryRegister()
     {
-        string username = userField.Text.Trim();
-        string password = passField.Text;
-        string passwordConfirm = passConfirmField.Text;
+        string username = UserField.Text.Trim();
+        string password = PassField.Text;
+        string passwordConfirm = PassConfirmField.Text;
 
         // Validate username
         var usernameValidation = InputValidator.ValidateUsername(username);
         if (!usernameValidation.IsValid)
         {
             Raylib.PlaySound(ResourceLoader.FailedSound);
-            feedback.ShowError(usernameValidation.ErrorMessage);
+            Feedback.ShowError(usernameValidation.ErrorMessage);
             return;
         }
 
@@ -90,7 +90,7 @@ public class RegisterScreenLogic : ScreenLogicBase
         if (!passwordValidation.IsValid)
         {
             Raylib.PlaySound(ResourceLoader.FailedSound);
-            feedback.ShowError(passwordValidation.ErrorMessage);
+            Feedback.ShowError(passwordValidation.ErrorMessage);
             return;
         }
 
@@ -99,16 +99,16 @@ public class RegisterScreenLogic : ScreenLogicBase
         if (!matchValidation.IsValid)
         {
             Raylib.PlaySound(ResourceLoader.FailedSound);
-            feedback.ShowError(matchValidation.ErrorMessage);
+            Feedback.ShowError(matchValidation.ErrorMessage);
             return;
         }
 
-        bool success = userAuth.Register(username, password);
+        bool success = UserAuth.Register(username, password);
 
         if (success)
         {
             Raylib.PlaySound(ResourceLoader.LoginSound);
-            feedback.ShowSuccess($"Duckount created! Welcome, {username}!");
+            Feedback.ShowSuccess($"Duckount created! Welcome, {username}!");
             
             Task.Delay(3000).ContinueWith(_ =>
             {
@@ -119,7 +119,7 @@ public class RegisterScreenLogic : ScreenLogicBase
         else
         {
             Raylib.PlaySound(ResourceLoader.FailedSound);
-            feedback.ShowError("Registration failed! Quackername may be taken.");
+            Feedback.ShowError("Registration failed! Quackername may be taken.");
         }
     }
 }
