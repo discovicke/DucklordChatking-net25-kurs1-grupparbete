@@ -238,7 +238,9 @@ public static class UserEndpoints
 .WithDescription(
     "Records that the authenticated user is active by updating their last seen timestamp. " +
     "A valid request returns `200`. Unauthorized calls receive `401`."
-);
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+
     #endregion
     return users;
   }
