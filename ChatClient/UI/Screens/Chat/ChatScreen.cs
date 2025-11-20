@@ -2,7 +2,6 @@
 using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
 using ChatClient.Data.Services;
-using ChatClient.UI.Components;
 using ChatClient.UI.Components.Base;
 using ChatClient.UI.Components.Specialized;
 using ChatClient.UI.Screens.Chat.Components;
@@ -39,14 +38,14 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     private List<string> online = new();
     private List<string> offline = new();
 
-    public bool startedPolling = false;
+    public bool StartedPolling { get; private set; }
 
     #endregion
 
     public ChatScreen()
     {
         // Create scroll panels
-        var chatPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 30f);
+        var chatPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 20f);
         var userListPanel = new ScrollablePanel(new Rectangle(), scrollSpeed: 20f);
 
         // Create views
@@ -168,7 +167,7 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
     public void StopPolling()
     {
         dataService.StopPolling();
-        startedPolling = false;
+        StartedPolling = false;
         toolbar.ClearInput();
     }
     #endregion
@@ -208,14 +207,14 @@ public class ChatScreen : ScreenBase<ChatScreenLayout.LayoutData>
             return;
         }
 
-        if (startedPolling)
+        if (StartedPolling)
         {
             return;
         }
 
         toolbar.ClearInput();
         dataService.StartPolling();
-        startedPolling = true;
+        StartedPolling = true;
     }
     #endregion
 }
