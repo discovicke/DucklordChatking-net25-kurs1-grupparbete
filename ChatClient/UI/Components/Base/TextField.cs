@@ -64,7 +64,17 @@ namespace ChatClient.UI.Components.Base
         {
             string currentState = Text ?? string.Empty;
             undoStack.Push(currentState);
-            Log.Info($"[{FieldName}] Undo state saved - Stack size: {undoStack.Count} - State: '{currentState.Replace("\n", "\\n")}'");
+            if (undoStack.Count > MaxUndoEntries)
+            {
+                // Keep newest MaxUndoEntries states
+                var latest = undoStack.ToArray(); // newest first
+                undoStack.Clear();
+                for (int i = 0; i < MaxUndoEntries && i < latest.Length; i++)
+                { 
+                    undoStack.Push(latest[i]);
+                }
+            }
+            Log.Info($"[{FieldName}] Undo saved ({undoStack.Count}) '{currentState.Replace("\n","\\n")}'");
         }
 
         public override void Draw()
