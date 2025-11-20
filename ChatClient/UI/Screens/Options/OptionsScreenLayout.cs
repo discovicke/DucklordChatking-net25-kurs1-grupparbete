@@ -61,11 +61,7 @@ public static class OptionsScreenLayout
         float wrapperH = toggleBoxSize + 5f + labelHeightApprox + 8f; // 8px internal padding
         float toggleY = confirmY + btnH + (GapBetweenItems * 3);
 
-        // --- Old calc --- 
-        // float leftX = centerX - wrapperW - (GapBetweenItems / 2f);
-        // float rightX = centerX + (GapBetweenItems / 2f);
-
-        // --- New calc ---
+        // --- Calc position for buttons ---
         float centerX = w / 2f;
         float totalWidth = (wrapperW * 3) + (GapBetweenItems * 2);
         float startX = centerX - (totalWidth / 2f);
