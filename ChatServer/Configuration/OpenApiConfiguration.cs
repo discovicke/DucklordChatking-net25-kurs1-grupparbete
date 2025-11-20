@@ -24,7 +24,7 @@ public static class OpenApiConfiguration
                 document.Info.Version = "v0.5.1";
                 document.Info.Description =
                     "The Ducklord Chatking Server API documentation provides a comprehensive overview of every public endpoint exposed by the chat server. " +
-                    "You will find detailed specifications for each route—including path parameters, query parameters, request and response payloads, status codes and headers. " +
+                    "You will find detailed specifications for each route, including path parameters, query parameters, request and response payloads, status codes and headers. " +
                     "Authentication and authorization requirements are clearly indicated for each call, with examples where relevant. " +
                     "Visit the interactive API explorer section to submit test requests, inspect live responses and understand the operational behavior of endpoints in real time. " +
                     "Use this reference to plan integration, verify expected data flows, troubleshoot error conditions and ensure the client software aligns with the server’s semantics.";

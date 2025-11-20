@@ -27,6 +27,8 @@ var messageStore = app.Services.GetRequiredService<MessageStore>();
 // Seed initial users (for testing + Scalar UI authentication)
 userStore.Add("Ducklord", "chatking", isAdmin: true);
 userStore.Add("Scalar", "APIDOCS", isAdmin: true); // This user is used to allow Scalar UI to send test requests
+userStore.Add("Heaton-Lover", "13371337", isAdmin: true);
+userStore.Add("Ducktor III", "duckduck", isAdmin: true);
 ServerLog.Info("Initial test users seeded");
 
 // Print debug token
