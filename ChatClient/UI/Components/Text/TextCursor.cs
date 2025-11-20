@@ -8,7 +8,7 @@
     {
         private float BlinkTimer { get; set; }
         private const float BlinkInterval = 0.5f;
-        public int Position { get; private set; }
+        public int Position { get; set; }
         public bool IsVisible { get; private set; } = false;
         
         
