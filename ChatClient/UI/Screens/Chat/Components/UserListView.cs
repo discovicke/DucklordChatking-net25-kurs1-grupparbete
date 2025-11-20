@@ -11,11 +11,11 @@ namespace ChatClient.UI.Screens.Chat.Components;
 /// </summary>
 public class UserListView(ScrollablePanel panel)
 {
-    private Rectangle bounds;
+    private Rectangle rectangleBounds;
 
     public void SetBounds(Rectangle bounds)
-    {
-        this.bounds = bounds;
+    { 
+        rectangleBounds = bounds;
         panel.SetBounds(bounds);
     }
 
@@ -28,8 +28,8 @@ public class UserListView(ScrollablePanel panel)
         float totalHeight = lineH + (onlineUsers.Count * lineH) + 10 + lineH + (offlineUsers.Count * lineH);
         panel.BeginScroll(totalHeight);
 
-        float x = bounds.X + inset;
-        float y = bounds.Y + inset;
+        float x = rectangleBounds.X + inset;
+        float y = rectangleBounds.Y + inset;
 
         // Online header
         float scrolledY = panel.GetScrolledY(y);

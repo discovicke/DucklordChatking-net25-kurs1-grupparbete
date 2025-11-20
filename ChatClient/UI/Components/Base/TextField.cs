@@ -99,18 +99,22 @@ namespace ChatClient.UI.Components.Base
         {
             Color fill = IsSelected
                 ? Colors.TextFieldSelected
-                : (MouseInput.IsHovered(Rect) ? Colors.TextFieldHovered : Colors.TextFieldUnselected);
+                : (MouseInput.IsHovered(Rect) 
+                    ? Colors.TextFieldHovered 
+                    : Colors.TextFieldUnselected);
 
             Raylib.DrawRectangleRounded(Rect, 0.1f, 10, fill);
             Raylib.DrawRectangleRoundedLinesEx(Rect, 0.1f, 10, IsSelected || MouseInput.IsHovered(Rect) ? 2 : 1, Colors.OutlineColor);
 
             if (string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(PlaceholderText))
             {
-                const float PlaceholderFontSize = 14f;
+                const float PlaceholderFontSize = 18f;
                 const float Padding = 8f;
 
                 float x = Rect.X + Padding;
-                float y = Rect.Y + (Rect.Height - PlaceholderFontSize) / 2f;
+                float y = AllowMultiline 
+                    ? Rect.Y + Padding 
+                    : Rect.Y + (Rect.Height - PlaceholderFontSize) / 2f;
                 float maxWidth = Rect.Width - (Padding * 2);
 
                 string display = PlaceholderText;
