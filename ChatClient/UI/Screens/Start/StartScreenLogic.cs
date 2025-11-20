@@ -25,9 +25,7 @@ namespace ChatClient.UI.Screens.Start
         private Button RegisterButton { get; set; }
         private IFeedbackService Feedback { get; set; }
         private UserAuth UserAuth { get; set; }
-        
         private Action PostLoginAction { get; set; }
-
         public FeedbackBox FeedbackBox { get; }
 
         public StartScreenLogic(

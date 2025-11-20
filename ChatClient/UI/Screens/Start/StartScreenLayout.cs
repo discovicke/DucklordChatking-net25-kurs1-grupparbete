@@ -12,8 +12,16 @@ namespace ChatClient.UI.Screens.Start
     {
         public struct LayoutData
         {
-            public Rectangle UserRect, PassRect, LoginRect, RegisterRect;
-            public float LogoX, LogoY, LogoWidth, LogoHeight, LogoScale, ScreenHeight;
+            public Rectangle UserRect { get; init; }
+            public Rectangle PassRect { get; init; }
+            public Rectangle LoginRect { get; init; }
+            public Rectangle RegisterRect { get; init; }
+            public float LogoX { get; init; }
+            public float LogoY { get; init; }
+            public float LogoWidth { get; init; }
+            public float LogoHeight { get; init; }
+            public float LogoScale { get; init; }
+            public float ScreenHeight { get; init; }
         }
 
         public static LayoutData Calculate(int logoWidth, int logoHeight)
