@@ -1,134 +1,103 @@
-﻿using ChatClient.Core.Application;
+﻿﻿using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
 using ChatClient.UI.Components.Base;
 using ChatClient.UI.Components.Specialized;
-using ChatClient.UI.Components.Text;
 using ChatClient.UI.Screens.Common;
 using Raylib_cs;
 
 namespace ChatClient.UI.Screens.Options;
+
 /// <summary>
 /// Responsible for: calculating layout positions for all UI elements on the options/settings screen.
 /// Determines field sizes for account updates and window mode toggle buttons (windowed/fullscreen).
 /// </summary>
 // TODO Save settings
-public class OptionsScreenLogic(
-    TextField userField,
-    TextField passField,
-    TextField passConfirmField,
-    Button confirmButton,
-    BackButton backButton,
-    ToggleBox toggleWindowed,
-    ToggleBox toggleFullscreen,
-    ToggleBox toggleMute
-) : IScreenLogic
+public class OptionsScreenLogic : ScreenLogicBase
 {
-    private readonly TabLogics tabs = new();
-    private bool tabsIniti;
-    private bool togglesIniti;
+    private readonly TextField userField;
+    private readonly TextField passField;
+    private readonly TextField passConfirmField;
+    private readonly Button confirmButton;
+    private readonly BackButton backButton;
+    private readonly ToggleBox toggleWindowed;
+    private readonly ToggleBox toggleFullscreen;
+    private readonly ToggleBox toggleMute;
 
-    public void HandleInput()
+    public OptionsScreenLogic(
+        TextField userField,
+        TextField passField,
+        TextField passConfirmField,
+        Button confirmButton,
+        BackButton backButton,
+        ToggleBox toggleWindowed,
+        ToggleBox toggleFullscreen,
+        ToggleBox toggleMute)
     {
-        tabs.Update();
+        this.userField = userField;
+        this.passField = passField;
+        this.passConfirmField = passConfirmField;
+        this.confirmButton = confirmButton;
+        this.backButton = backButton;
+        this.toggleWindowed = toggleWindowed;
+        this.toggleFullscreen = toggleFullscreen;
+        this.toggleMute = toggleMute;
 
-        if (!tabsIniti)
-        {
-            tabs.Register(userField);
-            tabs.Register(passField);
-            tabs.Register(passConfirmField);
-            tabsIniti = true;
-        }
+        // Register fields for automatic tab navigation
+        RegisterField(userField);
+        RegisterField(passField);
+        RegisterField(passConfirmField);
+    }
 
-        // Initialize toggle state from current window mode once
-        if (!togglesIniti)
-        {
-            if (WindowSettings.CurrentMode == WindowMode.Windowed)
-            {
-                toggleWindowed.SetChecked(true);
-                toggleFullscreen.SetChecked(false);
-            }
-            else
-            {
-                toggleWindowed.SetChecked(false);
-                toggleFullscreen.SetChecked(true);
-            }
-            togglesIniti = true;
-        }
-
-        userField.Update();
-        passField.Update();
-        passConfirmField.Update();
-
-        toggleWindowed.Update();
-        toggleFullscreen.Update();
+    protected override void UpdateComponents()
+    {
+        base.UpdateComponents(); // Updates all registered fields with tab navigation
+        
+        // Use WindowSettings to handle window mode toggles
+        WindowSettings.UpdateToggles(toggleWindowed, toggleFullscreen);
+        
         toggleMute.Update();
+        confirmButton.Update();
+        backButton.Update();
+        
+        HandleMuteToggle();
+    }
 
-        // Enforce mutual exclusion and reflect active mode immediately
-        if (toggleWindowed.IsClicked())
+    protected override void HandleActions()
+    {
+        if (confirmButton.IsClicked())
         {
-            // Always force state: cannot uncheck without selecting the other
-            toggleWindowed.SetChecked(true);
-            toggleFullscreen.SetChecked(false);
-
-            if (WindowSettings.CurrentMode != WindowMode.Windowed)
-            {
-                WindowSettings.SetMode(WindowMode.Windowed);
-                Log.Info("[OptionsScreenLogic] Windowed mode selected");
-            }
+            SaveSettings();
         }
 
-        if (toggleFullscreen.IsClicked())
+        if (backButton.IsClicked())
         {
-            toggleFullscreen.SetChecked(true);
-            toggleWindowed.SetChecked(false);
-
-            if (WindowSettings.CurrentMode != WindowMode.Fullscreen)
-            {
-                WindowSettings.SetMode(WindowMode.Fullscreen);
-                Log.Info("[OptionsScreenLogic] Fullscreen mode selected");
-            }
+            Cancel();
         }
+    }
 
-        // Mute application
+    private void HandleMuteToggle()
+    {
         if (toggleMute.IsChecked)
         {
-            
             Raylib.SetMasterVolume(0.0f);
-            Log.Info("[OptionsScreenLogic] Mute enabled");
         }
         else
         {
-            
             Raylib.SetMasterVolume(1.0f);
-            Log.Info("[OptionsScreenLogic] Mute disabled");
         }
-
-            
-
-
-
-            confirmButton.Update();
-            if (confirmButton.IsClicked())
-            {
-                Log.Info($"[OptionsScreenLogic] Settings confirmed - New username: '{userField.Text}'");
-                Clear();
-                AppState.GoBack();
-            }
-
-            backButton.Update();
-            if (backButton.IsClicked())
-            {
-                Clear();
-                AppState.GoBack();
-            }
-     
     }
 
-    private void Clear()
+    private void SaveSettings()
     {
-        Log.Info("[OptionsScreenLogic] Clearing all fields");
-        userField.Clear();
-        passField.Clear();
-        passConfirmField.Clear();
+        Log.Info($"[OptionsScreenLogic] Settings confirmed - New username: '{userField.Text}'");
+        ClearFields();
+        Navigation.NavigateBack();
+    }
+
+    private void Cancel()
+    {
+        Log.Info("[OptionsScreenLogic] Cancelling settings changes");
+        ClearFields();
+        Navigation.NavigateBack();
     }
 }
