@@ -11,24 +11,31 @@ namespace ChatClient.UI.Components.Text
     public class TabLogics
     {
 
-        private readonly List<TextField> fields = new();
+        private List<TextField> Fields { get; } = new();
 
         // Register fields in tab order
         public void Register(TextField field)
         {
-            if (field == null) return;
-            if (fields.Contains(field)) return;
+            if (field == null)
+            {
+                return;
+            }
 
-            fields.Add(field);
+            if (Fields.Contains(field))
+            {
+                return;
+            }
+
+            Fields.Add(field);
 
             // Auto-focus the first field if none focused yet
-            if (fields.Count == 1 && !field.IsFocused)
+            if (Fields.Count == 1 && !field.IsFocused)
             {
                 field.Focus();
             }
         }
         // clears all fields
-        public void Clear() => fields.Clear();
+        public void Clear() => Fields.Clear();
 
         public void Update()
         {
@@ -37,31 +44,31 @@ namespace ChatClient.UI.Components.Text
                 return;
             }
 
-            if (fields.Count == 0)
+            if (Fields.Count == 0)
             {
                 return;
             }
 
             bool backwards = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
 
-            int currentIndex = fields.FindIndex(f => f.IsFocused);
+            int currentIndex = Fields.FindIndex(f => f.IsFocused);
             if (currentIndex < 0)
             {
                 // Nothing focused yet: focus first and stop
-                fields[0].Focus();
+                Fields[0].Focus();
                 return;
             }
 
             int next = backwards
-                ? (currentIndex - 1 + fields.Count) % fields.Count
-                : (currentIndex + 1) % fields.Count;
+                ? (currentIndex - 1 + Fields.Count) % Fields.Count
+                : (currentIndex + 1) % Fields.Count;
 
-            if (next == currentIndex && fields.Count == 1)
+            if (next == currentIndex && Fields.Count == 1)
             {
                 return;
             }
-            fields[currentIndex].Blur();
-            fields[next].Focus();
+            Fields[currentIndex].Blur();
+            Fields[next].Focus();
         }
     }
 }

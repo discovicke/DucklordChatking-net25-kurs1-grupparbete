@@ -11,37 +11,37 @@ namespace ChatClient.UI.Components.Specialized;
 /// </summary>
 public class FeedbackBox
 {
-    private string message = "";
-    private bool isSuccess = false;
-    private double startTime = 0;
+    public string Message { get; private set; } = "";
+    public bool IsSuccess { get; private set; } = false;
+    public double StartTime { get; private set; } = 0;
     private const double DisplayDuration = 3.0;
     private const float PaddingFromBottom = 50f;
     private const float BoxPadding = 15f;
 
     public void Show(string message, bool isSuccess)
     {
-        this.message = message;
-        this.isSuccess = isSuccess;
-        this.startTime = Raylib.GetTime();
+        Message = message;
+        IsSuccess = isSuccess;
+        StartTime = Raylib.GetTime();
     }
 
     public void Update()
     {
         // Clear message after duration
-        if (!string.IsNullOrEmpty(message) && Raylib.GetTime() - startTime > DisplayDuration)
+        if (!string.IsNullOrEmpty(Message) && Raylib.GetTime() - StartTime > DisplayDuration)
         {
-            message = "";
+            Message = "";
         }
     }
 
     public void Draw()
     {
-        if (string.IsNullOrEmpty(message)) return;
+        if (string.IsNullOrEmpty(Message)) return;
 
-        Color feedbackColor = isSuccess ? Colors.Success : Colors.Fail;
+        Color feedbackColor = IsSuccess ? Colors.Success : Colors.Fail;
 
         // Measure text size
-        Vector2 textSize = Raylib.MeasureTextEx(ResourceLoader.MediumFont, message, 16, 0.5f);
+        Vector2 textSize = Raylib.MeasureTextEx(ResourceLoader.MediumFont, Message, 16, 0.5f);
 
         // Calculate box dimensions
         float boxWidth = textSize.X + (BoxPadding * 2);
@@ -61,7 +61,7 @@ public class FeedbackBox
         float textX = boxX + BoxPadding;
         float textY = boxY + BoxPadding;
 
-        Raylib.DrawTextEx(ResourceLoader.MediumFont, message,
+        Raylib.DrawTextEx(ResourceLoader.MediumFont, Message,
             new Vector2(textX, textY), 16, 0.5f, feedbackColor);
     }
 }

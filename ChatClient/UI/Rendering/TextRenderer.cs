@@ -4,43 +4,34 @@ using Raylib_cs;
 
 namespace ChatClient.UI.Components.Text
 {
-    public class TextRenderer
+    public class TextRenderer(Rectangle bounds, Color textColor, bool isPassword, bool allowMultiline)
     {
-        private Rectangle bounds;
-        private readonly Color textColor;
-        private readonly bool isPassword;
-        private readonly bool allowMultiline;
+        public Rectangle Bounds { get; private set; } = bounds;
+        public Color TextColor { get; } = textColor;
+        public bool IsPassword { get; } = isPassword;
+        public bool AllowMultiline { get; } = allowMultiline;
+
+        public int ScrollIndex { get; private set; }
 
         private const int FontSize = 20;
         private const int Padding = 8;
         private const int LineSpacing = 2;
 
-        // Horizontal scrolling state for single-line
-        private int scrollIndex = 0;
-
-        public TextRenderer(Rectangle bounds, Color textColor, bool isPassword, bool allowMultiline)
-        {
-            this.bounds = bounds;
-            this.textColor = textColor;
-            this.isPassword = isPassword;
-            this.allowMultiline = allowMultiline;
-        }
-
-        public void UpdateBounds(Rectangle newBounds) => bounds = newBounds;
+        public void UpdateBounds(Rectangle newBounds) => Bounds = newBounds;
 
         public void Draw(string text, TextCursor cursor, bool isSelected, bool showCursor)
         {
             if (string.IsNullOrEmpty(text) && !showCursor)
                 return;
 
-            float textX = bounds.X + Padding;
-            float textY = allowMultiline
-                ? bounds.Y + Padding
-                : bounds.Y + (bounds.Height - FontSize) / 2f;
+            float textX = Bounds.X + Padding;
+            float textY = AllowMultiline
+                ? Bounds.Y + Padding
+                : Bounds.Y + (Bounds.Height - FontSize) / 2f;
 
-            Raylib.BeginScissorMode((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
+            Raylib.BeginScissorMode((int)Bounds.X, (int)Bounds.Y, (int)Bounds.Width, (int)Bounds.Height);
 
-            if (allowMultiline)
+            if (AllowMultiline)
                 DrawMultilineText(text, textX, textY);
             else
                 DrawSingleLineText(text, textX, textY, cursor);
@@ -53,59 +44,59 @@ namespace ChatClient.UI.Components.Text
 
         private void DrawSingleLineText(string text, float x, float y, TextCursor cursor)
         {
-            string full = isPassword ? new string('*', text.Length) : text;
-            float maxWidth = bounds.Width - Padding * 2f;
+            string full = IsPassword ? new string('*', text.Length) : text;
+            float maxWidth = Bounds.Width - Padding * 2f;
 
             EnsureScrollForCaret(full, cursor.Position, maxWidth);
 
-            string visible = SubstringThatFits(full, scrollIndex, maxWidth);
-            Raylib.DrawTextEx(ResourceLoader.MediumFont, visible, new Vector2(x, y), FontSize, 0.5f, textColor);
+            string visible = SubstringThatFits(full, ScrollIndex, maxWidth);
+            Raylib.DrawTextEx(ResourceLoader.MediumFont, visible, new Vector2(x, y), FontSize, 0.5f, TextColor);
         }
 
         private void DrawCaret(string text, float x, float y, TextCursor cursor)
         {
-            if (allowMultiline)
+            if (AllowMultiline)
             {
                 var (cx, cy) = GetCaretPixelPosition(text, x, y, cursor);
-                Raylib.DrawLine((int)cx, (int)cy, (int)cx, (int)(cy + FontSize), textColor);
+                Raylib.DrawLine((int)cx, (int)cy, (int)cx, (int)(cy + FontSize), TextColor);
                 return;
             }
 
-            string full = isPassword ? new string('*', text.Length) : text;
-            float maxWidth = bounds.Width - Padding * 2f;
+            string full = IsPassword ? new string('*', text.Length) : text;
+            float maxWidth = Bounds.Width - Padding * 2f;
 
             EnsureScrollForCaret(full, cursor.Position, maxWidth);
 
             int caret = Math.Clamp(cursor.Position, 0, full.Length);
-            int leftCount = Math.Max(0, caret - scrollIndex);
-            string leftOfCaret = leftCount > 0 ? full.Substring(scrollIndex, leftCount) : "";
+            int leftCount = Math.Max(0, caret - ScrollIndex);
+            string leftOfCaret = leftCount > 0 ? full.Substring(ScrollIndex, leftCount) : "";
             float leftWidth = Raylib.MeasureTextEx(ResourceLoader.MediumFont, leftOfCaret, FontSize, 0.5f).X;
 
             float carX = x + leftWidth;
-            Raylib.DrawLine((int)carX, (int)y, (int)carX, (int)(y + FontSize), textColor);
+            Raylib.DrawLine((int)carX, (int)y, (int)carX, (int)(y + FontSize), TextColor);
         }
 
         // Keep caret visible by adjusting scrollIndex
         private void EnsureScrollForCaret(string full, int caretIndex, float maxWidth)
         {
             caretIndex = Math.Clamp(caretIndex, 0, full.Length);
-            scrollIndex = Math.Clamp(scrollIndex, 0, full.Length);
+            ScrollIndex = Math.Clamp(ScrollIndex, 0, full.Length);
 
             // If caret moved left beyond view, snap start to caret
-            if (caretIndex < scrollIndex)
+            if (caretIndex < ScrollIndex)
             {
-                scrollIndex = caretIndex;
+                ScrollIndex = caretIndex;
                 return;
             }
 
             // If caret is to the right and does not fit, advance start until it fits
-            while (scrollIndex < caretIndex)
+            while (ScrollIndex < caretIndex)
             {
-                string span = full.Substring(scrollIndex, caretIndex - scrollIndex);
+                string span = full.Substring(ScrollIndex, caretIndex - ScrollIndex);
                 float w = Raylib.MeasureTextEx(ResourceLoader.MediumFont, span, FontSize, 0.5f).X;
                 if (w <= maxWidth)
                     break;
-                scrollIndex++;
+                ScrollIndex++;
             }
         }
 
@@ -136,10 +127,10 @@ namespace ChatClient.UI.Components.Text
             var manualLines = text.Split('\n');
             foreach (var line in manualLines)
             {
-                var wrappedLines = WrapText(line, (int)bounds.Width - Padding * 2);
+                var wrappedLines = WrapText(line, (int)Bounds.Width - Padding * 2);
                 foreach (var wrapped in wrappedLines)
                 {
-                    Raylib.DrawTextEx(ResourceLoader.MediumFont, wrapped, new Vector2(x, currentY), FontSize, 0.5f, textColor);
+                    Raylib.DrawTextEx(ResourceLoader.MediumFont, wrapped, new Vector2(x, currentY), FontSize, 0.5f, TextColor);
                     currentY += FontSize + LineSpacing;
                 }
             }
@@ -148,8 +139,8 @@ namespace ChatClient.UI.Components.Text
         private (float x, float y) GetCaretPixelPosition(string text, float x, float y, TextCursor cursor)
         {
             int pos = Math.Clamp(cursor.Position, 0, text.Length);
-            string display = isPassword ? new string('*', text.Length) : text;
-            int availableWidth = (int)bounds.Width - Padding * 2;
+            string display = IsPassword ? new string('*', text.Length) : text;
+            int availableWidth = (int)Bounds.Width - Padding * 2;
             string pre = pos > 0 ? display.Substring(0, pos) : "";
             var paras = pre.Split('\n');
 

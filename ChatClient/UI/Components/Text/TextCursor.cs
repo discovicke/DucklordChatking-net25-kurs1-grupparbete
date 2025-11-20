@@ -1,4 +1,4 @@
-namespace ChatClient.UI.Components.Text
+﻿namespace ChatClient.UI.Components.Text
 {
     /// <summary>
     /// Responsible for: managing text cursor position and blinking animation within text fields.
@@ -6,75 +6,74 @@ namespace ChatClient.UI.Components.Text
     /// </summary>
     public class TextCursor
     {
-        private int position;
-        private float blinkTimer;
-        private bool visible = false;
+        private float BlinkTimer { get; set; }
         private const float BlinkInterval = 0.5f;
-
-        public int Position
-        {
-            get => position;
-            set => position = Math.Clamp(value, 0, int.MaxValue);
-        }
-
-        public bool IsVisible => visible;
+        public int Position { get; set; }
+        public bool IsVisible { get; private set; } = false;
+        
         
         public void ResetInvisible()
         {
-            visible = false;
-            blinkTimer = 0f;
+            IsVisible = false;
+            BlinkTimer = 0f;
         }
 
         public void Update(float deltaTime)
         {
-            blinkTimer += deltaTime;
-            if (blinkTimer >= BlinkInterval)
+            BlinkTimer += deltaTime;
+            if (BlinkTimer >= BlinkInterval)
             {
-                blinkTimer = 0f;
-                visible = !visible;
+                BlinkTimer = 0f;
+                IsVisible = !IsVisible;
             }
         }
 
         public void ResetBlink()
         {
-            blinkTimer = 0f;
-            visible = true;
+            BlinkTimer = 0f;
+            IsVisible = true;
         }
 
         public void MoveLeft(int textLength)
         {
-            if (position > 0)
+            if (Position > 0)
             {
-                position--;
+                Position--;
                 ResetBlink();
             }
         }
 
         public void MoveRight(int textLength)
         {
-            if (position < textLength)
+            if (Position < textLength)
             {
-                position++;
+                Position++;
                 ResetBlink();
             }
         }
 
         public void MoveToStart()
         {
-            position = 0;
+            Position = 0;
             ResetBlink();
         }
 
         public void MoveToEnd(int textLength)
         {
-            position = textLength;
+            Position = textLength;
             ResetBlink();
         }
 
         public void Reset()
         {
-            position = 0;
+            Position = 0;
             ResetBlink();
+        }
+
+        // New: central clamp tied to current text length
+        public void ClampToTextLength(int textLength)
+        {
+            Position = Math.Clamp(Position, 0, textLength);
         }
     }
 }
