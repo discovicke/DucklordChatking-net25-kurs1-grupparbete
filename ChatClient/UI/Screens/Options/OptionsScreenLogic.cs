@@ -1,5 +1,6 @@
 ﻿﻿using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
+using ChatClient.Data.Services;
 using ChatClient.UI.Components.Base;
 using ChatClient.UI.Components.Specialized;
 using ChatClient.UI.Screens.Common;
@@ -22,6 +23,11 @@ public class OptionsScreenLogic : ScreenLogicBase
     private readonly ToggleBox toggleWindowed;
     private readonly ToggleBox toggleFullscreen;
     private readonly ToggleBox toggleMute;
+    private readonly FeedbackBox feedbackBox;
+    private readonly IFeedbackService feedback;
+
+    public FeedbackBox FeedbackBox => feedbackBox;
+
 
     public OptionsScreenLogic(
         TextField userField,
@@ -42,23 +48,27 @@ public class OptionsScreenLogic : ScreenLogicBase
         this.toggleFullscreen = toggleFullscreen;
         this.toggleMute = toggleMute;
 
-        // Register fields for automatic tab navigation
         RegisterField(userField);
         RegisterField(passField);
         RegisterField(passConfirmField);
+
+        feedbackBox = new FeedbackBox();
+        feedback = new FeedbackService(feedbackBox);
     }
+
 
     protected override void UpdateComponents()
     {
         base.UpdateComponents(); // Updates all registered fields with tab navigation
-        
+
         // Use WindowSettings to handle window mode toggles
         WindowSettings.UpdateToggles(toggleWindowed, toggleFullscreen);
-        
+
         toggleMute.Update();
         confirmButton.Update();
         backButton.Update();
-        
+
+        feedbackBox.Update();
         HandleMuteToggle();
     }
 
@@ -89,9 +99,39 @@ public class OptionsScreenLogic : ScreenLogicBase
 
     private void SaveSettings()
     {
+        var oldUsername = AppState.LoggedInUsername;
+        var newUsername = userField.Text;
+        var newPassword = passField.Text;
+        var confirmPassword = passConfirmField.Text;
+
+        if (string.IsNullOrWhiteSpace(newUsername))
+        {
+            feedback.ShowError("Username cannot be empty!");
+            return;
+        }
+
+        if (newPassword != confirmPassword)
+        {
+            feedback.ShowError("Passwords do not match!");
+            return;
+        }
+
+        var auth = new UserAuth();
+        var success = auth.UpdateCredentials(oldUsername, newUsername, newPassword);
+
+        if (!success)
+        {
+            feedback.ShowError("Failed to update credentials!");
+            return;
+        }
+
+        // Update client-side stored username
+        AppState.LoggedInUsername = newUsername;
+
+        feedback.ShowSuccess("Credentials updated!");
         Log.Info($"[OptionsScreenLogic] Settings confirmed - New username: '{userField.Text}'");
         ClearFields();
-        Navigation.NavigateBack();
+        Task.Delay(1000).ContinueWith(_ => Navigation.NavigateBack());
     }
 
     private void Cancel()
