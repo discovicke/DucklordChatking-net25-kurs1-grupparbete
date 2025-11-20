@@ -1,4 +1,4 @@
-namespace ChatClient.UI.Components.Text
+﻿namespace ChatClient.UI.Components.Text
 {
     /// <summary>
     /// Responsible for: managing text cursor position and blinking animation within text fields.
@@ -18,7 +18,7 @@ namespace ChatClient.UI.Components.Text
         }
 
         public bool IsVisible => visible;
-        
+
         public void ResetInvisible()
         {
             visible = false;
@@ -75,6 +75,12 @@ namespace ChatClient.UI.Components.Text
         {
             position = 0;
             ResetBlink();
+        }
+
+        // New: central clamp tied to current text length
+        public void ClampToTextLength(int textLength)
+        {
+            position = Math.Clamp(position, 0, textLength);
         }
     }
 }

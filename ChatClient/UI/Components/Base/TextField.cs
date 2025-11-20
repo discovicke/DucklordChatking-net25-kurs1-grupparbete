@@ -12,6 +12,8 @@ namespace ChatClient.UI.Components.Base
         private string FieldName { get; set; } = "TextField";
         private string PlaceholderText { get; set; } = "";
 
+        public event Action<string>? TextChanged;
+
         private string lastSavedState = string.Empty;
         private bool isTypingWord = false;
         private bool IsSelected { get; set; }
@@ -44,12 +46,21 @@ namespace ChatClient.UI.Components.Base
             var ctx = new ClipboardContext
             {
                 GetText = () => Text,
-                SetText = s => Text = s,
+                SetText = s => SetTextInternal(s), // NEW helper ensures clamp + event + undo
                 InsertText = s => InsertText(s),
                 SaveStateForUndo = SaveStateForUndo,
                 UndoStack = undoStack,
-                ResetCursorToStart = () => cursor.Position = 0,
-                ResetCursorToEnd = pos => cursor.Position = pos,
+                ResetCursorToStart = () =>
+                {
+                    cursor.MoveToStart();
+                    cursor.ClampToTextLength(Text.Length);
+                },
+                ResetCursorToEnd = pos =>
+                {
+                    cursor.Position = pos;
+                    cursor.ClampToTextLength(Text.Length);
+                    cursor.ResetBlink();
+                },
                 ResetCursorBlink = () => cursor.ResetBlink(),
                 SetMovedThisFrame = () => movedThisFrame = true,
                 FieldName = FieldName
@@ -208,13 +219,13 @@ namespace ChatClient.UI.Components.Base
             TryPress(KeyboardKey.Home, () => cursor.MoveToStart());
             TryPress(KeyboardKey.End, () => cursor.MoveToEnd(Text.Length));
         }
-
         private void InsertText(string s)
         {
-            cursor.Position = Math.Clamp(cursor.Position, 0, Text.Length);
+            cursor.ClampToTextLength(Text.Length);
             Text = Text.Insert(cursor.Position, s);
             cursor.Position += s.Length;
             cursor.ResetBlink();
+            TextChanged?.Invoke(Text);
 
             string displayChar = s == "\n" ? "\\n" : s;
             Log.Info($"[{FieldName}] Text inserted: '{displayChar}' - Current text: '{Text.Replace("\n", "\\n")}'");
@@ -234,11 +245,11 @@ namespace ChatClient.UI.Components.Base
             char deletedChar = Text[removeIndex];
             Text = Text.Remove(removeIndex, 1);
             cursor.Position = removeIndex;
+            cursor.ClampToTextLength(Text.Length); // ensure safe after mutation
             cursor.ResetBlink();
+            TextChanged?.Invoke(Text);
 
-            // Backspace sound
             Raylib.PlaySound(ResourceLoader.BackspaceSound);
-
             isTypingWord = true;
             Log.Info($"[{FieldName}] Deleted: '{deletedChar}' at position {removeIndex}");
         }
@@ -264,11 +275,25 @@ namespace ChatClient.UI.Components.Base
             renderer.UpdateBounds(rect);
         }
 
+        private void SetTextInternal(string value)
+        {
+            value ??= string.Empty;
+            if (value == Text) return;
+            Text = value;
+            if (cursor.Position > Text.Length)
+                cursor.ClampToTextLength(Text.Length);
+            TextChanged?.Invoke(Text);
+            SaveUndoIfChanged();
+        }
+
         public void Clear()
         {
+            if (Text.Length == 0) return;
             Log.Info($"[{FieldName}] Field cleared - Previous text: '{Text.Replace("\n", "\\n")}'");
             Text = string.Empty;
-            cursor.Reset();
+            cursor.Reset(); // sets to 0; already valid
+            TextChanged?.Invoke(Text);
+            SaveUndoIfChanged();
         }
     }
 }
