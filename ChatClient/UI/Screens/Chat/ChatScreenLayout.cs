@@ -11,8 +11,17 @@ public static class ChatScreenLayout
 {
     public struct LayoutData
     {
-        public Rectangle ChatRect, InputRect, SendRect, BackRect, UserListRect, OptionsRect;
-        public float LogoX, LogoY, LogoScale, LogoWidth, LogoHeight;
+        public Rectangle ChatRect { get; set; }
+        public Rectangle InputRect { get; set; }
+        public Rectangle SendRect { get; set; }
+        public Rectangle BackRect { get; set; }
+        public Rectangle UserListRect { get; set; }
+        public Rectangle OptionsRect { get; set; }
+        public float LogoX { get; set; }
+        public float LogoY { get; set; }
+        public float LogoScale { get; set; }
+        public float LogoWidth { get; set; }
+        public float LogoHeight { get; set; }
     }
 
     public static LayoutData Calculate(int logoWidth, int logoHeight)
