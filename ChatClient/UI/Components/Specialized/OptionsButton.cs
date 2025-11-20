@@ -59,7 +59,6 @@ namespace ChatClient.UI.Components.Specialized
         private static void DrawRing(Vector2 center, float inner, float outer, Color color)
         {
             // Use DrawRing when available, else emulate with two circles
-            // raylib_cs provides DrawRing in modern versions:
             Raylib.DrawRing(center, inner, outer, 0f, 360f, 48, color);
         }
     }
