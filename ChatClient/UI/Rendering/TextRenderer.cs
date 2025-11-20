@@ -4,12 +4,9 @@ using Raylib_cs;
 
 namespace ChatClient.UI.Components.Text
 {
-    public class TextRenderer
+    public class TextRenderer(Rectangle bounds, Color textColor, bool isPassword, bool allowMultiline)
     {
-        private Rectangle bounds;
-        private readonly Color textColor;
-        private readonly bool isPassword;
-        private readonly bool allowMultiline;
+        private Rectangle bounds = bounds;
 
         private const int FontSize = 20;
         private const int Padding = 8;
@@ -17,14 +14,6 @@ namespace ChatClient.UI.Components.Text
 
         // Horizontal scrolling state for single-line
         private int scrollIndex = 0;
-
-        public TextRenderer(Rectangle bounds, Color textColor, bool isPassword, bool allowMultiline)
-        {
-            this.bounds = bounds;
-            this.textColor = textColor;
-            this.isPassword = isPassword;
-            this.allowMultiline = allowMultiline;
-        }
 
         public void UpdateBounds(Rectangle newBounds) => bounds = newBounds;
 
