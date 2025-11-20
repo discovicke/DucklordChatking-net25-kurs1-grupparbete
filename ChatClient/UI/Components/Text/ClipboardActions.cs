@@ -14,7 +14,9 @@ namespace ChatClient.UI.Components.Text
         Copy,
         Paste,
         Cut,
-        Undo
+        Undo,
+        Jumpleft,
+        JumpRight
     }
     // Small DTO that groups required delegates/state for clipboard operations.
     // Keeps ClipboardActions ctor simple and the dependency surface explicit.
@@ -54,14 +56,17 @@ namespace ChatClient.UI.Components.Text
             if (Context.UndoStack is null) throw new ArgumentException("UndoStack required", nameof(context));
             if (Context.ResetCursorToStart is null) throw new ArgumentException("ResetCursorToStart delegate required", nameof(context));
             if (Context.ResetCursorBlink is null) throw new ArgumentException("ResetCursorBlink delegate required", nameof(context));
+            if (Context.GetCursorIndex is null) throw new ArgumentException("GetCursorIndex delegate required", nameof(context));
+            if (Context.SetCursorIndex is null) throw new ArgumentException("SetCursorIndex delegate required", nameof(context));
+
         }
-        public  void Process()
+        public void Process()
         {
-            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || 
-                            Raylib.IsKeyDown(KeyboardKey.RightControl) || 
+            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) ||
+                            Raylib.IsKeyDown(KeyboardKey.RightControl) ||
                             Raylib.IsKeyDown(KeyboardKey.LeftSuper) ||  // Cmd on macOS
                             Raylib.IsKeyDown(KeyboardKey.RightSuper);
-                            ;
+            ;
             if (!ctrlDown) return;
 
             ClipboardAction action = ClipboardAction.None;
@@ -69,6 +74,8 @@ namespace ChatClient.UI.Components.Text
             else if (Raylib.IsKeyPressed(KeyboardKey.V)) action = ClipboardAction.Paste;
             else if (Raylib.IsKeyPressed(KeyboardKey.X)) action = ClipboardAction.Cut;
             else if (Raylib.IsKeyPressed(KeyboardKey.Z)) action = ClipboardAction.Undo;
+            else if (Raylib.IsKeyPressed(KeyboardKey.Left)) action = ClipboardAction.Jumpleft;
+            else if (Raylib.IsKeyPressed(KeyboardKey.Right)) action = ClipboardAction.JumpRight;
 
             switch (action)
             {
@@ -78,7 +85,7 @@ namespace ChatClient.UI.Components.Text
                         Raylib.SetClipboardText(Context.GetText() ?? string.Empty);
                         Context.SetMovedThisFrame();
                         Log.Info($"[{Context.FieldName}] Copied to clipboard - Length: {(Context.GetText()?.Length ?? 0)}");
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -157,11 +164,18 @@ namespace ChatClient.UI.Components.Text
                     }
                     return;
 
+                case ClipboardAction.Jumpleft:
+                    MoveCurserLeftByWord();
+                    return;
+
+                case ClipboardAction.JumpRight:
+                    MoveCurserRightByWord();
+                    return;
 
             }
         }
 
-        private void MoveCurserLeftByWord() 
+        private void MoveCurserLeftByWord()
         {
             string text = Context.GetText() ?? string.Empty;
             int index = Context.GetCursorIndex();
@@ -194,7 +208,6 @@ namespace ChatClient.UI.Components.Text
         {
             string text = Context.GetText() ?? string.Empty;
             int index = Context.GetCursorIndex();
-
             if (index >= text.Length || text.Length == 0)
             {
                 return;
@@ -202,17 +215,21 @@ namespace ChatClient.UI.Components.Text
 
             int i = index;
 
-            // Skip any whitespace directly after the cursor
+            // If inside a word, move to its end first
+            if (i < text.Length && !char.IsWhiteSpace(text[i]))
+            {
+                while (i < text.Length && !char.IsWhiteSpace(text[i]))
+                {
+                    i++;
+                }
+            }
+
+            // Then skip whitespace to the start of the next word
             while (i < text.Length && char.IsWhiteSpace(text[i]))
             {
                 i++;
             }
 
-            // Move right until whitespace or end
-            while (i < text.Length && char.IsWhiteSpace(text[i]))
-            {
-                i++;
-            }
             Context.SetCursorIndex(i);
             Context.SetMovedThisFrame();
             Context.ResetCursorBlink();

@@ -63,10 +63,17 @@ namespace ChatClient.UI.Components.Base
                 },
                 ResetCursorBlink = () => cursor.ResetBlink(),
                 SetMovedThisFrame = () => movedThisFrame = true,
-                FieldName = FieldName
+                FieldName = FieldName,
+                GetCursorIndex = () => cursor.Position,
+                SetCursorIndex = pos => 
+                {
+                    cursor.Position = pos;
+                    cursor.ClampToTextLength(Text.Length);
+                }
+                
             };
             clipboardActions = new ClipboardActions(ctx);
-
+            
             undoStack.Push(string.Empty);
             SaveStateForUndo();
         }
