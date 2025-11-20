@@ -12,11 +12,10 @@ namespace ChatClient.UI.Screens.Chat.Components;
 /// </summary>
 public class ChatMessage
 {
-    private readonly MessageDTO message;
-    private readonly bool isOwnMessage;
-    private readonly string displayText;
-    private readonly float maxWidth;
-    private readonly List<string> wrappedLines;
+    private MessageDTO Message { get; set; }
+    private bool IsOwnMessage { get; set; }
+    private float MaxWidth { get; set; }
+    private List<string> WrappedLines { get; set; }
 
     public float Height { get; private set; }
     public float Width { get; private set; } 
@@ -26,37 +25,37 @@ public class ChatMessage
 
     public ChatMessage(MessageDTO message, float maxWidth, bool isOwnMessage, bool playNotificationSound = true)
     {
-        this.message = message;
-        this.isOwnMessage = isOwnMessage;
-        this.maxWidth = maxWidth - (Padding * 2);
+        Message = message;
+        IsOwnMessage = isOwnMessage;
+        MaxWidth = maxWidth - (Padding * 2);
 
         string sender = string.IsNullOrWhiteSpace(message.Sender) ? "Unknown Duck" : message.Sender;
         string timestamp = message.Timestamp.ToLocalTime().ToString("HH:mm");
         string header = $"{timestamp} - {sender}:";
 
-        wrappedLines = new List<string>();
+        WrappedLines = new List<string>();
 
         // Wrap header
-        wrappedLines.AddRange(WrapText(header, ResourceLoader.BoldFont));
+        WrappedLines.AddRange(WrapText(header, ResourceLoader.BoldFont));
 
         // Wrap content
-        wrappedLines.AddRange(WrapText(message.Content ?? "", ResourceLoader.RegularFont));
+        WrappedLines.AddRange(WrapText(message.Content ?? "", ResourceLoader.RegularFont));
 
         // Total height
         float maxLineWidth = 0f;
         int headerLines = WrapText(header, ResourceLoader.BoldFont).Count;
 
-        for (int i = 0; i < wrappedLines.Count; i++)
+        for (int i = 0; i < WrappedLines.Count; i++)
         {
             var font = i < headerLines 
                 ? ResourceLoader.BoldFont 
                 : ResourceLoader.RegularFont;
-            var lineWidth = Raylib.MeasureTextEx(font, wrappedLines[i], FontSize, 0.5f).X;
+            var lineWidth = Raylib.MeasureTextEx(font, WrappedLines[i], FontSize, 0.5f).X;
             maxLineWidth = Math.Max(maxLineWidth, lineWidth);
         }
 
         Width = maxLineWidth + (Padding * 2);
-        Height = wrappedLines.Count * LineSpacing + (Padding * 2);
+        Height = WrappedLines.Count * LineSpacing + (Padding * 2);
 
         // --- Notification sound ---
         /*
@@ -79,7 +78,7 @@ public class ChatMessage
             string testLine = string.IsNullOrEmpty(currentLine) ? word : currentLine + " " + word;
             var size = Raylib.MeasureTextEx(font, testLine, FontSize, 0.5f);
 
-            if (size.X > maxWidth && !string.IsNullOrEmpty(currentLine))
+            if (size.X > MaxWidth && !string.IsNullOrEmpty(currentLine))
             {
                 lines.Add(currentLine);
                 currentLine = word;
@@ -103,13 +102,13 @@ public class ChatMessage
         const float RightInset = 5f; // Distance from right edge for own messages
     
         // Right-align own messages with inset from scrollbar
-        float bubbleX = isOwnMessage 
+        float bubbleX = IsOwnMessage 
             ? x + containerWidth - Width - RightInset 
             : x - RightInset;
 
         // Draw bubble background
         var bubbleRect = new Rectangle(bubbleX, y, Width, Height);
-        var bubbleColor = isOwnMessage 
+        var bubbleColor = IsOwnMessage 
             ? Colors.ChatBubbleSelf 
             : Colors.ChatBubbleOther;
     
@@ -119,16 +118,16 @@ public class ChatMessage
         // Draw text
         float textY = y + Padding;
     
-        string sender = string.IsNullOrWhiteSpace(message.Sender) 
+        string sender = string.IsNullOrWhiteSpace(Message.Sender) 
             ? "Unknown Duck" 
-            : message.Sender;
-        string timestamp = message.Timestamp
+            : Message.Sender;
+        string timestamp = Message.Timestamp
             .ToLocalTime()
             .ToString("HH:mm");
         string header = $"{timestamp} - {sender}";
         int headerLineCount = WrapText(header, ResourceLoader.BoldFont).Count;
 
-        for (int i = 0; i < wrappedLines.Count; i++)
+        for (int i = 0; i < WrappedLines.Count; i++)
         {
             var font = i < headerLineCount 
                 ? ResourceLoader.BoldFont 
@@ -137,7 +136,7 @@ public class ChatMessage
                 ? Colors.ChatBubbleSelfText 
                 : Colors.ChatBubbleOtherText;
 
-            Raylib.DrawTextEx(font, wrappedLines[i],
+            Raylib.DrawTextEx(font, WrappedLines[i],
                 new Vector2(bubbleX + Padding, textY), FontSize, 0.5f, color);
 
             textY += LineSpacing;
