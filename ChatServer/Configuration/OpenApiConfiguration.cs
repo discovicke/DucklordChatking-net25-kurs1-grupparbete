@@ -20,8 +20,14 @@ public static class OpenApiConfiguration
                 document.SecurityRequirements ??= [];
 
                 // Configure the document
-                document.Info.Title = "Ducklord Chatking's Super Secure Server API Docs";
-                document.Info.Version = "v0.0.2";
+                document.Info.Title = "Ducklord Chatking's Server API Docs";
+                document.Info.Version = "v0.5.1";
+                document.Info.Description =
+                    "The Ducklord Chatking Server API documentation provides a comprehensive overview of every public endpoint exposed by the chat server. " +
+                    "You will find detailed specifications for each route—including path parameters, query parameters, request and response payloads, status codes and headers. " +
+                    "Authentication and authorization requirements are clearly indicated for each call, with examples where relevant. " +
+                    "Visit the interactive API explorer section to submit test requests, inspect live responses and understand the operational behavior of endpoints in real time. " +
+                    "Use this reference to plan integration, verify expected data flows, troubleshoot error conditions and ensure the client software aligns with the server’s semantics.";
 
                 const string schemeKey = "SessionAuth";
 
@@ -31,7 +37,7 @@ public static class OpenApiConfiguration
                     Type = SecuritySchemeType.ApiKey,
                     Name = "SessionAuthToken",
                     In = ParameterLocation.Header,
-                    Description = "Session auth token which is normally returned in the server response when user logs in (/auth/login/)."
+                    Description = "Session auth token which is normally returned in the server response when user logs in successfully (/auth/login/)."
                 };
 
                 // Apply globally
