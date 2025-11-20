@@ -9,9 +9,19 @@ public static class OptionsScreenLayout
 {
     public struct LayoutData
     {
-        public Rectangle UserRect, PassRect, PassConfirmRect, ConfirmRect, BackRect;
-        public Rectangle ToggleWindowedRect, ToggleFullscreenRect, ToggleMuteRect;
-        public float LogoX, LogoY, LogoScale, LogoWidth, LogoHeight;
+        public Rectangle UserRect { get; init; }
+        public Rectangle PassRect { get; init; }
+        public Rectangle PassConfirmRect { get; init; }
+        public Rectangle ConfirmRect { get; init; }
+        public Rectangle BackRect { get; init; }
+        public Rectangle ToggleWindowedRect { get; init; }
+        public Rectangle ToggleFullscreenRect { get; init; }
+        public Rectangle ToggleMuteRect { get; init; }
+        public float LogoX { get; init; }
+        public float LogoY { get; init; }
+        public float LogoScale { get; init; }
+        public float LogoWidth { get; set; }
+        public float LogoHeight { get; set; }
     }
 
     public static LayoutData Calculate(int logoWidth, int logoHeight)
