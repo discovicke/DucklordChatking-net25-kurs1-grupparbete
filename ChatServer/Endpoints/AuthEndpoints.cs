@@ -47,13 +47,16 @@ public static class AuthEndpoints
       // 200: success
       return Results.Ok(response);
     })
-    .Produces(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .WithSummary("User Login")
-    .WithDescription("Validates username and password. On success, creates a new session Auth-token for the user and returns it in the response body of status `200`. " +
-    "Returns `401` when the credentials are incorrect and `400` when the request is missing a username or password. " +
-    "The session token functions as proof that the caller has authenticated and must be included in subsequent requests that require access control.");
+.Produces(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.WithSummary("User Login")
+.WithDescription(
+    "Authenticates a user based on the provided username and password. " +
+    "A valid login returns `200` with the caller’s username and a newly issued session token. " +
+    "Incorrect credentials lead to `401`, and requests missing required fields result in `400`. " +
+    "The session token identifies the caller in future authenticated requests."
+);
     #endregion
 
     #region REGISTER
@@ -88,15 +91,17 @@ public static class AuthEndpoints
       // 201: created, return the username
       return Results.Created("", newUser.Username);
     })
-    .Produces(StatusCodes.Status201Created)
-    .Produces(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status409Conflict)
-    .Produces(StatusCodes.Status500InternalServerError)
-    .WithSummary("Register User Account")
-    .WithDescription(
-        "Creates a new user account. Returns `201` with the username as content when the account is successfully created. " +
-        "Returns `409` when the provided username already exists. Returns `400` when the request content is missing a username or password."
-    );
+.Produces(StatusCodes.Status201Created)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status409Conflict)
+.Produces(StatusCodes.Status500InternalServerError)
+.WithSummary("Register User Account")
+.WithDescription(
+    "Creates a new user account for the caller. " +
+    "A successful registration produces `201` with the created username. " +
+    "Conflicting usernames result in `409`, and requests missing required fields lead to `400`. " +
+    "Unexpected retrieval issues during the creation process return `500`."
+);
     #endregion
 
     return auth;

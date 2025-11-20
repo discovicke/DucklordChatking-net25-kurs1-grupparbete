@@ -55,19 +55,19 @@ public static class MessageEndpoints
       // 204: success
       return Results.NoContent();
     })
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .Produces(StatusCodes.Status403Forbidden)
-    .Produces(StatusCodes.Status500InternalServerError)
-    .WithSummary("Send Message")
-    .WithDescription(
-        "Handles the submission of a new chat message from an authenticated caller. " +
-        "A valid request stores the message, broadcasts it to all connected clients, and concludes with `204`. " +
-        "Missing fields lead to `400`, unauthenticated attempts receive `401`, and a sender mismatch produces `403`. " +
-        "Unexpected storage issues return `500`."
-    )
-    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
+.Produces(StatusCodes.Status500InternalServerError)
+.WithSummary("Send Message")
+.WithDescription(
+    "Processes a new chat message from an authenticated caller. " +
+    "A valid request stores the message and returns `204` to signal completion. " +
+    "Missing fields result in `400`, unauthenticated calls receive `401`, and a sender mismatch triggers `403`. " +
+    "Unexpected storage problems lead to `500`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
     #region GET MESSAGE UPDATES (LONG POLLING)
@@ -146,13 +146,12 @@ public static class MessageEndpoints
 .Produces<IEnumerable<MessageDTO>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status401Unauthorized)
-.WithSummary("Get Message Updates (Event-Driven Long Polling)")
+.WithSummary("Get Message Updates (Long Polling)")
 .WithDescription(
-    "Returns new chat messages that have an ID greater than the provided lastId. " +
-    "If updates are available, the response is returned immediately. " +
-    "If no updates exist, the request is suspended and waits efficiently until either a new message is posted " +
-    "or a 25-second timeout is reached. " +
-    "This event-driven design eliminates CPU polling and resumes the request the moment new messages arrive."
+    "Retrieves new messages created after the caller’s last received ID. " +
+    "If new messages exist, they are returned immediately with `200`. " +
+    "If no messages are available, the request waits until a new message arrives or until the 25 second timeout passes. " +
+    "The notifier resumes the request as soon as a new message is posted, which creates efficient long polling without repeated checks."
 )
 .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
@@ -182,16 +181,16 @@ public static class MessageEndpoints
       ServerLog.Info($"Message history requested by '{caller.Username}' with {messages.Count} messages returned");
       return Results.Ok(messages);
     })
-    .Produces<IEnumerable<MessageDTO>>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .WithSummary("Get Message History")
-    .WithDescription(
-       "Provides access to the stored chat history for authenticated callers. " +
-       "A successful retrieval returns `200` with the messages, while invalid query values result in `400`. " +
-       "Unauthenticated requests receive `401`."
-    )
-    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+.Produces<IEnumerable<MessageDTO>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.WithSummary("Get Message History")
+.WithDescription(
+    "Returns stored chat messages for an authenticated caller. " +
+    "A valid request produces `200` with the entire history or a limited set when the take parameter is provided. " +
+    "Invalid values for the parameter result in `400`, and unauthorized requests receive `401`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
     #region CLEAR MESSAGE HISTORY
@@ -225,19 +224,19 @@ public static class MessageEndpoints
       ServerLog.Success($"Message history cleared by admin '{caller.Username}'");
       return Results.NoContent();
     })
-    .WithBadge("Danger Zone 💣", BadgePosition.Before, "#ff3b30")
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .Produces(StatusCodes.Status403Forbidden)
-    .Produces(StatusCodes.Status500InternalServerError)
-    .WithSummary("Clear Message History")
-    .WithDescription(
-        "Removes all stored chat messages. Available only to authenticated administrators. " +
-        "A successful operation returns `204`. Unauthenticated attempts receive `401`, " +
-        "while callers lacking administrative privileges receive `403`. " +
-        "Unexpected storage failures result in `500`."
-    )
-    .WithBadge("Admin Only 🔐", BadgePosition.Before, "#707fff");
+.WithBadge("Danger Zone 💣", BadgePosition.Before, "#ff3b30")
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
+.Produces(StatusCodes.Status500InternalServerError)
+.WithSummary("Clear Message History")
+.WithDescription(
+    "Removes all stored chat messages for an authenticated administrator. " +
+    "A successful clear returns `204`. Unauthorized requests receive `401`, " +
+    "and callers without administrative rights receive `403`. " +
+    "Unexpected storage issues lead to `500`."
+)
+.WithBadge("Admin Only 🔐", BadgePosition.Before, "#707fff");
     #endregion
 
     return messages;

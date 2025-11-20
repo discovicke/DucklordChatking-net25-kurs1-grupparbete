@@ -43,17 +43,17 @@ public static class UserEndpoints
       ServerLog.Info($"User list returned ({usernames.Count()} users)");
       return Results.Ok(usernames);
     })
-    .Produces<IEnumerable<string>>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status500InternalServerError)
-    .WithSummary("List All Usernames")
-    .WithDescription(
-        "Provides the complete list of registered usernames for authenticated callers. " +
-        "A successful lookup yields a `200` response with the usernames, or `204` when the store is empty. " +
-        "Unauthenticated requests receive `401`, and any internal retrieval failure results in `500`."
-    )
-    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+.Produces<IEnumerable<string>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status500InternalServerError)
+.WithSummary("List All Usernames")
+.WithDescription(
+    "Returns a list of all registered usernames for an authenticated caller. " +
+    "A successful request produces `200` with the usernames, while an empty store produces `204`. " +
+    "Unauthorized callers receive `401`, and unexpected retrieval issues lead to `500`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
     #region UPDATE USER CREDENTIALS
@@ -97,18 +97,19 @@ public static class UserEndpoints
       ServerLog.Success($"User '{dto.OldUsername}' updated credentials to '{dto.NewUsername}'");
       return Results.NoContent();
     })
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .Produces(StatusCodes.Status403Forbidden)
-    .Produces(StatusCodes.Status409Conflict)
-    .WithSummary("Update User Account")
-    .WithDescription(
-        "Allows authenticated users to update their own account details. Administrators may update any account. " +
-        "Successful updates return `204`. Conflicts in username availability yield `409`, " +
-        "and callers without the right permissions receive `403`."
-    )
-    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
+.Produces(StatusCodes.Status409Conflict)
+.WithSummary("Update User Account")
+.WithDescription(
+    "Updates account details for an authenticated user. Administrators may perform updates on any account. " +
+    "A successful change returns `204`. Conflicts involving username availability produce `409`, " +
+    "and callers without the necessary permissions receive `403`. " +
+    "Requests with missing required fields return `400`, and unauthorized callers receive `401`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
     #region DELETE USER
@@ -158,18 +159,19 @@ public static class UserEndpoints
       ServerLog.Success($"User '{dto.Username}' deleted");
       return Results.NoContent();
     })
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .Produces(StatusCodes.Status403Forbidden)
-    .Produces(StatusCodes.Status500InternalServerError)
-    .WithSummary("Delete User Account")
-    .WithDescription(
-        "Authenticated users may delete their own account, while administrators may remove any account. " +
-        "A successful deletion returns `204`. Invalid credentials result in `401`, insufficient permissions in `403`, " +
-        "and unexpected storage failures in `500`."
-    )
-    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
+.Produces(StatusCodes.Status500InternalServerError)
+.WithSummary("Delete User Account")
+.WithDescription(
+    "Removes a user account after validating the caller’s identity and permissions. " +
+    "Users may delete their own account, and administrators may delete any account. " +
+    "A successful deletion returns `204`. Incorrect credentials return `401`, while callers without the required permission receive `403`. " +
+    "Unexpected storage issues result in `500`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
     #region GET ALL USER STATUSES
@@ -203,16 +205,16 @@ public static class UserEndpoints
 
       return Results.Ok(result);
     })
-    .Produces<IEnumerable<UserStatusDTO>>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .WithSummary("List All Users With Online/Offline Status")
-    .WithDescription(
-    "Returns all registered users along with their current online status. " +
-    "Each entry includes the `Username` and a boolean `Online` value. " +
-    "A user is considered online when their `LastActivityUtc` timestamp is within the configured `OnlineWindow`."
-    )
-    .WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
+.Produces<IEnumerable<UserStatusDTO>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status401Unauthorized)
+.WithSummary("List User Statuses")
+.WithDescription(
+    "Provides the online and offline status of all registered users. " +
+    "A successful request returns `200` with a list of UserStatusDTO objects. " +
+    "An empty store results in `204`, and unauthorized requests receive `401`."
+)
+.WithBadge("Auth Required 🔐", BadgePosition.Before, "#ffec72");
     #endregion
 
     #region USER HEARTBEAT CHECK
@@ -229,8 +231,15 @@ public static class UserEndpoints
 
       caller.LastSeenUtc = DateTime.UtcNow;
       return Results.Ok();
-    });
+    })
+.Produces(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.WithSummary("User Heartbeat")
+.WithDescription(
+    "Records that the authenticated user is active by updating their last seen timestamp. " +
+    "A valid request returns `200`. Unauthorized calls receive `401`."
+);
+    #endregion
     return users;
   }
-  #endregion
 }
