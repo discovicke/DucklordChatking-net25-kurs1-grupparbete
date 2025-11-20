@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using ChatClient.Core;
 using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;

@@ -12,31 +12,31 @@ namespace ChatClient.UI.Screens.Options;
 
 public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
 {
-    private readonly TextField newUsername = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+    private readonly TextField newUsername = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         false, false, "OptionsScreen_NewUsername", "New quackername...");
-    private readonly TextField newPassword = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+    private readonly TextField newPassword = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         false, true, "OptionsScreen_NewPassword", "New password...");
-    private readonly TextField confirmPassword = new(new Rectangle(), 
-        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor, 
+    private readonly TextField confirmPassword = new(new Rectangle(),
+        Colors.TextFieldUnselected, Colors.TextFieldHovered, Colors.TextColor,
         false, true, "OptionsScreen_ConfirmPassword", "Confirm new password...");
-    
-    private readonly Button confirmButton = new(new Rectangle(), "Confirm", 
+
+    private readonly Button confirmButton = new(new Rectangle(), "Confirm",
         Colors.ButtonDefault, Colors.ButtonHovered, Colors.TextColor);
     private readonly BackButton backButton = new(new Rectangle(10, 10, 100, 30));
 
     private readonly ToggleBox toggleWindowed = new(new Rectangle(), "Windowed");
     private readonly ToggleBox toggleFullscreen = new(new Rectangle(), "Fullscreen");
     private readonly ToggleBox toggleMute = new(new Rectangle(), "Sound OFF");
-    
+
     public OptionsScreen()
     {
-        logic = new OptionsScreenLogic(newUsername, newPassword, confirmPassword, 
+        logic = new OptionsScreenLogic(newUsername, newPassword, confirmPassword,
             confirmButton, backButton, toggleWindowed, toggleFullscreen, toggleMute);
     }
 
-    protected override OptionsScreenLayout.LayoutData CalculateLayout() => 
+    protected override OptionsScreenLayout.LayoutData CalculateLayout() =>
         OptionsScreenLayout.Calculate(ResourceLoader.LogoTexture.Width, ResourceLoader.LogoTexture.Height);
 
     protected override void ApplyLayout(OptionsScreenLayout.LayoutData layout)
@@ -59,7 +59,7 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
 
         confirmButton.Draw();
         backButton.Draw();
-        
+
         toggleWindowed.Draw();
         toggleFullscreen.Draw();
         toggleMute.Draw();
@@ -67,5 +67,8 @@ public class OptionsScreen : ScreenBase<OptionsScreenLayout.LayoutData>
         Raylib.DrawTextureEx(ResourceLoader.LogoTexture,
             new Vector2(layout.LogoX, layout.LogoY),
             0f, layout.LogoScale, Color.White);
+
+        ((OptionsScreenLogic?)logic)?.FeedbackBox.Draw();
+
     }
 }
