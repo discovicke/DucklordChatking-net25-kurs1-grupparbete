@@ -194,7 +194,34 @@ namespace ChatClient.UI.Components.Text
             Log.Info($"[{Context.FieldName}] Ctrl + Left -> Cursor moved left firn {index} to {i}");
 
         }
-        
+        private void MoveCurserRightByWord()
+        {
+            string text = Context.GetText() ?? string.Empty;
+            int index = Context.GetCursorIndex();
+
+            if (index >= text.Length || text.Length == 0)
+            {
+                return;
+            }
+
+            int i = index;
+
+            // Skip any whitespace directly after the cursor
+            while (i < text.Length && char.IsWhiteSpace(text[i]))
+            {
+                i++;
+            }
+
+            // Move right until whitespace or end
+            while (i < text.Length && char.IsWhiteSpace(text[i]))
+            {
+                i++;
+            }
+            Context.SetCursorIndex(i);
+            Context.SetMovedThisFrame();
+            Context.ResetCursorBlink();
+            Log.Info($"[{Context.FieldName}] Ctrl+Right -> Cursor moved from {index} to {i}");
+        }
 
     }
 }
