@@ -92,15 +92,11 @@ public class OptionsScreenLogic(
         // Mute application
         if (toggleMute.IsChecked)
         {
-            
             Raylib.SetMasterVolume(0.0f);
-            Log.Info("[OptionsScreenLogic] Mute enabled");
         }
         else
         {
-            
             Raylib.SetMasterVolume(1.0f);
-            Log.Info("[OptionsScreenLogic] Mute disabled");
         }
 
             
