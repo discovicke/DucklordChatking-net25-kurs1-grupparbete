@@ -15,18 +15,17 @@ namespace ChatClient.UI.Screens.Options;
 // TODO Save settings
 public class OptionsScreenLogic : ScreenLogicBase
 {
-    private readonly TextField userField;
-    private readonly TextField passField;
-    private readonly TextField passConfirmField;
-    private readonly Button confirmButton;
-    private readonly BackButton backButton;
-    private readonly ToggleBox toggleWindowed;
-    private readonly ToggleBox toggleFullscreen;
-    private readonly ToggleBox toggleMute;
-    private readonly FeedbackBox feedbackBox;
+    private readonly TextField UserField;
+    private readonly TextField PassField;
+    private readonly TextField PassConfirmField;
+    private readonly Button ConfirmButton;
+    private readonly BackButton BackButton;
+    private readonly ToggleBox ToggleWindowed;
+    private readonly ToggleBox ToggleFullscreen;
+    private readonly ToggleBox ToggleMute;
     private readonly IFeedbackService feedback;
 
-    public FeedbackBox FeedbackBox => feedbackBox;
+    public FeedbackBox FeedbackBox { get; }
 
 
     public OptionsScreenLogic(
@@ -39,21 +38,22 @@ public class OptionsScreenLogic : ScreenLogicBase
         ToggleBox toggleFullscreen,
         ToggleBox toggleMute)
     {
-        this.userField = userField;
-        this.passField = passField;
-        this.passConfirmField = passConfirmField;
-        this.confirmButton = confirmButton;
-        this.backButton = backButton;
-        this.toggleWindowed = toggleWindowed;
-        this.toggleFullscreen = toggleFullscreen;
-        this.toggleMute = toggleMute;
+        UserField = userField;
+        PassField = passField;
+        PassConfirmField = passConfirmField;
+        ConfirmButton = confirmButton;
+        BackButton = backButton;
+        ToggleWindowed = toggleWindowed;
+        ToggleFullscreen = toggleFullscreen;
+        ToggleMute = toggleMute;
 
+        // Register fields for automatic tab navigation
         RegisterField(userField);
         RegisterField(passField);
         RegisterField(passConfirmField);
 
-        feedbackBox = new FeedbackBox();
-        feedback = new FeedbackService(feedbackBox);
+        FeedbackBox = new FeedbackBox();
+        feedback = new FeedbackService(FeedbackBox);
     }
 
 
@@ -62,24 +62,23 @@ public class OptionsScreenLogic : ScreenLogicBase
         base.UpdateComponents(); // Updates all registered fields with tab navigation
 
         // Use WindowSettings to handle window mode toggles
-        WindowSettings.UpdateToggles(toggleWindowed, toggleFullscreen);
-
-        toggleMute.Update();
-        confirmButton.Update();
-        backButton.Update();
-
-        feedbackBox.Update();
+        WindowSettings.UpdateToggles(ToggleWindowed, ToggleFullscreen);
+        
+        ToggleMute.Update();
+        ConfirmButton.Update();
+        BackButton.Update();
+        FeedbackBox.Update();
         HandleMuteToggle();
     }
 
     protected override void HandleActions()
     {
-        if (confirmButton.IsClicked())
+        if (ConfirmButton.IsClicked())
         {
             SaveSettings();
         }
 
-        if (backButton.IsClicked())
+        if (BackButton.IsClicked())
         {
             Cancel();
         }
@@ -87,7 +86,7 @@ public class OptionsScreenLogic : ScreenLogicBase
 
     private void HandleMuteToggle()
     {
-        if (toggleMute.IsChecked)
+        if (ToggleMute.IsChecked)
         {
             Raylib.SetMasterVolume(0.0f);
         }
@@ -100,9 +99,9 @@ public class OptionsScreenLogic : ScreenLogicBase
     private void SaveSettings()
     {
         var oldUsername = AppState.LoggedInUsername;
-        var newUsername = userField.Text;
-        var newPassword = passField.Text;
-        var confirmPassword = passConfirmField.Text;
+        var newUsername = UserField.Text;
+        var newPassword = PassField.Text;
+        var confirmPassword = PassConfirmField.Text;
 
         if (string.IsNullOrWhiteSpace(newUsername))
         {
@@ -129,7 +128,7 @@ public class OptionsScreenLogic : ScreenLogicBase
         AppState.LoggedInUsername = newUsername;
 
         feedback.ShowSuccess("Credentials updated!");
-        Log.Info($"[OptionsScreenLogic] Settings confirmed - New username: '{userField.Text}'");
+        Log.Info($"[OptionsScreenLogic] Settings confirmed - New username: '{UserField.Text}'");
         ClearFields();
         Task.Delay(1000).ContinueWith(_ => Navigation.NavigateBack());
     }

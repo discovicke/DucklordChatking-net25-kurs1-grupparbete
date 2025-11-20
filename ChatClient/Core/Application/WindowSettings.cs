@@ -7,7 +7,7 @@ namespace ChatClient.Core.Application;
 public enum WindowMode
 {
     Windowed,
-    Fullscreen
+    FullscreenWindowed
 }
 
 /// <summary>
@@ -19,23 +19,131 @@ public static class WindowSettings
 {
     public static WindowMode CurrentMode { get; private set; } = WindowMode.Windowed;
     private static bool togglesInitialized = false;
-    
+    private static int WindowedWidth { get; set; } = 1024;
+    private static int WindowedHeight { get; set; } = 768;
+    private static int WindowedX { get; set; } = 100;
+    private static int WindowedY { get; set; } = 100;
+    private static bool HasWindowedSnapshot { get; set; }
+
     public static void SetMode(WindowMode mode)
     {
         CurrentMode = mode;
         ApplyCurrentMode(AppState.CurrentScreen);
     }
-    
+
+    public static void UpdateToggles(ToggleBox windowedToggle, ToggleBox fullscreenToggle)
+    {
+
+        if (windowedToggle is null || fullscreenToggle is null)
+        {
+            return;
+        }
+
+        bool windowedBefore = windowedToggle.IsChecked;
+        bool fullscreenBefore = fullscreenToggle.IsChecked;
+
+        windowedToggle.Update();
+        fullscreenToggle.Update();
+
+        bool windowedChanged = windowedBefore != windowedToggle.IsChecked;
+        bool fullscreenChanged = fullscreenBefore != fullscreenToggle.IsChecked;
+
+        // Initialize toggles to match current mode (only once)
+        if (windowedChanged && windowedToggle.IsChecked)
+        {
+            fullscreenToggle.SetChecked(false);
+            RestoreWindowedMode();
+            SetMode(WindowMode.Windowed);
+            return;
+        }
+
+        if (fullscreenChanged && fullscreenToggle.IsChecked)
+        {
+            windowedToggle.SetChecked(false);
+            SetMode(WindowMode.FullscreenWindowed);
+            return;
+        }
+
+        if (!windowedToggle.IsChecked && !fullscreenToggle.IsChecked)
+        {
+            if (CurrentMode == WindowMode.Windowed)
+            {
+                windowedToggle.SetChecked(true);
+            }
+            else
+            {
+                fullscreenToggle.SetChecked(true);
+            }
+        }
+        else
+        {
+            windowedToggle.SetChecked(CurrentMode == WindowMode.Windowed);
+            fullscreenToggle.SetChecked(CurrentMode == WindowMode.FullscreenWindowed);
+        }
+    }
+
+    private static void CaptureWindowedBounds()
+    {
+        if (!Raylib.IsWindowReady())
+        {
+            return;
+        }
+
+        WindowedWidth = Raylib.GetScreenWidth();
+        WindowedHeight = Raylib.GetScreenHeight();
+
+        var position = Raylib.GetWindowPosition();
+        WindowedX = (int)position.X;
+        WindowedY = (int)position.Y;
+        HasWindowedSnapshot = true;
+    }
+
+    /// <summary>
+    /// Resets the initialization state. Call this when changing screens if needed.
+    /// </summary>
+    private static void RestoreWindowedMode()
+    {
+        //Raylib.ClearWindowState(ConfigFlags.UndecoratedWindow);
+
+        if (!HasWindowedSnapshot)
+        {
+            var monitorPos = Raylib.GetMonitorPosition(Raylib.GetCurrentMonitor());
+            WindowedX = (int)monitorPos.X + 100;
+            WindowedY = (int)monitorPos.Y + 100;
+        }
+
+        Raylib.SetWindowSize(WindowedWidth, WindowedHeight);
+        Raylib.SetWindowPosition(WindowedX, WindowedY);
+    }
+
+    private static void ApplyBorderlessMode()
+    {
+        //Raylib.SetWindowState(ConfigFlags.UndecoratedWindow);
+
+        int monitor = Raylib.GetCurrentMonitor();
+        var monitorPos = Raylib.GetMonitorPosition(monitor);
+        int width = Raylib.GetMonitorWidth(monitor);
+        int height = Raylib.GetMonitorHeight(monitor);
+
+        Raylib.SetWindowSize(width, height);
+        Raylib.SetWindowPosition((int)monitorPos.X, (int)monitorPos.Y);
+    }
+
+
     public static void ApplyCurrentMode(Screen screen)
     {
-        if (CurrentMode == WindowMode.Fullscreen)
+        if (CurrentMode == WindowMode.FullscreenWindowed)
         {
             Raylib.SetWindowState(ConfigFlags.FullscreenMode);
+            Raylib.SetWindowSize(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+            ApplyBorderlessMode();
+            CaptureWindowedBounds();
         }
         else
         {
             Raylib.ClearWindowState(ConfigFlags.FullscreenMode);
-            
+            RestoreWindowedMode();
+
             // Apply windowed size based on screen
             switch (screen)
             {
@@ -43,65 +151,14 @@ public static class WindowSettings
                 case Screen.Register:
                     Raylib.SetWindowSize(500, 750);
                     break;
-                    
+
                 case Screen.Chat:
                 case Screen.Options:
                     Raylib.SetWindowSize(1200, 720);
                     break;
             }
         }
-        
+
         Log.Info($"[WindowSettings] Applied {CurrentMode} mode for {screen} screen");
     }
-
-    /// <summary>
-    /// Updates toggle boxes and handles mode switching.
-    /// Call this in your screen's update loop.
-    /// </summary>
-    public static void UpdateToggles(ToggleBox windowedToggle, ToggleBox fullscreenToggle)
-    {
-        // Initialize toggles to match current mode (only once)
-        if (!togglesInitialized)
-        {
-            bool isWindowed = CurrentMode == WindowMode.Windowed;
-            windowedToggle.SetChecked(isWindowed);
-            fullscreenToggle.SetChecked(!isWindowed);
-            togglesInitialized = true;
-        }
-
-        windowedToggle.Update();
-        fullscreenToggle.Update();
-
-        // Handle toggle clicks
-        if (windowedToggle.IsClicked())
-        {
-            SetModeFromToggle(WindowMode.Windowed, windowedToggle, fullscreenToggle);
-        }
-        else if (fullscreenToggle.IsClicked())
-        {
-            SetModeFromToggle(WindowMode.Fullscreen, windowedToggle, fullscreenToggle);
-        }
-    }
-
-    /// <summary>
-    /// Resets the initialization state. Call this when changing screens if needed.
-    /// </summary>
-    public static void ResetToggleInitialization()
-    {
-        togglesInitialized = false;
-    }
-
-    private static void SetModeFromToggle(WindowMode mode, ToggleBox windowedToggle, ToggleBox fullscreenToggle)
-    {
-        bool isWindowed = mode == WindowMode.Windowed;
-        windowedToggle.SetChecked(isWindowed);
-        fullscreenToggle.SetChecked(!isWindowed);
-
-        if (CurrentMode != mode)
-        {
-            SetMode(mode);
-            Log.Info($"[WindowSettings] {mode} mode selected via toggle");
-        }
-    }
 }
-
