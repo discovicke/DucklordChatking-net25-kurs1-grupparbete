@@ -19,12 +19,14 @@ namespace ChatClient.UI.Screens.Start
         // DEV MODE: Set to false before production release
         private const bool DEV_MODE_ENABLED = true;
         
-        private readonly TextField userField;
-        private readonly TextField passwordField;
-        private readonly Button loginButton;
-        private readonly Button registerButton;
-        private readonly IFeedbackService feedback;
-        private readonly UserAuth userAuth;
+        private TextField UserField { get; set; }
+        private TextField PasswordField { get; set; }
+        private Button LoginButton { get; set; }
+        private Button RegisterButton { get; set; }
+        private IFeedbackService Feedback { get; set; }
+        private UserAuth UserAuth { get; set; }
+        
+        private Action PostLoginAction { get; set; }
 
         public FeedbackBox FeedbackBox { get; }
 
@@ -34,24 +36,29 @@ namespace ChatClient.UI.Screens.Start
             Button loginButton,
             Button registerButton)
         {
-            this.userField = userField;
-            this.passwordField = passwordField;
-            this.loginButton = loginButton;
-            this.registerButton = registerButton;
-            
-            this.FeedbackBox = new FeedbackBox();
-            this.feedback = new FeedbackService(FeedbackBox);
-            this.userAuth = new UserAuth(ServerConfig.CreateHttpClient());
+            UserField = userField;
+            PasswordField = passwordField;
+            LoginButton = loginButton;
+            RegisterButton = registerButton;
 
-            // Register fields for automatic tab navigation
-            RegisterField(userField);
-            RegisterField(passwordField);
+            FeedbackBox = new FeedbackBox();
+            Feedback = new FeedbackService(FeedbackBox);
+            UserAuth = new UserAuth(ServerConfig.CreateHttpClient());
+
+            PostLoginAction = () =>
+            {
+                Navigation.NavigateTo(Screen.Chat);
+                ClearFields();
+            };
+
+            RegisterField(UserField);
+            RegisterField(PasswordField);
         }
 
         protected override void UpdateComponents()
         {
             base.UpdateComponents(); // Updates all registered fields with tab navigation
-            feedback.Update();
+            Feedback.Update();
         }
 
         protected override void HandleActions()
@@ -66,12 +73,12 @@ namespace ChatClient.UI.Screens.Start
                 return;
             }
 
-            if (MouseInput.IsLeftClick(loginButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
+            if (MouseInput.IsLeftClick(LoginButton.Rect) || Raylib.IsKeyPressed(KeyboardKey.Enter))
             {
                 Login();
             }
 
-            if (MouseInput.IsLeftClick(registerButton.Rect))
+            if (MouseInput.IsLeftClick(RegisterButton.Rect))
             {
                 NavigateToRegister();
             }
@@ -79,27 +86,27 @@ namespace ChatClient.UI.Screens.Start
 
         private void Login()
         {
-            string username = userField.Text.Trim();
-            string password = passwordField.Text;
+            string username = UserField.Text.Trim();
+            string password = PasswordField.Text;
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
                 Raylib.PlaySound(ResourceLoader.FailedSound);
-                feedback.ShowError("Please enter quackername and password!");
+                Feedback.ShowError("Please enter quackername and password!");
                 Log.Info("[StartScreenLogic] Login failed - Username or password empty");
                 return;
             }
 
             Log.Info($"[StartScreenLogic] Login attempt - Username: '{username}'");
 
-            bool success = userAuth.Login(username, password);
+            bool success = UserAuth.Login(username, password);
 
             if (success)
             {
                 Raylib.PlaySound(ResourceLoader.LoginSound);
                 Log.Success($"[StartScreenLogic] Login successful for user '{username}'");
                 AppState.LoggedInUsername = username;
-                feedback.ShowSuccess($"Welcome duck, {username}!");
+                Feedback.ShowSuccess($"Welcome duck, {username}!");
 
                 Task.Delay(1000).ContinueWith(_ =>
                 {
@@ -111,7 +118,7 @@ namespace ChatClient.UI.Screens.Start
             {
                 Raylib.PlaySound(ResourceLoader.FailedSound);
                 Log.Error($"[StartScreenLogic] Login failed for user '{username}' - Invalid credentials");
-                feedback.ShowError("DUCK! Login failed, check your credentials.");
+                Feedback.ShowError("DUCK! Login failed, check your credentials.");
             }
         }
 
@@ -119,14 +126,14 @@ namespace ChatClient.UI.Screens.Start
         {
             Log.Info("[StartScreenLogic] DEV MODE: Quack login activated (Ctrl+Shift+D)");
     
-            bool success = userAuth.Login("Ducklord", "chatking");
+            bool success = UserAuth.Login("Ducklord", "chatking");
     
             if (success)
             {
                 Raylib.PlaySound(ResourceLoader.LoginSound);
                 Log.Success("[StartScreenLogic] DEV MODE: Login successful for Ducklord");
                 AppState.LoggedInUsername = "Ducklord";
-                feedback.ShowSuccess("DEV MODE: Welcome back, Ducklord!");
+                Feedback.ShowSuccess("DEV MODE: Welcome back, Ducklord!");
         
                 Task.Delay(1000).ContinueWith(_ =>
                 {
@@ -138,7 +145,7 @@ namespace ChatClient.UI.Screens.Start
             {
                 Raylib.PlaySound(ResourceLoader.FailedSound);
                 Log.Error("[StartScreenLogic] DEV MODE: Login failed for Ducklord - Invalid credentials");
-                feedback.ShowError("DEV MODE: Login failed!");
+                Feedback.ShowError("DEV MODE: Login failed!");
             }
         }
 
