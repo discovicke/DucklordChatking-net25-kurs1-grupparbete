@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Linq;
 using ChatClient.Core.Application;
 using ChatClient.Core.Infrastructure;
@@ -160,8 +160,6 @@ public class ChatDataService(MessageHandler handler)
                 {
                     Log.Info("[Poll] No new messages");
                 }
-
-
 
                 await Task.Delay(150, token);
             }

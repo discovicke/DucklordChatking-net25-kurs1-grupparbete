@@ -1,4 +1,4 @@
-using ChatClient.Core.Application;
+﻿using ChatClient.Core.Application;
 
 namespace ChatClient.UI.Screens.Common;
 

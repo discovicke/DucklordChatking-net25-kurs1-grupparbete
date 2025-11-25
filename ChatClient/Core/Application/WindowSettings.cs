@@ -103,8 +103,6 @@ public static class WindowSettings
     /// </summary>
     private static void RestoreWindowedMode()
     {
-        //Raylib.ClearWindowState(ConfigFlags.UndecoratedWindow);
-
         if (!HasWindowedSnapshot)
         {
             var monitorPos = Raylib.GetMonitorPosition(Raylib.GetCurrentMonitor());
@@ -117,8 +115,6 @@ public static class WindowSettings
 
     private static void ApplyBorderlessMode()
     {
-        //Raylib.SetWindowState(ConfigFlags.UndecoratedWindow);
-
         int monitor = Raylib.GetCurrentMonitor();
         var monitorPos = Raylib.GetMonitorPosition(monitor);
         int width = Raylib.GetMonitorWidth(monitor);

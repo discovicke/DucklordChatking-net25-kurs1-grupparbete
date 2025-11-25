@@ -11,11 +11,6 @@ namespace ChatClient;
 
 public class Program
 {
-    // TODO:
-    //      - Add relative spacing to window size
-    //      - Add chat bubble for own user message
-    //      - Add feedback box / message when other users change status
-
     public static void Main()
     {
         string appVersion = "DuckLord v.0.8.2";

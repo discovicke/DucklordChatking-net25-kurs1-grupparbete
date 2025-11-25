@@ -26,10 +26,11 @@ namespace ChatClient.UI.Components.Specialized
             Raylib.DrawRectangleRounded(Rect, 0.12f, 12, bg);
             Raylib.DrawRectangleRoundedLinesEx(Rect, 0.12f, 12, 1f, Colors.OutlineColor);
 
-            // --- TEST Gear Icon ---
+            // --- Gear Icon ---
             string gearIcon = "\uf013";
             float fontSize = Rect.Height * 0.6f;
             Vector2 textSize = Raylib.MeasureTextEx(ResourceLoader.SymbolFont, gearIcon, fontSize, 0);
+
             // Center icon in button
             Vector2 pos = new Vector2(
                 Rect.X + (Rect.Width - textSize.X) * 0.5f,
@@ -56,10 +57,5 @@ namespace ChatClient.UI.Components.Specialized
             }
         }
 
-        private static void DrawRing(Vector2 center, float inner, float outer, Color color)
-        {
-            // Use DrawRing when available, else emulate with two circles
-            Raylib.DrawRing(center, inner, outer, 0f, 360f, 48, color);
-        }
     }
 }

@@ -107,6 +107,4 @@ namespace ChatClient.UI.Components.Base
         public override void Update() { }
     }
 
-
-    // TODO: add button for exit application
 }

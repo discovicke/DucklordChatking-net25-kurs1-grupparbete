@@ -280,7 +280,6 @@ namespace ChatClient.UI.Components.Base
                    && Raylib.IsKeyPressed(KeyboardKey.Enter);
         }
 
-
         public new void SetRect(Rectangle rect)
         {
             Rect = rect;

@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using ChatClient.Core.Infrastructure;
 using ChatClient.UI.Components.Base;
 using ChatClient.UI.Theme;

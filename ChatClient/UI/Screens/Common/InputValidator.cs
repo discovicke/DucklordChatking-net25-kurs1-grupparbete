@@ -1,4 +1,4 @@
-namespace ChatClient.UI.Screens.Common;
+﻿namespace ChatClient.UI.Screens.Common;
 
 /// <summary>
 /// Provides validation logic for user input

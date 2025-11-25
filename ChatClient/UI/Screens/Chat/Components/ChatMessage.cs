@@ -57,14 +57,6 @@ public class ChatMessage
         Width = maxLineWidth + (Padding * 2);
         Height = WrappedLines.Count * LineSpacing + (Padding * 2);
 
-        // --- Notification sound ---
-        /*
-        if (playNotificationSound && !isOwnMessage)
-        {
-            Raylib.PlaySound(ResourceLoader.NotificationSound);
-        }
-        */
-
     }
 
     private List<string> WrapText(string text, Font font)

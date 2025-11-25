@@ -98,9 +98,7 @@ public static class ChatScreenLayout
             LogoY = logoY,
             LogoWidth = scaledLogoWidth,
             LogoHeight = scaledLogoHeight,
-            // --- Options ---
             OptionsRect = optionsRect
-            // --- ---
         };
     }
 }
