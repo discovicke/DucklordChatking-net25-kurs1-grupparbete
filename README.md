@@ -1,8 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/TyBvFPPq)
-
-# .net25-oop-group
-
-Grupparbete för första kursen
+#### Grupparbete för första kursen *Objektorienterad Programmering med C# & .NET* på programmet *Systemutveckling med AI-kompetens* på *Edugrade*, 2025. 
 
 #
 ```
@@ -61,7 +57,10 @@ If the server is deployed, you can also visit:
 `https://ducklord-server.onrender.com/scalar`
 
 ### Created by
-Viktor, Christian, Marcus, André
+Viktor Johansson 
+Christian Gennari 
+Marcus Löf
+André Pontén
 ```
 >(.)__ <(.)__ =(.)__ >(.)__ 
  (___/  (___/  (___/  (___/
